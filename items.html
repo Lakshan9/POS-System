@@ -1,0 +1,555 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
+    <title>Menu Management</title>
+    <link rel="stylesheet" href="style-items.css" />
+</head>
+<body>
+
+<!-- ===== HEADER ===== -->
+<div class="main-header">
+    <div class="header-left">
+        <h1>📋 MENU MANAGEMENT</h1>
+        <span class="datetime" id="datetime">--</span>
+    </div>
+    <div class="header-right">
+        <button onclick="window.location.href='index.html'" class="back-btn">🏠 Back to POS</button>
+    </div>
+</div>
+
+<!-- ===== ACTIONS BAR ===== -->
+<div class="actions-bar">
+    <button class="active" id="showCategoriesBtn">📂 Categories</button>
+    <button id="showAllItemsBtn">📦 All Items</button>
+    <button id="refreshBtn">⟳ Refresh</button>
+</div>
+
+<!-- ===== MAIN CONTENT ===== -->
+<div class="main-content" id="mainContent">
+    <!-- Rendered by JS -->
+</div>
+
+<!-- ===== ADD CATEGORY MODAL ===== -->
+<div class="modal-overlay" id="addCategoryModal">
+    <div class="modal modal-small">
+        <div class="modal-header">
+            <h2>📁 Add New Category</h2>
+            <button class="close-btn" id="closeCategoryModalBtn">✕</button>
+        </div>
+        <label>Category Name</label>
+        <input type="text" id="newCategoryName" placeholder="e.g. Seafood" />
+        <div class="modal-actions">
+            <button class="save-btn" id="saveCategoryBtn">💾 Save</button>
+            <button class="cancel-btn" id="cancelCategoryBtn">✕ Cancel</button>
+        </div>
+    </div>
+</div>
+
+<!-- ===== ADD ITEM MODAL ===== -->
+<div class="modal-overlay" id="addItemModal">
+    <div class="modal modal-small">
+        <div class="modal-header">
+            <h2 id="itemModalTitle">➕ Add New Item</h2>
+            <button class="close-btn" id="closeItemModalBtn">✕</button>
+        </div>
+        <label>Item Name</label>
+        <input type="text" id="newItemName" placeholder="e.g. Grilled Fish" />
+        <label>Price ($)</label>
+        <input type="number" id="newItemPrice" placeholder="0.00" step="0.01" min="0" />
+        <label>Category</label>
+        <select id="newItemCategory">
+            <!-- Rendered by JS -->
+        </select>
+        <input type="hidden" id="editItemId" value="" />
+        <div class="modal-actions">
+            <button class="save-btn" id="saveItemBtn">💾 Save</button>
+            <button class="delete-btn" id="deleteItemBtn" style="display:none;">🗑 Delete</button>
+            <button class="cancel-btn" id="cancelItemBtn">✕ Cancel</button>
+        </div>
+    </div>
+</div>
+
+<script>
+// ============================================================
+//  DATA
+// ============================================================
+const STORAGE_KEY = 'hotel_items';
+const CATEGORY_KEY = 'hotel_categories';
+
+let items = [];
+let categories = [];
+let currentView = 'categories';
+let editingCategory = null;
+
+// ============================================================
+//  LOAD / SAVE
+// ============================================================
+function loadData() {
+    try {
+        const storedCategories = localStorage.getItem(CATEGORY_KEY);
+        categories = storedCategories ? JSON.parse(storedCategories) : ['main', 'drinks', 'desserts'];
+        
+        const storedItems = localStorage.getItem(STORAGE_KEY);
+        if (storedItems) {
+            items = JSON.parse(storedItems);
+        } else {
+            items = [
+                { id: 1, name: '🍔 Burger', price: 8.99, category: 'main' },
+                { id: 2, name: '🍕 Pizza', price: 10.99, category: 'main' },
+                { id: 3, name: '🍝 Pasta', price: 9.99, category: 'main' },
+                { id: 4, name: '🥗 Salad', price: 6.99, category: 'main' },
+                { id: 5, name: '🍜 Noodles', price: 7.99, category: 'main' },
+                { id: 6, name: '🍗 Chicken', price: 11.99, category: 'main' },
+                { id: 7, name: '🥩 Steak', price: 15.99, category: 'main' },
+                { id: 8, name: '🍣 Sushi', price: 12.99, category: 'main' },
+                { id: 9, name: '🥤 Soda', price: 2.99, category: 'drinks' },
+                { id: 10, name: '🧃 Juice', price: 3.49, category: 'drinks' },
+                { id: 11, name: '☕ Coffee', price: 2.99, category: 'drinks' },
+                { id: 12, name: '🍰 Cake', price: 4.99, category: 'desserts' },
+                { id: 13, name: '🍦 Ice Cream', price: 3.99, category: 'desserts' },
+                { id: 14, name: '🍪 Cookies', price: 2.49, category: 'desserts' },
+            ];
+            saveItems();
+        }
+        
+        // Ensure all categories exist in items
+        items.forEach(item => {
+            if (!categories.includes(item.category)) {
+                categories.push(item.category);
+                saveCategories();
+            }
+        });
+        
+    } catch (e) {
+        console.error('Load error:', e);
+        items = [];
+        categories = ['main', 'drinks', 'desserts'];
+    }
+}
+
+function saveItems() { localStorage.setItem(STORAGE_KEY, JSON.stringify(items)); }
+function saveCategories() { localStorage.setItem(CATEGORY_KEY, JSON.stringify(categories)); }
+
+// ============================================================
+//  DOM REFS
+// ============================================================
+const mainContent = document.getElementById('mainContent');
+const datetimeEl = document.getElementById('datetime');
+const addCategoryModal = document.getElementById('addCategoryModal');
+const addItemModal = document.getElementById('addItemModal');
+const newCategoryName = document.getElementById('newCategoryName');
+const newItemName = document.getElementById('newItemName');
+const newItemPrice = document.getElementById('newItemPrice');
+const newItemCategory = document.getElementById('newItemCategory');
+const editItemId = document.getElementById('editItemId');
+const itemModalTitle = document.getElementById('itemModalTitle');
+const deleteItemBtn = document.getElementById('deleteItemBtn');
+
+// ============================================================
+//  CLOCK
+// ============================================================
+function updateClock() {
+    const now = new Date();
+    const d = now.toLocaleDateString('en-US', { month: '2-digit', day: '2-digit', year: 'numeric' });
+    const t = now.toLocaleTimeString('en-US', { hour12: true, hour: '2-digit', minute: '2-digit', second: '2-digit' });
+    datetimeEl.textContent = `${d} ${t}`;
+}
+updateClock();
+setInterval(updateClock, 1000);
+
+// ============================================================
+//  RENDER CATEGORIES
+// ============================================================
+function renderCategories() {
+    currentView = 'categories';
+    document.getElementById('showCategoriesBtn').classList.add('active');
+    document.getElementById('showAllItemsBtn').classList.remove('active');
+    
+    let html = `
+        <div class="view-header">
+            <h2>📂 Categories</h2>
+            <button class="add-btn" id="addCategoryBtn">➕ Add Category</button>
+        </div>
+        <div class="category-grid">
+    `;
+    
+    categories.forEach(cat => {
+        const count = items.filter(i => i.category === cat).length;
+        const icon = getCategoryIcon(cat);
+        const displayName = getCategoryDisplayName(cat);
+        
+        html += `
+            <div class="category-card" onclick="showCategoryItems('${cat}')">
+                <div class="cat-icon">${icon}</div>
+                <div class="cat-info">
+                    <div class="cat-name">${displayName}</div>
+                    <div class="cat-count">${count} items</div>
+                </div>
+                <div class="cat-actions">
+                    <button class="cat-edit" onclick="event.stopPropagation();editCategory('${cat}')">✎</button>
+                    <button class="cat-delete" onclick="event.stopPropagation();deleteCategory('${cat}')">✕</button>
+                </div>
+            </div>
+        `;
+    });
+    
+    html += '</div>';
+    mainContent.innerHTML = html;
+    
+    document.getElementById('addCategoryBtn').addEventListener('click', openAddCategoryModal);
+}
+
+// ============================================================
+//  SHOW CATEGORY ITEMS
+// ============================================================
+function showCategoryItems(category) {
+    currentView = 'category-items';
+    const catItems = items.filter(i => i.category === category);
+    const displayName = getCategoryDisplayName(category);
+    const icon = getCategoryIcon(category);
+    
+    let html = `
+        <div class="view-header">
+            <button class="back-btn-small" onclick="renderCategories()">⬅ Back</button>
+            <h2>${icon} ${displayName}</h2>
+            <button class="add-btn" onclick="openAddItemModal('${category}')">➕ Add Item</button>
+        </div>
+        <div class="item-grid">
+    `;
+    
+    if (catItems.length === 0) {
+        html += `<div class="empty-state">No items in this category</div>`;
+    } else {
+        catItems.forEach(item => {
+            html += `
+                <div class="item-card">
+                    <span class="item-name">${item.name}</span>
+                    <span class="item-price">$${item.price.toFixed(2)}</span>
+                    <div class="item-actions">
+                        <button class="item-edit" onclick="editItem(${item.id})">✎</button>
+                        <button class="item-delete" onclick="deleteItem(${item.id})">✕</button>
+                    </div>
+                </div>
+            `;
+        });
+    }
+    
+    html += '</div>';
+    mainContent.innerHTML = html;
+}
+
+// ============================================================
+//  RENDER ALL ITEMS
+// ============================================================
+function renderAllItems() {
+    currentView = 'all-items';
+    document.getElementById('showAllItemsBtn').classList.add('active');
+    document.getElementById('showCategoriesBtn').classList.remove('active');
+    
+    const sortedItems = [...items].sort((a, b) => a.category.localeCompare(b.category));
+    
+    let html = `
+        <div class="view-header">
+            <h2>📦 All Items (${items.length})</h2>
+            <button class="add-btn" onclick="openAddItemModal()">➕ Add Item</button>
+        </div>
+        <div class="item-grid all-items">
+    `;
+    
+    if (items.length === 0) {
+        html += `<div class="empty-state">No items found</div>`;
+    } else {
+        sortedItems.forEach(item => {
+            html += `
+                <div class="item-card">
+                    <span class="item-category">${getCategoryDisplayName(item.category)}</span>
+                    <span class="item-name">${item.name}</span>
+                    <span class="item-price">$${item.price.toFixed(2)}</span>
+                    <div class="item-actions">
+                        <button class="item-edit" onclick="editItem(${item.id})">✎</button>
+                        <button class="item-delete" onclick="deleteItem(${item.id})">✕</button>
+                    </div>
+                </div>
+            `;
+        });
+    }
+    
+    html += '</div>';
+    mainContent.innerHTML = html;
+}
+
+// ============================================================
+//  CATEGORY MANAGEMENT
+// ============================================================
+function openAddCategoryModal() {
+    newCategoryName.value = '';
+    addCategoryModal.classList.add('open');
+}
+
+function editCategory(category) {
+    editingCategory = category;
+    newCategoryName.value = category;
+    addCategoryModal.classList.add('open');
+}
+
+document.getElementById('saveCategoryBtn').addEventListener('click', function() {
+    const name = newCategoryName.value.trim();
+    if (!name) {
+        alert('Please enter a category name!');
+        return;
+    }
+    
+    if (editingCategory) {
+        // Edit existing category
+        const oldName = editingCategory;
+        const index = categories.indexOf(oldName);
+        if (index !== -1) {
+            categories[index] = name;
+            // Update items with old category name
+            items.forEach(item => {
+                if (item.category === oldName) {
+                    item.category = name;
+                }
+            });
+            saveCategories();
+            saveItems();
+        }
+        editingCategory = null;
+        alert(`✅ Category updated!`);
+    } else {
+        // Add new category
+        if (categories.includes(name)) {
+            alert('Category already exists!');
+            return;
+        }
+        categories.push(name);
+        saveCategories();
+        alert(`✅ Category "${name}" added!`);
+    }
+    
+    addCategoryModal.classList.remove('open');
+    renderCategories();
+});
+
+document.getElementById('cancelCategoryBtn').addEventListener('click', function() {
+    addCategoryModal.classList.remove('open');
+    editingCategory = null;
+});
+
+document.getElementById('closeCategoryModalBtn').addEventListener('click', function() {
+    addCategoryModal.classList.remove('open');
+    editingCategory = null;
+});
+
+function deleteCategory(category) {
+    if (!confirm(`Delete category "${getCategoryDisplayName(category)}" and all its items?`)) return;
+    
+    items = items.filter(i => i.category !== category);
+    categories = categories.filter(c => c !== category);
+    saveItems();
+    saveCategories();
+    renderCategories();
+    alert(`✅ Category deleted!`);
+}
+
+// ============================================================
+//  ITEM MANAGEMENT
+// ============================================================
+function openAddItemModal(category = null) {
+    itemModalTitle.textContent = '➕ Add New Item';
+    newItemName.value = '';
+    newItemPrice.value = '';
+    editItemId.value = '';
+    deleteItemBtn.style.display = 'none';
+    
+    // Populate category dropdown
+    newItemCategory.innerHTML = categories.map(cat => 
+        `<option value="${cat}" ${cat === category ? 'selected' : ''}>${getCategoryDisplayName(cat)}</option>`
+    ).join('');
+    
+    addItemModal.classList.add('open');
+}
+
+function editItem(id) {
+    const item = items.find(i => i.id === id);
+    if (!item) return;
+    
+    itemModalTitle.textContent = '✎ Edit Item';
+    newItemName.value = item.name;
+    newItemPrice.value = item.price;
+    editItemId.value = id;
+    deleteItemBtn.style.display = 'block';
+    
+    newItemCategory.innerHTML = categories.map(cat => 
+        `<option value="${cat}" ${cat === item.category ? 'selected' : ''}>${getCategoryDisplayName(cat)}</option>`
+    ).join('');
+    
+    addItemModal.classList.add('open');
+}
+
+document.getElementById('saveItemBtn').addEventListener('click', function() {
+    const name = newItemName.value.trim();
+    const price = parseFloat(newItemPrice.value);
+    const category = newItemCategory.value;
+    const editId = editItemId.value;
+    
+    if (!name) {
+        alert('Please enter an item name!');
+        return;
+    }
+    if (isNaN(price) || price < 0) {
+        alert('Please enter a valid price!');
+        return;
+    }
+    
+    if (editId) {
+        // Edit existing item
+        const idx = items.findIndex(i => i.id === parseInt(editId));
+        if (idx !== -1) {
+            // Check duplicate name in same category
+            const duplicate = items.find(i => i.name === name && i.category === category && i.id !== parseInt(editId));
+            if (duplicate) {
+                alert('Item with this name already exists in this category!');
+                return;
+            }
+            items[idx].name = name;
+            items[idx].price = price;
+            items[idx].category = category;
+            saveItems();
+            alert(`✅ Item updated!`);
+        }
+    } else {
+        // Add new item
+        const duplicate = items.find(i => i.name === name && i.category === category);
+        if (duplicate) {
+            alert('Item already exists in this category!');
+            return;
+        }
+        const maxId = items.reduce((max, i) => Math.max(max, i.id), 0);
+        items.push({ id: maxId + 1, name, price, category });
+        saveItems();
+        alert(`✅ Item "${name}" added!`);
+    }
+    
+    addItemModal.classList.remove('open');
+    
+    if (currentView === 'all-items') {
+        renderAllItems();
+    } else {
+        renderCategories();
+    }
+});
+
+document.getElementById('deleteItemBtn').addEventListener('click', function() {
+    const id = parseInt(editItemId.value);
+    if (!id) return;
+    if (!confirm('Delete this item permanently?')) return;
+    
+    items = items.filter(i => i.id !== id);
+    saveItems();
+    addItemModal.classList.remove('open');
+    
+    if (currentView === 'all-items') {
+        renderAllItems();
+    } else {
+        renderCategories();
+    }
+    alert(`✅ Item deleted!`);
+});
+
+document.getElementById('cancelItemBtn').addEventListener('click', function() {
+    addItemModal.classList.remove('open');
+});
+
+document.getElementById('closeItemModalBtn').addEventListener('click', function() {
+    addItemModal.classList.remove('open');
+});
+
+function deleteItem(id) {
+    if (!confirm('Delete this item permanently?')) return;
+    items = items.filter(i => i.id !== id);
+    saveItems();
+    
+    if (currentView === 'all-items') {
+        renderAllItems();
+    } else {
+        renderCategories();
+    }
+    alert(`✅ Item deleted!`);
+}
+
+// ============================================================
+//  CATEGORY HELPERS
+// ============================================================
+function getCategoryIcon(category) {
+    const icons = {
+        'main': '🍽️',
+        'drinks': '🥤',
+        'desserts': '🍰'
+    };
+    return icons[category] || '📁';
+}
+
+function getCategoryDisplayName(category) {
+    const names = {
+        'main': 'Main Dishes',
+        'drinks': 'Beverages',
+        'desserts': 'Desserts'
+    };
+    return names[category] || category.charAt(0).toUpperCase() + category.slice(1);
+}
+
+// ============================================================
+//  FILTER BUTTONS
+// ============================================================
+document.getElementById('showCategoriesBtn').addEventListener('click', renderCategories);
+document.getElementById('showAllItemsBtn').addEventListener('click', renderAllItems);
+document.getElementById('refreshBtn').addEventListener('click', function() {
+    loadData();
+    if (currentView === 'all-items') {
+        renderAllItems();
+    } else {
+        renderCategories();
+    }
+});
+
+// ============================================================
+//  MODAL CLOSE (click outside)
+// ============================================================
+addCategoryModal.addEventListener('click', (e) => {
+    if (e.target === addCategoryModal) {
+        addCategoryModal.classList.remove('open');
+        editingCategory = null;
+    }
+});
+
+addItemModal.addEventListener('click', (e) => {
+    if (e.target === addItemModal) {
+        addItemModal.classList.remove('open');
+    }
+});
+
+// ============================================================
+//  EXPORT FUNCTIONS
+// ============================================================
+window.renderCategories = renderCategories;
+window.renderAllItems = renderAllItems;
+window.showCategoryItems = showCategoryItems;
+window.openAddItemModal = openAddItemModal;
+window.editItem = editItem;
+window.deleteItem = deleteItem;
+window.deleteCategory = deleteCategory;
+window.editCategory = editCategory;
+window.openAddCategoryModal = openAddCategoryModal;
+
+// ============================================================
+//  INIT
+// ============================================================
+loadData();
+renderCategories();
+</script>
+
+</body>
+</html>

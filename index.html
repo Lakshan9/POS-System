@@ -1,0 +1,1052 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
+    <title>Hotel POS</title>
+    <link rel="stylesheet" href="style.css" />
+</head>
+<body>
+
+<!-- ===== HEADER ===== -->
+<div class="main-header">
+    <div class="header-left">
+        <button class="hamburger-btn" id="hamburgerBtn">
+            <span></span>
+            <span></span>
+            <span></span>
+        </button>
+        <h1>🍽️ HOTEL POS</h1>
+        <span class="datetime" id="datetime">--</span>
+    </div>
+    <div class="header-right">
+        <button class="tab-btn fullscreen-btn" onclick="toggleFullScreen()" id="fullscreenBtn">⛶ Full</button>
+    </div>
+</div>
+
+<!-- ===== DROPDOWN MENU ===== -->
+<div class="dropdown-menu" id="dropdownMenu">
+    <div class="dropdown-content">
+        <a href="#" class="dropdown-item" onclick="switchTab('pos');closeDropdown();">
+            <span class="drop-icon">🧾</span>
+            <span class="drop-text">POS</span>
+        </a>
+        <a href="#" class="dropdown-item" onclick="switchTab('history');closeDropdown();">
+            <span class="drop-icon">📜</span>
+            <span class="drop-text">History</span>
+        </a>
+        <a href="#" class="dropdown-item" onclick="switchTab('report');closeDropdown();">
+            <span class="drop-icon">📊</span>
+            <span class="drop-text">Report</span>
+        </a>
+        <a href="items.html" class="dropdown-item" onclick="closeDropdown();">
+            <span class="drop-icon">📋</span>
+            <span class="drop-text">Menu</span>
+        </a>
+        <a href="tables.html" class="dropdown-item" onclick="closeDropdown();">
+            <span class="drop-icon">🪑</span>
+            <span class="drop-text">Tables</span>
+        </a>
+        <div class="dropdown-divider"></div>
+        <a href="#" class="dropdown-item" onclick="toggleFullScreen();closeDropdown();">
+            <span class="drop-icon">⛶</span>
+            <span class="drop-text">Full Screen</span>
+        </a>
+    </div>
+</div>
+
+<!-- ===== POS VIEW ===== -->
+<div id="view-pos" class="pos-container active">
+
+    <!-- ===== LEFT: CART / BILLING ===== -->
+    <div class="left-billing">
+        <div class="billing-header">
+            <span>🧾 Current Order</span>
+            <div class="billing-actions">
+                <button class="hold-btn" id="holdBtn">⏸ Hold</button>
+                <button class="tables-btn" onclick="window.location.href='tables.html'">🪑 Tables</button>
+                <button class="clear-btn" id="clearCartBtn">🗑 Clear</button>
+            </div>
+        </div>
+
+        <div class="billing-table">
+            <div class="table-header">
+                <span>Item</span>
+                <span>Qty</span>
+                <span>Price</span>
+                <span>Dis%</span>
+                <span>Total</span>
+                <span></span>
+            </div>
+            <div id="billingList">
+                <div class="empty-cart">🛒 No items in cart</div>
+            </div>
+        </div>
+
+        <div class="billing-summary">
+            <div class="line"><span>Subtotal</span><span id="subtotal">$0.00</span></div>
+            <div class="line discount"><span>Discount</span><span id="discountAmount">-$0.00</span></div>
+            <div class="line"><span>Tax (5%)</span><span id="tax">$0.00</span></div>
+            <div class="line total"><span>TOTAL</span><span id="total">$0.00</span></div>
+
+            <div class="discount-row">
+                <label>Discount %</label>
+                <input type="number" id="discountInput" value="0" min="0" max="100" step="1" />
+            </div>
+
+            <button class="pay-btn" id="payBtn" disabled>💳 Pay Now</button>
+        </div>
+    </div>
+
+    <!-- ===== RIGHT: CATEGORIES ===== -->
+    <div class="right-items">
+        <div class="items-header">
+            <span>📂 Categories</span>
+            <div>
+                <button id="backToCategoriesBtn" style="display:none;">⬅ Back</button>
+                <button id="refreshItemsBtn">⟳</button>
+            </div>
+        </div>
+        <div class="items-grid" id="itemsGrid">
+            <!-- Rendered by JS -->
+        </div>
+    </div>
+</div>
+
+<!-- ===== HISTORY VIEW ===== -->
+<div id="view-history" class="view-container">
+    <h2>📜 Bill History <button id="clearHistoryBtn">Clear All</button></h2>
+    <div class="history-list" id="historyList">
+        <div class="empty-state">No bills yet</div>
+    </div>
+</div>
+
+<!-- ===== REPORT VIEW ===== -->
+<div id="view-report" class="view-container">
+    <h2>📊 Daily Report <button id="exportReportBtn">⬇ Export CSV</button></h2>
+    <div class="report-summary" id="reportSummary">
+        <div class="report-card"><div class="num" id="reportOrders">0</div><div class="label">Orders</div></div>
+        <div class="report-card"><div class="num" id="reportItems">0</div><div class="label">Items Sold</div></div>
+        <div class="report-card"><div class="num" id="reportRevenue">$0.00</div><div class="label">Revenue</div></div>
+        <div class="report-card"><div class="num" id="reportTax">$0.00</div><div class="label">Tax</div></div>
+    </div>
+    <div id="reportDetail"></div>
+</div>
+
+<!-- ===== HOLD MODAL ===== -->
+<div class="modal-overlay" id="holdModal">
+    <div class="modal modal-small">
+        <div class="modal-header">
+            <h2>⏸ Hold Order</h2>
+            <button class="close-btn" id="closeHoldModalBtn">✕</button>
+        </div>
+        <p style="color:#475569;margin-bottom:16px;">Where do you want to hold this order?</p>
+        <div class="hold-options">
+            <button class="hold-option" id="holdToTableBtn">
+                <span style="font-size:2rem;">🪑</span>
+                <span>Table</span>
+            </button>
+            <button class="hold-option" id="holdToCustomerBtn">
+                <span style="font-size:2rem;">👤</span>
+                <span>Customer</span>
+            </button>
+        </div>
+        <button class="cancel-btn" id="cancelHoldBtn" style="margin-top:12px;width:100%;">Cancel</button>
+    </div>
+</div>
+
+<!-- ===== PAYMENT MODAL ===== -->
+<div class="modal-overlay" id="paymentModal">
+    <div class="modal modal-small">
+        <div class="modal-header">
+            <h2>💳 Payment</h2>
+            <button class="close-btn" id="closePaymentModalBtn">✕</button>
+        </div>
+        <div class="payment-body">
+            <div class="payment-details" id="paymentDetails">
+                <!-- Rendered by JS -->
+            </div>
+            <div class="payment-input">
+                <label>Amount Received ($)</label>
+                <input type="number" id="amountReceived" placeholder="0.00" step="0.01" min="0" />
+            </div>
+            <div class="payment-change" id="paymentChange">
+                <span>Change Due:</span>
+                <span id="changeAmount">$0.00</span>
+            </div>
+            <!-- Print Option -->
+            <div class="print-option">
+                <label>
+                    <input type="checkbox" id="printBillCheckbox" checked />
+                    🖨️ Print Bill
+                </label>
+            </div>
+            <div class="payment-actions">
+                <button class="confirm-btn" id="confirmPaymentBtn" disabled>✅ Confirm Payment</button>
+                <button class="cancel-btn" id="cancelPaymentBtn">✕ Cancel</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+
+<script>
+// ============================================================
+//  DATA
+// ============================================================
+const STORAGE_KEY = 'hotel_items';
+const CART_KEY = 'hotel_cart';
+const HISTORY_KEY = 'hotel_history';
+const TABLE_ORDERS_KEY = 'hotel_table_orders';
+const CUSTOMER_ORDERS_KEY = 'hotel_customer_orders';
+
+let items = [];
+let cart = [];
+let history = [];
+let discountPercent = 0;
+let tableOrders = {};
+let customerOrders = {};
+let selectedCategory = null;
+let currentBill = null;
+
+// ============================================================
+//  LOAD / SAVE
+// ============================================================
+function loadData() {
+    try {
+        const storedItems = localStorage.getItem(STORAGE_KEY);
+        if (storedItems) {
+            items = JSON.parse(storedItems);
+        } else {
+            items = [
+                { id: 1, name: '🍔 Burger', price: 8.99, category: 'main' },
+                { id: 2, name: '🍕 Pizza', price: 10.99, category: 'main' },
+                { id: 3, name: '🍝 Pasta', price: 9.99, category: 'main' },
+                { id: 4, name: '🥗 Salad', price: 6.99, category: 'main' },
+                { id: 5, name: '🍜 Noodles', price: 7.99, category: 'main' },
+                { id: 6, name: '🍗 Chicken', price: 11.99, category: 'main' },
+                { id: 7, name: '🥩 Steak', price: 15.99, category: 'main' },
+                { id: 8, name: '🍣 Sushi', price: 12.99, category: 'main' },
+                { id: 9, name: '🥤 Soda', price: 2.99, category: 'drinks' },
+                { id: 10, name: '🧃 Juice', price: 3.49, category: 'drinks' },
+                { id: 11, name: '☕ Coffee', price: 2.99, category: 'drinks' },
+                { id: 12, name: '🍰 Cake', price: 4.99, category: 'desserts' },
+                { id: 13, name: '🍦 Ice Cream', price: 3.99, category: 'desserts' },
+                { id: 14, name: '🍪 Cookies', price: 2.49, category: 'desserts' },
+            ];
+            saveItems();
+        }
+
+        const storedCart = localStorage.getItem(CART_KEY);
+        cart = storedCart ? JSON.parse(storedCart) : [];
+
+        const storedHistory = localStorage.getItem(HISTORY_KEY);
+        history = storedHistory ? JSON.parse(storedHistory) : [];
+        
+        const storedTables = localStorage.getItem(TABLE_ORDERS_KEY);
+        tableOrders = storedTables ? JSON.parse(storedTables) : {};
+        for (let i = 1; i <= 12; i++) {
+            if (!tableOrders[i]) tableOrders[i] = [];
+        }
+        
+        const storedCustomers = localStorage.getItem(CUSTOMER_ORDERS_KEY);
+        customerOrders = storedCustomers ? JSON.parse(storedCustomers) : {};
+        
+    } catch (e) {
+        console.error('Load error:', e);
+        items = [];
+        cart = [];
+        history = [];
+        tableOrders = {};
+        customerOrders = {};
+        for (let i = 1; i <= 12; i++) {
+            tableOrders[i] = [];
+        }
+    }
+}
+
+function saveItems() { localStorage.setItem(STORAGE_KEY, JSON.stringify(items)); }
+function saveCart() { localStorage.setItem(CART_KEY, JSON.stringify(cart)); }
+function saveHistory() { localStorage.setItem(HISTORY_KEY, JSON.stringify(history)); }
+function saveTables() { localStorage.setItem(TABLE_ORDERS_KEY, JSON.stringify(tableOrders)); }
+function saveCustomers() { localStorage.setItem(CUSTOMER_ORDERS_KEY, JSON.stringify(customerOrders)); }
+
+// ============================================================
+//  DOM REFS
+// ============================================================
+const billingList = document.getElementById('billingList');
+const itemsGrid = document.getElementById('itemsGrid');
+const subtotalEl = document.getElementById('subtotal');
+const discountAmountEl = document.getElementById('discountAmount');
+const taxEl = document.getElementById('tax');
+const totalEl = document.getElementById('total');
+const payBtn = document.getElementById('payBtn');
+const clearCartBtn = document.getElementById('clearCartBtn');
+const holdBtn = document.getElementById('holdBtn');
+const discountInput = document.getElementById('discountInput');
+const datetimeEl = document.getElementById('datetime');
+const holdModal = document.getElementById('holdModal');
+const holdToTableBtn = document.getElementById('holdToTableBtn');
+const holdToCustomerBtn = document.getElementById('holdToCustomerBtn');
+const cancelHoldBtn = document.getElementById('cancelHoldBtn');
+const closeHoldModalBtn = document.getElementById('closeHoldModalBtn');
+const refreshItemsBtn = document.getElementById('refreshItemsBtn');
+const backToCategoriesBtn = document.getElementById('backToCategoriesBtn');
+const historyList = document.getElementById('historyList');
+const clearHistoryBtn = document.getElementById('clearHistoryBtn');
+const reportOrders = document.getElementById('reportOrders');
+const reportItems = document.getElementById('reportItems');
+const reportRevenue = document.getElementById('reportRevenue');
+const reportTax = document.getElementById('reportTax');
+const reportDetail = document.getElementById('reportDetail');
+const exportReportBtn = document.getElementById('exportReportBtn');
+const paymentModal = document.getElementById('paymentModal');
+const paymentDetails = document.getElementById('paymentDetails');
+const amountReceived = document.getElementById('amountReceived');
+const changeAmount = document.getElementById('changeAmount');
+const confirmPaymentBtn = document.getElementById('confirmPaymentBtn');
+const cancelPaymentBtn = document.getElementById('cancelPaymentBtn');
+const closePaymentModalBtn = document.getElementById('closePaymentModalBtn');
+
+// ============================================================
+//  CLOCK
+// ============================================================
+function updateClock() {
+    const now = new Date();
+    const d = now.toLocaleDateString('en-US', { month: '2-digit', day: '2-digit', year: 'numeric' });
+    const t = now.toLocaleTimeString('en-US', { hour12: true, hour: '2-digit', minute: '2-digit', second: '2-digit' });
+    datetimeEl.textContent = `${d} ${t}`;
+}
+updateClock();
+setInterval(updateClock, 1000);
+
+// ============================================================
+//  RENDER CATEGORIES & ITEMS (Right Column)
+// ============================================================
+function renderItems() {
+    const categories = getCategories();
+    
+    if (!selectedCategory) {
+        renderCategories(categories);
+    } else {
+        renderCategoryItems(selectedCategory);
+    }
+}
+
+function getCategories() {
+    const cats = {};
+    items.forEach(item => {
+        if (!cats[item.category]) {
+            cats[item.category] = [];
+        }
+        cats[item.category].push(item);
+    });
+    return cats;
+}
+
+function renderCategories(categories) {
+    backToCategoriesBtn.style.display = 'none';
+    
+    const categoryNames = {
+        'main': { icon: '🍽️', name: 'Main Dishes' },
+        'drinks': { icon: '🥤', name: 'Beverages' },
+        'desserts': { icon: '🍰', name: 'Desserts' }
+    };
+    
+    const categoryKeys = Object.keys(categories);
+    
+    if (categoryKeys.length === 0) {
+        itemsGrid.innerHTML = `
+            <div class="empty-state" style="grid-column:1/-1;padding:20px;">
+                No categories found.
+                <br/><button onclick="window.location.href='items.html'" style="margin-top:8px;background:#8b5cf6;color:#fff;border:none;padding:4px 16px;border-radius:30px;cursor:pointer;">📋 Add Categories</button>
+            </div>
+        `;
+        return;
+    }
+    
+    let html = '';
+    categoryKeys.forEach(cat => {
+        const info = categoryNames[cat] || { icon: '📁', name: cat.charAt(0).toUpperCase() + cat.slice(1) };
+        const count = categories[cat].length;
+        html += `
+            <div class="category-grid-item" onclick="selectCategory('${cat}')">
+                <span class="cat-icon">${info.icon}</span>
+                ${info.name}
+                <span class="cat-count">${count} items</span>
+            </div>
+        `;
+    });
+    
+    itemsGrid.innerHTML = html;
+}
+
+function selectCategory(category) {
+    selectedCategory = category;
+    backToCategoriesBtn.style.display = 'block';
+    renderCategoryItems(category);
+}
+
+function renderCategoryItems(category) {
+    const catItems = items.filter(item => item.category === category);
+    const categoryNames = {
+        'main': 'Main Dishes',
+        'drinks': 'Beverages',
+        'desserts': 'Desserts'
+    };
+    const catName = categoryNames[category] || category.charAt(0).toUpperCase() + category.slice(1);
+    
+    if (catItems.length === 0) {
+        itemsGrid.innerHTML = `
+            <div style="grid-column:1/-1;text-align:center;padding:30px 0;color:#94a3b8;">
+                No items in ${catName}
+            </div>
+        `;
+        return;
+    }
+    
+    let html = `<div class="category-label">${catName}</div>`;
+    catItems.forEach(item => {
+        html += `
+            <button class="item-btn" onclick="addToCart('${item.name}', ${item.price})">
+                <span class="item-name">${item.name}</span>
+                <span class="item-price">$${item.price.toFixed(2)}</span>
+            </button>
+        `;
+    });
+    
+    itemsGrid.innerHTML = html;
+}
+
+backToCategoriesBtn.addEventListener('click', function() {
+    selectedCategory = null;
+    renderItems();
+});
+
+// ============================================================
+//  ADD TO CART
+// ============================================================
+function addToCart(name, price) {
+    const item = items.find(i => i.name === name);
+    if (!item) return;
+    
+    const existing = cart.find(c => c.id === item.id);
+    if (existing) {
+        existing.quantity += 1;
+    } else {
+        cart.push({ ...item, quantity: 1, discount: 0 });
+    }
+    saveCart();
+    updateBilling();
+}
+
+function updateBilling() {
+    if (cart.length === 0) {
+        billingList.innerHTML = `<div class="empty-cart">🛒 No items in cart</div>`;
+    } else {
+        billingList.innerHTML = cart.map(item => {
+            const total = item.price * item.quantity;
+            const discount = (total * (item.discount || 0)) / 100;
+            const finalTotal = total - discount;
+            return `
+                <div class="billing-row">
+                    <span class="item-name">${item.name}</span>
+                    <span class="item-qty">
+                        <button onclick="changeQty(${item.id}, -1)">−</button>
+                        <span>${item.quantity}</span>
+                        <button onclick="changeQty(${item.id}, 1)">+</button>
+                    </span>
+                    <span class="item-price">$${item.price.toFixed(2)}</span>
+                    <span class="item-discount">
+                        <input type="number" value="${item.discount || 0}" min="0" max="100" 
+                               onchange="updateDiscount(${item.id}, this.value)" />
+                    </span>
+                    <span class="item-total">$${finalTotal.toFixed(2)}</span>
+                    <button class="remove-btn" onclick="removeFromCart(${item.id})">✕</button>
+                </div>
+            `;
+        }).join('');
+    }
+    calculateTotals();
+}
+
+function changeQty(id, delta) {
+    const item = cart.find(c => c.id === id);
+    if (!item) return;
+    item.quantity += delta;
+    if (item.quantity <= 0) {
+        cart = cart.filter(c => c.id !== id);
+    }
+    saveCart();
+    updateBilling();
+}
+
+function removeFromCart(id) {
+    cart = cart.filter(c => c.id !== id);
+    saveCart();
+    updateBilling();
+}
+
+function updateDiscount(id, value) {
+    const item = cart.find(c => c.id === id);
+    if (!item) return;
+    let val = parseFloat(value) || 0;
+    if (val < 0) val = 0;
+    if (val > 100) val = 100;
+    item.discount = val;
+    saveCart();
+    updateBilling();
+}
+
+function calculateTotals() {
+    const subtotal = cart.reduce((sum, item) => sum + item.price * item.quantity, 0);
+    const itemDiscounts = cart.reduce((sum, item) => {
+        const total = item.price * item.quantity;
+        return sum + (total * (item.discount || 0)) / 100;
+    }, 0);
+    const discount = (subtotal * discountPercent) / 100 + itemDiscounts;
+    const tax = (subtotal - discount) * 0.05;
+    const total = subtotal - discount + tax;
+
+    subtotalEl.textContent = `$${subtotal.toFixed(2)}`;
+    discountAmountEl.textContent = `-$${discount.toFixed(2)}`;
+    taxEl.textContent = `$${tax.toFixed(2)}`;
+    totalEl.textContent = `$${total.toFixed(2)}`;
+    payBtn.disabled = cart.length === 0;
+}
+
+discountInput.addEventListener('input', function() {
+    let val = parseFloat(this.value) || 0;
+    if (val < 0) val = 0;
+    if (val > 100) val = 100;
+    discountPercent = val;
+    calculateTotals();
+});
+
+clearCartBtn.addEventListener('click', function() {
+    cart = [];
+    saveCart();
+    updateBilling();
+});
+
+refreshItemsBtn.addEventListener('click', function() {
+    loadData();
+    renderItems();
+});
+
+// ============================================================
+//  HOLD - Customer or Table
+// ============================================================
+holdBtn.addEventListener('click', function() {
+    if (cart.length === 0) {
+        alert('Cart is empty!');
+        return;
+    }
+    holdModal.classList.add('open');
+});
+
+closeHoldModalBtn.addEventListener('click', function() {
+    holdModal.classList.remove('open');
+});
+
+cancelHoldBtn.addEventListener('click', function() {
+    holdModal.classList.remove('open');
+});
+
+holdToTableBtn.addEventListener('click', function() {
+    holdModal.classList.remove('open');
+    const tableNum = prompt('Enter table number (1-12):', '1');
+    if (tableNum === null) return;
+    const num = parseInt(tableNum);
+    if (isNaN(num) || num < 1 || num > 12) {
+        alert('Invalid table number!');
+        return;
+    }
+    
+    cart.forEach(item => {
+        const existing = tableOrders[num].find(c => c.id === item.id);
+        if (existing) {
+            existing.quantity += item.quantity;
+        } else {
+            tableOrders[num].push({ ...item });
+        }
+    });
+    
+    cart = [];
+    saveCart();
+    saveTables();
+    updateBilling();
+    alert(`✅ Order held to Table ${num}`);
+});
+
+holdToCustomerBtn.addEventListener('click', function() {
+    holdModal.classList.remove('open');
+    const customerName = prompt('Enter customer name:', '');
+    if (!customerName || customerName.trim() === '') {
+        alert('Customer name is required!');
+        return;
+    }
+    const name = customerName.trim();
+    
+    if (!customerOrders[name]) customerOrders[name] = [];
+    
+    cart.forEach(item => {
+        const existing = customerOrders[name].find(c => c.id === item.id);
+        if (existing) {
+            existing.quantity += item.quantity;
+        } else {
+            customerOrders[name].push({ ...item });
+        }
+    });
+    
+    cart = [];
+    saveCart();
+    saveCustomers();
+    updateBilling();
+    alert(`✅ Order held to Customer "${name}"`);
+});
+
+// ============================================================
+//  PAYMENT
+// ============================================================
+payBtn.addEventListener('click', function() {
+    if (cart.length === 0) return;
+    
+    const subtotal = cart.reduce((sum, item) => sum + item.price * item.quantity, 0);
+    const itemDiscounts = cart.reduce((sum, item) => {
+        const total = item.price * item.quantity;
+        return sum + (total * (item.discount || 0)) / 100;
+    }, 0);
+    const discount = (subtotal * discountPercent) / 100 + itemDiscounts;
+    const tax = (subtotal - discount) * 0.05;
+    const total = subtotal - discount + tax;
+    
+    currentBill = {
+        items: cart.map(c => ({ name: c.name, qty: c.quantity, price: c.price, discount: c.discount || 0 })),
+        subtotal: subtotal,
+        discount: discount,
+        tax: tax,
+        total: total
+    };
+    
+    // Show payment modal
+    paymentDetails.innerHTML = `
+        ${currentBill.items.map(item => `
+            <div class="pay-line">
+                <span>${item.name} x${item.qty}</span>
+                <span>$${(item.price * item.qty).toFixed(2)}</span>
+            </div>
+        `).join('')}
+        <div class="pay-line"><span>Subtotal</span><span>$${currentBill.subtotal.toFixed(2)}</span></div>
+        <div class="pay-line" style="color:#ef4444;"><span>Discount</span><span>$${currentBill.discount.toFixed(2)}</span></div>
+        <div class="pay-line"><span>Tax (5%)</span><span>$${currentBill.tax.toFixed(2)}</span></div>
+        <div class="pay-line total"><span>TOTAL</span><span>$${currentBill.total.toFixed(2)}</span></div>
+    `;
+    
+    amountReceived.value = '';
+    changeAmount.textContent = '$0.00';
+    const changeEl = document.getElementById('paymentChange');
+    changeEl.style.borderColor = '#86efac';
+    changeEl.style.background = '#f0fdf4';
+    changeEl.querySelector('span:first-child').textContent = 'Change Due:';
+    confirmPaymentBtn.disabled = true;
+    
+    paymentModal.classList.add('open');
+});
+
+// Calculate change on input
+amountReceived.addEventListener('input', function() {
+    const received = parseFloat(this.value) || 0;
+    const total = currentBill ? currentBill.total : 0;
+    const change = received - total;
+    
+    const changeEl = document.getElementById('paymentChange');
+    const changeSpan = document.getElementById('changeAmount');
+    
+    if (received > 0 && received < total) {
+        changeSpan.textContent = `-$${(total - received).toFixed(2)}`;
+        changeSpan.style.color = '#ef4444';
+        changeEl.style.borderColor = '#fca5a5';
+        changeEl.style.background = '#fef2f2';
+        changeEl.querySelector('span:first-child').textContent = 'Remaining:';
+        confirmPaymentBtn.disabled = true;
+    } else if (received >= total) {
+        changeSpan.textContent = `$${change.toFixed(2)}`;
+        changeSpan.style.color = '#16a34a';
+        changeEl.style.borderColor = '#86efac';
+        changeEl.style.background = '#f0fdf4';
+        changeEl.querySelector('span:first-child').textContent = 'Change Due:';
+        confirmPaymentBtn.disabled = false;
+    } else {
+        changeSpan.textContent = '$0.00';
+        changeSpan.style.color = '#16a34a';
+        changeEl.style.borderColor = '#86efac';
+        changeEl.style.background = '#f0fdf4';
+        changeEl.querySelector('span:first-child').textContent = 'Change Due:';
+        confirmPaymentBtn.disabled = true;
+    }
+});
+
+// Confirm Payment
+confirmPaymentBtn.addEventListener('click', function() {
+    if (!currentBill) return;
+    
+    const received = parseFloat(amountReceived.value) || 0;
+    if (received < currentBill.total) {
+        alert(`❌ Insufficient amount!\nTotal: $${currentBill.total.toFixed(2)}\nReceived: $${received.toFixed(2)}\nRemaining: $${(currentBill.total - received).toFixed(2)}`);
+        return;
+    }
+    
+    const bill = {
+        id: Date.now(),
+        date: new Date().toLocaleString('en-US', { month: '2-digit', day: '2-digit', year: 'numeric', hour: '2-digit', minute: '2-digit', second: '2-digit' }),
+        items: currentBill.items,
+        subtotal: currentBill.subtotal,
+        discount: currentBill.discount,
+        tax: currentBill.tax,
+        total: currentBill.total,
+        received: received,
+        change: received - currentBill.total
+    };
+    history.push(bill);
+    saveHistory();
+    
+    // Ask for print
+    const printOption = document.getElementById('printBillCheckbox');
+    const shouldPrint = printOption.checked;
+    
+    paymentModal.classList.remove('open');
+    
+    if (shouldPrint) {
+        printBill(bill);
+    }
+    
+    alert(`✅ Payment Successful!\nTotal: $${bill.total.toFixed(2)}\nReceived: $${bill.received.toFixed(2)}\nChange: $${bill.change.toFixed(2)}\nThank you! 🍽️`);
+    
+    cart = [];
+    saveCart();
+    updateBilling();
+    currentBill = null;
+});
+
+
+// Cancel Payment
+cancelPaymentBtn.addEventListener('click', function() {
+    paymentModal.classList.remove('open');
+    currentBill = null;
+});
+
+closePaymentModalBtn.addEventListener('click', function() {
+    paymentModal.classList.remove('open');
+    currentBill = null;
+});
+
+paymentModal.addEventListener('click', function(e) {
+    if (e.target === paymentModal) {
+        paymentModal.classList.remove('open');
+        currentBill = null;
+    }
+});
+
+// ============================================================
+//  TABS
+// ============================================================
+function switchTab(tab) {
+    document.querySelectorAll('.pos-container, .view-container').forEach(el => el.classList.remove('active'));
+    if (tab === 'pos') {
+        document.getElementById('view-pos').classList.add('active');
+    } else if (tab === 'history') {
+        document.getElementById('view-history').classList.add('active');
+        renderHistory();
+    } else if (tab === 'report') {
+        document.getElementById('view-report').classList.add('active');
+        updateReport();
+    }
+    document.querySelectorAll('.tab-btn').forEach(btn => {
+        btn.classList.toggle('active', btn.dataset.tab === tab);
+    });
+    closeDropdown();
+}
+
+document.querySelectorAll('.tab-btn').forEach(btn => {
+    btn.addEventListener('click', () => switchTab(btn.dataset.tab));
+});
+
+// ============================================================
+//  DROPDOWN MENU
+// ============================================================
+const hamburgerBtn = document.getElementById('hamburgerBtn');
+const dropdownMenu = document.getElementById('dropdownMenu');
+
+// Create overlay
+const overlay = document.createElement('div');
+overlay.className = 'dropdown-overlay';
+overlay.id = 'dropdownOverlay';
+document.body.appendChild(overlay);
+
+function toggleDropdown() {
+    hamburgerBtn.classList.toggle('open');
+    dropdownMenu.classList.toggle('open');
+    overlay.classList.toggle('active');
+    document.body.style.overflow = dropdownMenu.classList.contains('open') ? 'hidden' : '';
+}
+
+function closeDropdown() {
+    hamburgerBtn.classList.remove('open');
+    dropdownMenu.classList.remove('open');
+    overlay.classList.remove('active');
+    document.body.style.overflow = '';
+}
+
+hamburgerBtn.addEventListener('click', toggleDropdown);
+overlay.addEventListener('click', closeDropdown);
+
+document.addEventListener('keydown', function(e) {
+    if (e.key === 'Escape') {
+        closeDropdown();
+    }
+});
+
+// ============================================================
+//  HISTORY
+// ============================================================
+function renderHistory() {
+    if (history.length === 0) {
+        historyList.innerHTML = `<div class="empty-state">No bills yet</div>`;
+        return;
+    }
+    historyList.innerHTML = history.slice().reverse().map(bill => `
+        <div class="history-item">
+            <div class="h-top">
+                <span>#${bill.id}</span>
+                <span>${bill.date}</span>
+                <span class="h-total">$${bill.total.toFixed(2)}</span>
+            </div>
+            <div class="h-items">
+                ${bill.items.map(i => `${i.name} x${i.qty}`).join(' • ')}
+                ${bill.discount > 0 ? ` • Discount: $${bill.discount.toFixed(2)}` : ''}
+                ${bill.received ? ` • Received: $${bill.received.toFixed(2)}` : ''}
+                ${bill.change ? ` • Change: $${bill.change.toFixed(2)}` : ''}
+            </div>
+        </div>
+    `).join('');
+}
+
+clearHistoryBtn.addEventListener('click', function() {
+    if (!confirm('Clear all bill history?')) return;
+    history = [];
+    saveHistory();
+    renderHistory();
+    updateReport();
+});
+
+// ============================================================
+//  REPORT
+// ============================================================
+function updateReport() {
+    const today = new Date().toDateString();
+    const todayBills = history.filter(bill => new Date(bill.date).toDateString() === today);
+    const orders = todayBills.length;
+    const totalItems = todayBills.reduce((sum, b) => sum + b.items.reduce((s, i) => s + i.qty, 0), 0);
+    const revenue = todayBills.reduce((sum, b) => sum + b.total, 0);
+    const tax = todayBills.reduce((sum, b) => sum + b.tax, 0);
+
+    reportOrders.textContent = orders;
+    reportItems.textContent = totalItems;
+    reportRevenue.textContent = `$${revenue.toFixed(2)}`;
+    reportTax.textContent = `$${tax.toFixed(2)}`;
+
+    if (todayBills.length === 0) {
+        reportDetail.innerHTML = '<div class="empty-state">No sales today</div>';
+    } else {
+        reportDetail.innerHTML = todayBills.slice().reverse().map(bill => `
+            <div style="border-bottom:1px solid #f1f5f9; padding:6px 0; font-size:0.85rem;">
+                <strong>${bill.date}</strong>
+                <span style="float:right;color:#16a34a;font-weight:600;">$${bill.total.toFixed(2)}</span>
+                <div style="font-size:0.75rem;color:#94a3b8;">${bill.items.map(i => `${i.name} x${i.qty}`).join(' • ')}</div>
+            </div>
+        `).join('');
+    }
+}
+
+exportReportBtn.addEventListener('click', function() {
+    const today = new Date().toDateString();
+    const todayBills = history.filter(bill => new Date(bill.date).toDateString() === today);
+    if (todayBills.length === 0) {
+        alert('No sales today to export.');
+        return;
+    }
+    let csv = 'Bill ID,Date,Items,Total,Discount,Tax,Received,Change\n';
+    todayBills.forEach(bill => {
+        const itemsStr = bill.items.map(i => `${i.name} x${i.qty}`).join('; ');
+        csv += `${bill.id},${bill.date},"${itemsStr}",${bill.total.toFixed(2)},${(bill.discount || 0).toFixed(2)},${bill.tax.toFixed(2)},${(bill.received || 0).toFixed(2)},${(bill.change || 0).toFixed(2)}\n`;
+    });
+    const blob = new Blob([csv], { type: 'text/csv' });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = `daily_report_${new Date().toISOString().split('T')[0]}.csv`;
+    a.click();
+    URL.revokeObjectURL(url);
+});
+
+// ============================================================
+//  FULL SCREEN
+// ============================================================
+function toggleFullScreen() {
+    const btn = document.getElementById('fullscreenBtn');
+    
+    if (!document.fullscreenElement && !document.webkitFullscreenElement) {
+        const el = document.documentElement;
+        if (el.requestFullscreen) {
+            el.requestFullscreen();
+        } else if (el.webkitRequestFullscreen) {
+            el.webkitRequestFullscreen();
+        } else if (el.msRequestFullscreen) {
+            el.msRequestFullscreen();
+        }
+    } else {
+        if (document.exitFullscreen) {
+            document.exitFullscreen();
+        } else if (document.webkitExitFullscreen) {
+            document.webkitExitFullscreen();
+        } else if (document.msExitFullscreen) {
+            document.msExitFullscreen();
+        }
+    }
+}
+
+function updateFullscreenUI() {
+    const btn = document.getElementById('fullscreenBtn');
+    if (!btn) return;
+    
+    const isFullscreen = document.fullscreenElement || document.webkitFullscreenElement;
+    
+    if (isFullscreen) {
+        btn.textContent = '⛶ Exit';
+        btn.classList.add('exit');
+        document.body.classList.add('fullscreen-mode');
+    } else {
+        btn.textContent = '⛶ Full';
+        btn.classList.remove('exit');
+        document.body.classList.remove('fullscreen-mode');
+    }
+}
+
+document.addEventListener('fullscreenchange', updateFullscreenUI);
+document.addEventListener('webkitfullscreenchange', updateFullscreenUI);
+
+// ============================================================
+//  EXPORT FUNCTIONS
+// ============================================================
+window.addToCart = addToCart;
+window.changeQty = changeQty;
+window.removeFromCart = removeFromCart;
+window.updateDiscount = updateDiscount;
+window.toggleFullScreen = toggleFullScreen;
+window.selectCategory = selectCategory;
+window.switchTab = switchTab;
+window.closeDropdown = closeDropdown;
+
+// ============================================================
+//  INIT
+// ============================================================
+loadData();
+renderItems();
+updateBilling();
+setTimeout(updateFullscreenUI, 100);
+
+// ============================================================
+//  PRINT BILL FUNCTION
+// ============================================================
+function printBill(bill) {
+    const printWindow = window.open('', '_blank', 'width=400,height=600');
+    
+    const itemsHtml = bill.items.map(item => `
+        <tr>
+            <td>${item.name}</td>
+            <td style="text-align:center;">${item.qty}</td>
+            <td style="text-align:right;">$${item.price.toFixed(2)}</td>
+            <td style="text-align:right;">$${(item.price * item.qty).toFixed(2)}</td>
+        </tr>
+    `).join('');
+    
+    printWindow.document.write(`
+        <!DOCTYPE html>
+        <html>
+        <head>
+            <title>Bill #${bill.id}</title>
+            <style>
+                body { font-family: Arial, sans-serif; padding: 20px; max-width: 350px; margin: 0 auto; }
+                .header { text-align: center; border-bottom: 2px dashed #333; padding-bottom: 10px; margin-bottom: 10px; }
+                .header h1 { margin: 0; font-size: 1.2rem; }
+                .header p { margin: 4px 0; color: #666; font-size: 0.8rem; }
+                table { width: 100%; border-collapse: collapse; font-size: 0.85rem; }
+                th { text-align: left; border-bottom: 1px solid #ddd; padding: 4px 0; }
+                td { padding: 4px 0; border-bottom: 1px solid #eee; }
+                .totals { margin-top: 10px; border-top: 2px solid #333; padding-top: 10px; }
+                .totals div { display: flex; justify-content: space-between; font-size: 0.9rem; padding: 2px 0; }
+                .totals .grand { font-weight: 700; font-size: 1.1rem; border-top: 1px solid #ddd; padding-top: 6px; margin-top: 4px; }
+                .totals .received { color: #16a34a; }
+                .totals .change { color: #16a34a; }
+                .footer { text-align: center; margin-top: 20px; font-size: 0.8rem; color: #666; border-top: 2px dashed #333; padding-top: 10px; }
+                @media print {
+                    body { padding: 10px; }
+                    .no-print { display: none; }
+                }
+            </style>
+        </head>
+        <body>
+            <div class="header">
+                <h1>🍽️ HOTEL POS</h1>
+                <p>${bill.date}</p>
+                <p>Bill #${bill.id}</p>
+                ${bill.table ? `<p>🪑 Table ${bill.table}</p>` : ''}
+            </div>
+            
+            <table>
+                <thead>
+                    <tr>
+                        <th>Item</th>
+                        <th style="text-align:center;">Qty</th>
+                        <th style="text-align:right;">Price</th>
+                        <th style="text-align:right;">Total</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    ${itemsHtml}
+                </tbody>
+            </table>
+            
+            <div class="totals">
+                <div><span>Subtotal</span><span>$${bill.subtotal.toFixed(2)}</span></div>
+                ${bill.discount > 0 ? `<div><span>Discount</span><span>-$${bill.discount.toFixed(2)}</span></div>` : ''}
+                <div><span>Tax (5%)</span><span>$${bill.tax.toFixed(2)}</span></div>
+                <div class="grand"><span>TOTAL</span><span>$${bill.total.toFixed(2)}</span></div>
+                <div class="received"><span>Received</span><span>$${bill.received.toFixed(2)}</span></div>
+                <div class="change"><span>Change</span><span>$${bill.change.toFixed(2)}</span></div>
+            </div>
+            
+            <div class="footer">
+                <p>Thank you! Come again! 🍽️</p>
+            </div>
+            
+            <script>
+                window.onload = function() {
+                    window.print();
+                    setTimeout(function() {
+                        window.close();
+                    }, 500);
+                };
+            <\/script>
+        </body>
+        </html>
+    `);
+    
+    printWindow.document.close();
+}
+
+</script>
+
+</body>
+</html>
