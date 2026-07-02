@@ -45,9 +45,8 @@
                 <div class="empty-state">No items</div>
             </div>
             <div class="order-summary">
-                <div class="line"><span>Subtotal</span><span id="modalSubtotal">$0.00</span></div>
-                <div class="line"><span>Tax (5%)</span><span id="modalTax">$0.00</span></div>
-                <div class="line total"><span>TOTAL</span><span id="modalTotal">$0.00</span></div>
+                <div class="line"><span>Subtotal</span><span id="modalSubtotal">Rs. 0.00</span></div>
+                <div class="line total"><span>TOTAL</span><span id="modalTotal">Rs. 0.00</span></div>
                 <div class="modal-actions">
                     <button class="pay-btn" id="payTableBtn">💳 Pay & Close</button>
                     <button class="close-btn-red" id="closeTableBtn">🚪 Close</button>
@@ -69,12 +68,12 @@
                 <!-- Rendered by JS -->
             </div>
             <div class="payment-input">
-                <label>Amount Received ($)</label>
+                <label>Amount Received (Rs.)</label>
                 <input type="number" id="tableAmountReceived" placeholder="0.00" step="0.01" min="0" />
             </div>
             <div class="payment-change" id="tablePaymentChange">
                 <span>Change Due:</span>
-                <span id="tableChangeAmount">$0.00</span>
+                <span id="tableChangeAmount">Rs. 0.00</span>
             </div>
             <div class="print-option">
                 <label>
@@ -138,6 +137,22 @@ function saveCustomers() { localStorage.setItem(CUSTOMER_ORDERS_KEY, JSON.string
 function saveHistory() { localStorage.setItem(HISTORY_KEY, JSON.stringify(history)); }
 
 // ============================================================
+//  FORCE INITIALIZE TABLES (if empty)
+// ============================================================
+function forceInitTables() {
+    const stored = localStorage.getItem(TABLE_ORDERS_KEY);
+    if (!stored || stored === '{}') {
+        console.log('No table data found! Initializing...');
+        const newOrders = {};
+        for (let i = 1; i <= TABLE_COUNT; i++) {
+            newOrders[i] = [];
+        }
+        localStorage.setItem(TABLE_ORDERS_KEY, JSON.stringify(newOrders));
+        console.log('Tables initialized!');
+    }
+}
+
+// ============================================================
 //  DOM REFS
 // ============================================================
 const grid = document.getElementById('tableGrid');
@@ -147,7 +162,6 @@ const modalTableNum = document.getElementById('modalTableNum');
 const modalTitle = document.getElementById('modalTitle');
 const orderItems = document.getElementById('orderItems');
 const modalSubtotal = document.getElementById('modalSubtotal');
-const modalTax = document.getElementById('modalTax');
 const modalTotal = document.getElementById('modalTotal');
 const tablePaymentDetails = document.getElementById('tablePaymentDetails');
 const tableAmountReceived = document.getElementById('tableAmountReceived');
@@ -207,7 +221,7 @@ function renderTables(filter = 'all') {
                 <span class="num">🪑 ${i}</span>
                 <span class="status">${statusText}</span>
                 ${badge}
-                ${count > 0 ? `<span class="total">$${subtotal.toFixed(2)}</span>` : ''}
+                ${count > 0 ? `<span class="total">Rs. ${subtotal.toFixed(2)}</span>` : ''}
             </div>
         `;
     }
@@ -220,7 +234,7 @@ function renderTables(filter = 'all') {
     html += `
         <div class="summary-bar">
             <span>📦 Total Items: ${totalItems}</span>
-            <span>💰 Revenue: $${totalRevenue.toFixed(2)}</span>
+            <span>💰 Revenue: Rs. ${totalRevenue.toFixed(2)}</span>
             <span>🪑 Active Tables: ${activeTables}/${TABLE_COUNT}</span>
         </div>
     `;
@@ -250,7 +264,7 @@ function renderSummary() {
             <div class="summary-card ${status}">
                 <span class="table-num">🪑 ${i}</span>
                 <span class="table-status">${statusText}</span>
-                <span class="table-total">$${subtotal.toFixed(2)}</span>
+                <span class="table-total">Rs. ${subtotal.toFixed(2)}</span>
                 <span class="table-count">${count} items</span>
             </div>
         `;
@@ -260,7 +274,7 @@ function renderSummary() {
         <div class="summary-grand">
             <span>📊 GRAND TOTAL</span>
             <span>${grandItems} items</span>
-            <span style="color:#16a34a; font-size:1.4rem;">$${grandTotal.toFixed(2)}</span>
+            <span style="color:#16a34a; font-size:1.4rem;">Rs. ${grandTotal.toFixed(2)}</span>
         </div>
     </div>`;
     
@@ -298,7 +312,7 @@ function renderTableOrderItems(tableNum) {
                     <span>${item.quantity}</span>
                     <button onclick="changeTableQty(${tableNum}, ${index}, 1)">+</button>
                 </div>
-                <span class="price">$${total.toFixed(2)}</span>
+                <span class="price">Rs. ${total.toFixed(2)}</span>
                 <button class="remove" onclick="removeTableItem(${tableNum}, ${index})">✕</button>
             </div>
         `;
@@ -310,12 +324,10 @@ function renderTableOrderItems(tableNum) {
 function updateModalTotals(tableNum) {
     const items = tableOrders[tableNum] || [];
     const subtotal = items.reduce((sum, item) => sum + item.price * item.quantity, 0);
-    const tax = subtotal * 0.05;
-    const total = subtotal + tax;
+    const total = subtotal; // Tax අයින් කරන ලදි
     
-    modalSubtotal.textContent = `$${subtotal.toFixed(2)}`;
-    modalTax.textContent = `$${tax.toFixed(2)}`;
-    modalTotal.textContent = `$${total.toFixed(2)}`;
+    modalSubtotal.textContent = `Rs. ${subtotal.toFixed(2)}`;
+    modalTotal.textContent = `Rs. ${total.toFixed(2)}`;
 }
 
 function changeTableQty(tableNum, index, delta) {
@@ -357,7 +369,7 @@ document.getElementById('closeTableBtn').addEventListener('click', function() {
 });
 
 // ============================================================
-//  PRINT BILL FUNCTION
+//  PRINT BILL FUNCTION (Tax අයින් කරපු)
 // ============================================================
 function printBill(bill) {
     const printWindow = window.open('', '_blank', 'width=400,height=600');
@@ -366,8 +378,8 @@ function printBill(bill) {
         <tr>
             <td>${item.name}</td>
             <td style="text-align:center;">${item.qty}</td>
-            <td style="text-align:right;">$${item.price.toFixed(2)}</td>
-            <td style="text-align:right;">$${(item.price * item.qty).toFixed(2)}</td>
+            <td style="text-align:right;">Rs. ${item.price.toFixed(2)}</td>
+            <td style="text-align:right;">Rs. ${(item.price * item.qty).toFixed(2)}</td>
         </tr>
     `).join('');
     
@@ -415,12 +427,10 @@ function printBill(bill) {
             </table>
             
             <div class="totals">
-                <div><span>Subtotal</span><span>$${bill.subtotal.toFixed(2)}</span></div>
-                ${bill.discount > 0 ? `<div><span>Discount</span><span>-$${bill.discount.toFixed(2)}</span></div>` : ''}
-                <div><span>Tax (5%)</span><span>$${bill.tax.toFixed(2)}</span></div>
-                <div class="grand"><span>TOTAL</span><span>$${bill.total.toFixed(2)}</span></div>
-                <div class="received"><span>Received</span><span>$${bill.received.toFixed(2)}</span></div>
-                <div class="change"><span>Change</span><span>$${bill.change.toFixed(2)}</span></div>
+                <div><span>Subtotal</span><span>Rs. ${bill.subtotal.toFixed(2)}</span></div>
+                <div class="grand"><span>TOTAL</span><span>Rs. ${bill.total.toFixed(2)}</span></div>
+                <div class="received"><span>Received</span><span>Rs. ${bill.received.toFixed(2)}</span></div>
+                <div class="change"><span>Change</span><span>Rs. ${bill.change.toFixed(2)}</span></div>
             </div>
             
             <div class="footer">
@@ -454,14 +464,12 @@ document.getElementById('payTableBtn').addEventListener('click', function() {
     }
     
     const subtotal = items.reduce((sum, item) => sum + item.price * item.quantity, 0);
-    const tax = subtotal * 0.05;
-    const total = subtotal + tax;
+    const total = subtotal; // Tax අයින් කරන ලදි
     
     currentTableBill = {
         table: currentTable,
         items: items.map(c => ({ name: c.name, qty: c.quantity, price: c.price })),
         subtotal: subtotal,
-        tax: tax,
         total: total
     };
     
@@ -470,16 +478,15 @@ document.getElementById('payTableBtn').addEventListener('click', function() {
         ${items.map(item => `
             <div class="pay-line">
                 <span>${item.name} x${item.quantity}</span>
-                <span>$${(item.price * item.quantity).toFixed(2)}</span>
+                <span>Rs. ${(item.price * item.quantity).toFixed(2)}</span>
             </div>
         `).join('')}
-        <div class="pay-line"><span>Subtotal</span><span>$${subtotal.toFixed(2)}</span></div>
-        <div class="pay-line"><span>Tax (5%)</span><span>$${tax.toFixed(2)}</span></div>
-        <div class="pay-line total"><span>TOTAL</span><span>$${total.toFixed(2)}</span></div>
+        <div class="pay-line"><span>Subtotal</span><span>Rs. ${subtotal.toFixed(2)}</span></div>
+        <div class="pay-line total"><span>TOTAL</span><span>Rs. ${total.toFixed(2)}</span></div>
     `;
     
     tableAmountReceived.value = '';
-    tableChangeAmount.textContent = '$0.00';
+    tableChangeAmount.textContent = 'Rs. 0.00';
     const changeEl = document.getElementById('tablePaymentChange');
     changeEl.style.borderColor = '#86efac';
     changeEl.style.background = '#f0fdf4';
@@ -503,21 +510,21 @@ tableAmountReceived.addEventListener('input', function() {
     const changeSpan = document.getElementById('tableChangeAmount');
     
     if (received > 0 && received < total) {
-        changeSpan.textContent = `-$${(total - received).toFixed(2)}`;
+        changeSpan.textContent = `-Rs. ${(total - received).toFixed(2)}`;
         changeSpan.style.color = '#ef4444';
         changeEl.style.borderColor = '#fca5a5';
         changeEl.style.background = '#fef2f2';
         changeEl.querySelector('span:first-child').textContent = 'Remaining:';
         confirmTablePaymentBtn.disabled = true;
     } else if (received >= total) {
-        changeSpan.textContent = `$${change.toFixed(2)}`;
+        changeSpan.textContent = `Rs. ${change.toFixed(2)}`;
         changeSpan.style.color = '#16a34a';
         changeEl.style.borderColor = '#86efac';
         changeEl.style.background = '#f0fdf4';
         changeEl.querySelector('span:first-child').textContent = 'Change Due:';
         confirmTablePaymentBtn.disabled = false;
     } else {
-        changeSpan.textContent = '$0.00';
+        changeSpan.textContent = 'Rs. 0.00';
         changeSpan.style.color = '#16a34a';
         changeEl.style.borderColor = '#86efac';
         changeEl.style.background = '#f0fdf4';
@@ -540,7 +547,7 @@ confirmTablePaymentBtn.addEventListener('click', function() {
     const received = parseFloat(tableAmountReceived.value) || 0;
     
     if (received < currentTableBill.total) {
-        alert(`❌ Insufficient amount!\nTotal: $${currentTableBill.total.toFixed(2)}\nReceived: $${received.toFixed(2)}\nRemaining: $${(currentTableBill.total - received).toFixed(2)}`);
+        alert(`❌ Insufficient amount!\nTotal: Rs. ${currentTableBill.total.toFixed(2)}\nReceived: Rs. ${received.toFixed(2)}\nRemaining: Rs. ${(currentTableBill.total - received).toFixed(2)}`);
         return;
     }
     
@@ -550,7 +557,6 @@ confirmTablePaymentBtn.addEventListener('click', function() {
         table: currentTableBill.table,
         items: currentTableBill.items,
         subtotal: currentTableBill.subtotal,
-        tax: currentTableBill.tax,
         total: currentTableBill.total,
         received: received,
         change: received - currentTableBill.total
@@ -573,7 +579,7 @@ confirmTablePaymentBtn.addEventListener('click', function() {
         printBill(bill);
     }
     
-    alert(`✅ Payment Successful!\nTable ${bill.table}\nTotal: $${bill.total.toFixed(2)}\nReceived: $${bill.received.toFixed(2)}\nChange: $${bill.change.toFixed(2)}\nThank you! 🍽️`);
+    alert(`✅ Payment Successful!\nTable ${bill.table}\nTotal: Rs. ${bill.total.toFixed(2)}\nReceived: Rs. ${bill.received.toFixed(2)}\nChange: Rs. ${bill.change.toFixed(2)}\nThank you! 🍽️`);
     
     currentTableBill = null;
     currentTable = null;
@@ -656,6 +662,7 @@ window.openTableModal = openTableModal;
 // ============================================================
 //  INIT
 // ============================================================
+forceInitTables();
 loadData();
 renderTables('all');
 </script>

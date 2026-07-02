@@ -86,7 +86,6 @@
         <div class="billing-summary">
             <div class="line"><span>Subtotal</span><span id="subtotal">$0.00</span></div>
             <div class="line discount"><span>Discount</span><span id="discountAmount">-$0.00</span></div>
-            <div class="line"><span>Tax (5%)</span><span id="tax">$0.00</span></div>
             <div class="line total"><span>TOTAL</span><span id="total">$0.00</span></div>
 
             <div class="discount-row">
@@ -99,19 +98,19 @@
     </div>
 
     <!-- ===== RIGHT: CATEGORIES ===== -->
-    <div class="right-items">
-        <div class="items-header">
-            <span>📂 Categories</span>
-            <div>
-                <button id="backToCategoriesBtn" style="display:none;">⬅ Back</button>
-                <button id="refreshItemsBtn">⟳</button>
-            </div>
-        </div>
-        <div class="items-grid" id="itemsGrid">
-            <!-- Rendered by JS -->
+<div class="right-items">
+    <div class="items-header">
+        <span>📂 Categories</span>
+        <div class="items-header-actions">
+            <button id="backToCategoriesBtn" style="display:none;">⬅ Back</button>
+            <button id="refreshItemsBtn">⟳</button>
         </div>
     </div>
+    <div class="items-grid" id="itemsGrid">
+        <!-- Rendered by JS -->
+    </div>
 </div>
+
 
 <!-- ===== HISTORY VIEW ===== -->
 <div id="view-history" class="view-container">
@@ -410,7 +409,7 @@ function renderCategoryItems(category) {
         html += `
             <button class="item-btn" onclick="addToCart('${item.name}', ${item.price})">
                 <span class="item-name">${item.name}</span>
-                <span class="item-price">$${item.price.toFixed(2)}</span>
+                <span class="item-price">Rs. ${item.price.toFixed(2)}</span>
             </button>
         `;
     });
@@ -456,12 +455,12 @@ function updateBilling() {
                         <span>${item.quantity}</span>
                         <button onclick="changeQty(${item.id}, 1)">+</button>
                     </span>
-                    <span class="item-price">$${item.price.toFixed(2)}</span>
+                    <span class="item-price">Rs. ${item.price.toFixed(2)}</span>
                     <span class="item-discount">
                         <input type="number" value="${item.discount || 0}" min="0" max="100" 
                                onchange="updateDiscount(${item.id}, this.value)" />
                     </span>
-                    <span class="item-total">$${finalTotal.toFixed(2)}</span>
+                    <span class="item-total">Rs. ${finalTotal.toFixed(2)}</span>
                     <button class="remove-btn" onclick="removeFromCart(${item.id})">✕</button>
                 </div>
             `;
@@ -505,13 +504,12 @@ function calculateTotals() {
         return sum + (total * (item.discount || 0)) / 100;
     }, 0);
     const discount = (subtotal * discountPercent) / 100 + itemDiscounts;
-    const tax = (subtotal - discount) * 0.05;
-    const total = subtotal - discount + tax;
+    const total = subtotal - discount; // Tax අයින් කරන ලදි
 
-    subtotalEl.textContent = `$${subtotal.toFixed(2)}`;
-    discountAmountEl.textContent = `-$${discount.toFixed(2)}`;
-    taxEl.textContent = `$${tax.toFixed(2)}`;
-    totalEl.textContent = `$${total.toFixed(2)}`;
+    subtotalEl.textContent = `Rs. ${subtotal.toFixed(2)}`;
+    discountAmountEl.textContent = `-Rs. ${discount.toFixed(2)}`;
+    taxEl.textContent = `Rs. 0.00`;
+    totalEl.textContent = `Rs. ${total.toFixed(2)}`;
     payBtn.disabled = cart.length === 0;
 }
 
@@ -618,33 +616,29 @@ payBtn.addEventListener('click', function() {
         return sum + (total * (item.discount || 0)) / 100;
     }, 0);
     const discount = (subtotal * discountPercent) / 100 + itemDiscounts;
-    const tax = (subtotal - discount) * 0.05;
-    const total = subtotal - discount + tax;
+    const total = subtotal - discount; // Tax අයින් කරන ලදි
     
     currentBill = {
         items: cart.map(c => ({ name: c.name, qty: c.quantity, price: c.price, discount: c.discount || 0 })),
         subtotal: subtotal,
         discount: discount,
-        tax: tax,
         total: total
     };
     
-    // Show payment modal
     paymentDetails.innerHTML = `
         ${currentBill.items.map(item => `
             <div class="pay-line">
                 <span>${item.name} x${item.qty}</span>
-                <span>$${(item.price * item.qty).toFixed(2)}</span>
+                <span>Rs. ${(item.price * item.qty).toFixed(2)}</span>
             </div>
         `).join('')}
-        <div class="pay-line"><span>Subtotal</span><span>$${currentBill.subtotal.toFixed(2)}</span></div>
-        <div class="pay-line" style="color:#ef4444;"><span>Discount</span><span>$${currentBill.discount.toFixed(2)}</span></div>
-        <div class="pay-line"><span>Tax (5%)</span><span>$${currentBill.tax.toFixed(2)}</span></div>
-        <div class="pay-line total"><span>TOTAL</span><span>$${currentBill.total.toFixed(2)}</span></div>
+        <div class="pay-line"><span>Subtotal</span><span>Rs. ${currentBill.subtotal.toFixed(2)}</span></div>
+        <div class="pay-line" style="color:#ef4444;"><span>Discount</span><span>Rs. ${currentBill.discount.toFixed(2)}</span></div>
+        <div class="pay-line total"><span>TOTAL</span><span>Rs. ${currentBill.total.toFixed(2)}</span></div>
     `;
     
     amountReceived.value = '';
-    changeAmount.textContent = '$0.00';
+    changeAmount.textContent = 'Rs. 0.00';
     const changeEl = document.getElementById('paymentChange');
     changeEl.style.borderColor = '#86efac';
     changeEl.style.background = '#f0fdf4';
@@ -664,21 +658,21 @@ amountReceived.addEventListener('input', function() {
     const changeSpan = document.getElementById('changeAmount');
     
     if (received > 0 && received < total) {
-        changeSpan.textContent = `-$${(total - received).toFixed(2)}`;
+        changeSpan.textContent = `-Rs. ${(total - received).toFixed(2)}`;
         changeSpan.style.color = '#ef4444';
         changeEl.style.borderColor = '#fca5a5';
         changeEl.style.background = '#fef2f2';
         changeEl.querySelector('span:first-child').textContent = 'Remaining:';
         confirmPaymentBtn.disabled = true;
     } else if (received >= total) {
-        changeSpan.textContent = `$${change.toFixed(2)}`;
+        changeSpan.textContent = `Rs. ${change.toFixed(2)}`;
         changeSpan.style.color = '#16a34a';
         changeEl.style.borderColor = '#86efac';
         changeEl.style.background = '#f0fdf4';
         changeEl.querySelector('span:first-child').textContent = 'Change Due:';
         confirmPaymentBtn.disabled = false;
     } else {
-        changeSpan.textContent = '$0.00';
+        changeSpan.textContent = 'Rs. 0.00';
         changeSpan.style.color = '#16a34a';
         changeEl.style.borderColor = '#86efac';
         changeEl.style.background = '#f0fdf4';
@@ -693,7 +687,7 @@ confirmPaymentBtn.addEventListener('click', function() {
     
     const received = parseFloat(amountReceived.value) || 0;
     if (received < currentBill.total) {
-        alert(`❌ Insufficient amount!\nTotal: $${currentBill.total.toFixed(2)}\nReceived: $${received.toFixed(2)}\nRemaining: $${(currentBill.total - received).toFixed(2)}`);
+        alert(`❌ Insufficient amount!\nTotal: Rs. ${currentBill.total.toFixed(2)}\nReceived: Rs. ${received.toFixed(2)}\nRemaining: Rs. ${(currentBill.total - received).toFixed(2)}`);
         return;
     }
     
@@ -703,7 +697,6 @@ confirmPaymentBtn.addEventListener('click', function() {
         items: currentBill.items,
         subtotal: currentBill.subtotal,
         discount: currentBill.discount,
-        tax: currentBill.tax,
         total: currentBill.total,
         received: received,
         change: received - currentBill.total
@@ -711,9 +704,8 @@ confirmPaymentBtn.addEventListener('click', function() {
     history.push(bill);
     saveHistory();
     
-    // Ask for print
     const printOption = document.getElementById('printBillCheckbox');
-    const shouldPrint = printOption.checked;
+    const shouldPrint = printOption ? printOption.checked : true;
     
     paymentModal.classList.remove('open');
     
@@ -721,14 +713,13 @@ confirmPaymentBtn.addEventListener('click', function() {
         printBill(bill);
     }
     
-    alert(`✅ Payment Successful!\nTotal: $${bill.total.toFixed(2)}\nReceived: $${bill.received.toFixed(2)}\nChange: $${bill.change.toFixed(2)}\nThank you! 🍽️`);
+    alert(`✅ Payment Successful!\nTotal: Rs. ${bill.total.toFixed(2)}\nReceived: Rs. ${bill.received.toFixed(2)}\nChange: Rs. ${bill.change.toFixed(2)}\nThank you! 🍽️`);
     
     cart = [];
     saveCart();
     updateBilling();
     currentBill = null;
 });
-
 
 // Cancel Payment
 cancelPaymentBtn.addEventListener('click', function() {
@@ -747,6 +738,91 @@ paymentModal.addEventListener('click', function(e) {
         currentBill = null;
     }
 });
+
+// ============================================================
+//  PRINT BILL FUNCTION (Tax අයින් කරපු)
+// ============================================================
+function printBill(bill) {
+    const printWindow = window.open('', '_blank', 'width=400,height=600');
+    
+    const itemsHtml = bill.items.map(item => `
+        <tr>
+            <td>${item.name}</td>
+            <td style="text-align:center;">${item.qty}</td>
+            <td style="text-align:right;">Rs. ${item.price.toFixed(2)}</td>
+            <td style="text-align:right;">Rs. ${(item.price * item.qty).toFixed(2)}</td>
+        </tr>
+    `).join('');
+    
+    printWindow.document.write(`
+        <!DOCTYPE html>
+        <html>
+        <head>
+            <title>Bill #${bill.id}</title>
+            <style>
+                body { font-family: Arial, sans-serif; padding: 20px; max-width: 350px; margin: 0 auto; }
+                .header { text-align: center; border-bottom: 2px dashed #333; padding-bottom: 10px; margin-bottom: 10px; }
+                .header h1 { margin: 0; font-size: 1.2rem; }
+                .header p { margin: 4px 0; color: #666; font-size: 0.8rem; }
+                table { width: 100%; border-collapse: collapse; font-size: 0.85rem; }
+                th { text-align: left; border-bottom: 1px solid #ddd; padding: 4px 0; }
+                td { padding: 4px 0; border-bottom: 1px solid #eee; }
+                .totals { margin-top: 10px; border-top: 2px solid #333; padding-top: 10px; }
+                .totals div { display: flex; justify-content: space-between; font-size: 0.9rem; padding: 2px 0; }
+                .totals .grand { font-weight: 700; font-size: 1.1rem; border-top: 1px solid #ddd; padding-top: 6px; margin-top: 4px; }
+                .totals .received { color: #16a34a; }
+                .totals .change { color: #16a34a; }
+                .footer { text-align: center; margin-top: 20px; font-size: 0.8rem; color: #666; border-top: 2px dashed #333; padding-top: 10px; }
+            </style>
+        </head>
+        <body>
+            <div class="header">
+                <h1>🍽️ HOTEL POS</h1>
+                <p>${bill.date}</p>
+                <p>Bill #${bill.id}</p>
+                ${bill.table ? `<p>🪑 Table ${bill.table}</p>` : ''}
+            </div>
+            
+            <table>
+                <thead>
+                    <tr>
+                        <th>Item</th>
+                        <th style="text-align:center;">Qty</th>
+                        <th style="text-align:right;">Price</th>
+                        <th style="text-align:right;">Total</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    ${itemsHtml}
+                </tbody>
+            </table>
+            
+            <div class="totals">
+                <div><span>Subtotal</span><span>Rs. ${bill.subtotal.toFixed(2)}</span></div>
+                ${bill.discount > 0 ? `<div><span>Discount</span><span>-Rs. ${bill.discount.toFixed(2)}</span></div>` : ''}
+                <div class="grand"><span>TOTAL</span><span>Rs. ${bill.total.toFixed(2)}</span></div>
+                <div class="received"><span>Received</span><span>Rs. ${bill.received.toFixed(2)}</span></div>
+                <div class="change"><span>Change</span><span>Rs. ${bill.change.toFixed(2)}</span></div>
+            </div>
+            
+            <div class="footer">
+                <p>Thank you! Come again! 🍽️</p>
+            </div>
+            
+            <script>
+                window.onload = function() {
+                    window.print();
+                    setTimeout(function() {
+                        window.close();
+                    }, 500);
+                };
+            <\/script>
+        </body>
+        </html>
+    `);
+    
+    printWindow.document.close();
+}
 
 // ============================================================
 //  TABS
@@ -778,7 +854,6 @@ document.querySelectorAll('.tab-btn').forEach(btn => {
 const hamburgerBtn = document.getElementById('hamburgerBtn');
 const dropdownMenu = document.getElementById('dropdownMenu');
 
-// Create overlay
 const overlay = document.createElement('div');
 overlay.className = 'dropdown-overlay';
 overlay.id = 'dropdownOverlay';
@@ -808,7 +883,7 @@ document.addEventListener('keydown', function(e) {
 });
 
 // ============================================================
-//  HISTORY
+//  HISTORY (Tax අයින් කරපු)
 // ============================================================
 function renderHistory() {
     if (history.length === 0) {
@@ -820,13 +895,13 @@ function renderHistory() {
             <div class="h-top">
                 <span>#${bill.id}</span>
                 <span>${bill.date}</span>
-                <span class="h-total">$${bill.total.toFixed(2)}</span>
+                <span class="h-total">Rs. ${bill.total.toFixed(2)}</span>
             </div>
             <div class="h-items">
                 ${bill.items.map(i => `${i.name} x${i.qty}`).join(' • ')}
-                ${bill.discount > 0 ? ` • Discount: $${bill.discount.toFixed(2)}` : ''}
-                ${bill.received ? ` • Received: $${bill.received.toFixed(2)}` : ''}
-                ${bill.change ? ` • Change: $${bill.change.toFixed(2)}` : ''}
+                ${bill.discount > 0 ? ` • Discount: Rs. ${bill.discount.toFixed(2)}` : ''}
+                ${bill.received ? ` • Received: Rs. ${bill.received.toFixed(2)}` : ''}
+                ${bill.change ? ` • Change: Rs. ${bill.change.toFixed(2)}` : ''}
             </div>
         </div>
     `).join('');
@@ -841,7 +916,7 @@ clearHistoryBtn.addEventListener('click', function() {
 });
 
 // ============================================================
-//  REPORT
+//  REPORT (Tax අයින් කරපු)
 // ============================================================
 function updateReport() {
     const today = new Date().toDateString();
@@ -849,12 +924,11 @@ function updateReport() {
     const orders = todayBills.length;
     const totalItems = todayBills.reduce((sum, b) => sum + b.items.reduce((s, i) => s + i.qty, 0), 0);
     const revenue = todayBills.reduce((sum, b) => sum + b.total, 0);
-    const tax = todayBills.reduce((sum, b) => sum + b.tax, 0);
 
     reportOrders.textContent = orders;
     reportItems.textContent = totalItems;
-    reportRevenue.textContent = `$${revenue.toFixed(2)}`;
-    reportTax.textContent = `$${tax.toFixed(2)}`;
+    reportRevenue.textContent = `Rs. ${revenue.toFixed(2)}`;
+    reportTax.textContent = `Rs. 0.00`;
 
     if (todayBills.length === 0) {
         reportDetail.innerHTML = '<div class="empty-state">No sales today</div>';
@@ -862,7 +936,7 @@ function updateReport() {
         reportDetail.innerHTML = todayBills.slice().reverse().map(bill => `
             <div style="border-bottom:1px solid #f1f5f9; padding:6px 0; font-size:0.85rem;">
                 <strong>${bill.date}</strong>
-                <span style="float:right;color:#16a34a;font-weight:600;">$${bill.total.toFixed(2)}</span>
+                <span style="float:right;color:#16a34a;font-weight:600;">Rs. ${bill.total.toFixed(2)}</span>
                 <div style="font-size:0.75rem;color:#94a3b8;">${bill.items.map(i => `${i.name} x${i.qty}`).join(' • ')}</div>
             </div>
         `).join('');
@@ -876,10 +950,10 @@ exportReportBtn.addEventListener('click', function() {
         alert('No sales today to export.');
         return;
     }
-    let csv = 'Bill ID,Date,Items,Total,Discount,Tax,Received,Change\n';
+    let csv = 'Bill ID,Date,Items,Total,Discount,Received,Change\n';
     todayBills.forEach(bill => {
         const itemsStr = bill.items.map(i => `${i.name} x${i.qty}`).join('; ');
-        csv += `${bill.id},${bill.date},"${itemsStr}",${bill.total.toFixed(2)},${(bill.discount || 0).toFixed(2)},${bill.tax.toFixed(2)},${(bill.received || 0).toFixed(2)},${(bill.change || 0).toFixed(2)}\n`;
+        csv += `${bill.id},${bill.date},"${itemsStr}",${bill.total.toFixed(2)},${(bill.discount || 0).toFixed(2)},${(bill.received || 0).toFixed(2)},${(bill.change || 0).toFixed(2)}\n`;
     });
     const blob = new Blob([csv], { type: 'text/csv' });
     const url = URL.createObjectURL(blob);
@@ -955,96 +1029,6 @@ loadData();
 renderItems();
 updateBilling();
 setTimeout(updateFullscreenUI, 100);
-
-// ============================================================
-//  PRINT BILL FUNCTION
-// ============================================================
-function printBill(bill) {
-    const printWindow = window.open('', '_blank', 'width=400,height=600');
-    
-    const itemsHtml = bill.items.map(item => `
-        <tr>
-            <td>${item.name}</td>
-            <td style="text-align:center;">${item.qty}</td>
-            <td style="text-align:right;">$${item.price.toFixed(2)}</td>
-            <td style="text-align:right;">$${(item.price * item.qty).toFixed(2)}</td>
-        </tr>
-    `).join('');
-    
-    printWindow.document.write(`
-        <!DOCTYPE html>
-        <html>
-        <head>
-            <title>Bill #${bill.id}</title>
-            <style>
-                body { font-family: Arial, sans-serif; padding: 20px; max-width: 350px; margin: 0 auto; }
-                .header { text-align: center; border-bottom: 2px dashed #333; padding-bottom: 10px; margin-bottom: 10px; }
-                .header h1 { margin: 0; font-size: 1.2rem; }
-                .header p { margin: 4px 0; color: #666; font-size: 0.8rem; }
-                table { width: 100%; border-collapse: collapse; font-size: 0.85rem; }
-                th { text-align: left; border-bottom: 1px solid #ddd; padding: 4px 0; }
-                td { padding: 4px 0; border-bottom: 1px solid #eee; }
-                .totals { margin-top: 10px; border-top: 2px solid #333; padding-top: 10px; }
-                .totals div { display: flex; justify-content: space-between; font-size: 0.9rem; padding: 2px 0; }
-                .totals .grand { font-weight: 700; font-size: 1.1rem; border-top: 1px solid #ddd; padding-top: 6px; margin-top: 4px; }
-                .totals .received { color: #16a34a; }
-                .totals .change { color: #16a34a; }
-                .footer { text-align: center; margin-top: 20px; font-size: 0.8rem; color: #666; border-top: 2px dashed #333; padding-top: 10px; }
-                @media print {
-                    body { padding: 10px; }
-                    .no-print { display: none; }
-                }
-            </style>
-        </head>
-        <body>
-            <div class="header">
-                <h1>🍽️ HOTEL POS</h1>
-                <p>${bill.date}</p>
-                <p>Bill #${bill.id}</p>
-                ${bill.table ? `<p>🪑 Table ${bill.table}</p>` : ''}
-            </div>
-            
-            <table>
-                <thead>
-                    <tr>
-                        <th>Item</th>
-                        <th style="text-align:center;">Qty</th>
-                        <th style="text-align:right;">Price</th>
-                        <th style="text-align:right;">Total</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    ${itemsHtml}
-                </tbody>
-            </table>
-            
-            <div class="totals">
-                <div><span>Subtotal</span><span>$${bill.subtotal.toFixed(2)}</span></div>
-                ${bill.discount > 0 ? `<div><span>Discount</span><span>-$${bill.discount.toFixed(2)}</span></div>` : ''}
-                <div><span>Tax (5%)</span><span>$${bill.tax.toFixed(2)}</span></div>
-                <div class="grand"><span>TOTAL</span><span>$${bill.total.toFixed(2)}</span></div>
-                <div class="received"><span>Received</span><span>$${bill.received.toFixed(2)}</span></div>
-                <div class="change"><span>Change</span><span>$${bill.change.toFixed(2)}</span></div>
-            </div>
-            
-            <div class="footer">
-                <p>Thank you! Come again! 🍽️</p>
-            </div>
-            
-            <script>
-                window.onload = function() {
-                    window.print();
-                    setTimeout(function() {
-                        window.close();
-                    }, 500);
-                };
-            <\/script>
-        </body>
-        </html>
-    `);
-    
-    printWindow.document.close();
-}
 
 </script>
 
