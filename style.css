@@ -105,22 +105,36 @@ body {
     background: #dc2626 !important;
 }
 
-/* ===== FULL SCREEN MODE ===== */
+/* ============================================================
+   FULL SCREEN MODE
+   ============================================================ */
 .fullscreen-mode .tab-btn:not(.fullscreen-btn) {
     display: none !important;
 }
+
+.fullscreen-mode .view-container:not(#view-pos) {
+    display: none !important;
+}
+
+.fullscreen-mode #view-pos {
+    display: grid !important;
+}
+
 .fullscreen-mode .main-header {
     border-radius: 0 !important;
     max-width: 100% !important;
 }
+
 .fullscreen-mode body {
     padding: 0 !important;
 }
+
 .fullscreen-mode .header-right {
     display: flex !important;
     gap: 6px !important;
     flex-wrap: wrap !important;
 }
+
 .fullscreen-mode .pos-container {
     max-width: 100% !important;
     border-radius: 0 0 16px 16px !important;
@@ -130,24 +144,21 @@ body {
     gap: 16px !important;
     min-height: 600px !important;
 }
-.fullscreen-mode .view-container {
-    max-width: 100% !important;
-    border-radius: 0 0 16px 16px !important;
-    padding: 20px !important;
-    display: block !important;
-}
+
 .fullscreen-mode .left-billing {
     display: flex !important;
     flex-direction: column !important;
     gap: 8px !important;
     max-height: 620px !important;
 }
+
 .fullscreen-mode .right-items {
     display: flex !important;
     flex-direction: column !important;
     gap: 8px !important;
     max-height: 620px !important;
 }
+
 .fullscreen-mode .items-grid {
     display: grid !important;
     grid-template-columns: 1fr 1fr !important;
@@ -155,32 +166,26 @@ body {
     flex: 1 !important;
     overflow-y: auto !important;
 }
-.fullscreen-mode .category-label {
-    display: block !important;
-    grid-column: 1 / -1 !important;
-}
-.fullscreen-mode .item-btn {
-    display: flex !important;
-    flex-direction: column !important;
-    align-items: center !important;
-    justify-content: center !important;
-}
+
 .fullscreen-mode .billing-table {
     display: block !important;
     flex: 1 !important;
     overflow-y: auto !important;
 }
+
 .fullscreen-mode .billing-row {
     display: grid !important;
     grid-template-columns: 1.8fr 0.6fr 0.8fr 0.6fr 1fr 0.4fr !important;
     align-items: center !important;
     padding: 4px 0 !important;
 }
+
 .fullscreen-mode .billing-summary {
     display: block !important;
     border-top: 2px solid #e2e8f0 !important;
     padding-top: 8px !important;
 }
+
 .fullscreen-mode .pay-btn {
     display: block !important;
     width: 100% !important;
