@@ -20,6 +20,11 @@
         <span class="datetime" id="datetime">--</span>
     </div>
     <div class="header-right">
+        <button class="tab-btn active" data-tab="pos">🧾 POS</button>
+        <button class="tab-btn" data-tab="history">📜 History</button>
+        <button class="tab-btn" data-tab="report">📊 Report</button>
+        <button class="tab-btn menu-btn" onclick="window.location.href='items.html'">📋 Menu</button>
+        <button class="tab-btn table-btn" onclick="window.location.href='tables.html'">🪑 Tables</button>
         <button class="tab-btn fullscreen-btn" onclick="toggleFullScreen()" id="fullscreenBtn">⛶ Full</button>
     </div>
 </div>
@@ -84,9 +89,9 @@
         </div>
 
         <div class="billing-summary">
-            <div class="line"><span>Subtotal</span><span id="subtotal">$0.00</span></div>
-            <div class="line discount"><span>Discount</span><span id="discountAmount">-$0.00</span></div>
-            <div class="line total"><span>TOTAL</span><span id="total">$0.00</span></div>
+            <div class="line"><span>Subtotal</span><span id="subtotal">Rs. 0.00</span></div>
+            <div class="line discount"><span>Discount</span><span id="discountAmount">-Rs. 0.00</span></div>
+            <div class="line total"><span>TOTAL</span><span id="total">Rs. 0.00</span></div>
 
             <div class="discount-row">
                 <label>Discount %</label>
@@ -98,19 +103,19 @@
     </div>
 
     <!-- ===== RIGHT: CATEGORIES ===== -->
-<div class="right-items">
-    <div class="items-header">
-        <span>📂 Categories</span>
-        <div class="items-header-actions">
-            <button id="backToCategoriesBtn" style="display:none;">⬅ Back</button>
-            <button id="refreshItemsBtn">⟳</button>
+    <div class="right-items">
+        <div class="items-header">
+            <span>📂 Categories</span>
+            <div class="items-header-actions">
+                <button id="backToCategoriesBtn" style="display:none;">⬅ Back</button>
+                <button id="refreshItemsBtn">⟳</button>
+            </div>
+        </div>
+        <div class="items-grid" id="itemsGrid">
+            <!-- Rendered by JS -->
         </div>
     </div>
-    <div class="items-grid" id="itemsGrid">
-        <!-- Rendered by JS -->
-    </div>
 </div>
-
 
 <!-- ===== HISTORY VIEW ===== -->
 <div id="view-history" class="view-container">
@@ -126,8 +131,8 @@
     <div class="report-summary" id="reportSummary">
         <div class="report-card"><div class="num" id="reportOrders">0</div><div class="label">Orders</div></div>
         <div class="report-card"><div class="num" id="reportItems">0</div><div class="label">Items Sold</div></div>
-        <div class="report-card"><div class="num" id="reportRevenue">$0.00</div><div class="label">Revenue</div></div>
-        <div class="report-card"><div class="num" id="reportTax">$0.00</div><div class="label">Tax</div></div>
+        <div class="report-card"><div class="num" id="reportRevenue">Rs. 0.00</div><div class="label">Revenue</div></div>
+        <div class="report-card"><div class="num" id="reportTax">Rs. 0.00</div><div class="label">Tax</div></div>
     </div>
     <div id="reportDetail"></div>
 </div>
@@ -166,17 +171,16 @@
                 <!-- Rendered by JS -->
             </div>
             <div class="payment-input">
-                <label>Amount Received ($)</label>
+                <label>Amount Received (Rs.)</label>
                 <input type="number" id="amountReceived" placeholder="0.00" step="0.01" min="0" />
             </div>
             <div class="payment-change" id="paymentChange">
                 <span>Change Due:</span>
-                <span id="changeAmount">$0.00</span>
+                <span id="changeAmount">Rs. 0.00</span>
             </div>
-            <!-- Print Option -->
             <div class="print-option">
                 <label>
-                    <input type="checkbox" id="printBillCheckbox" checked />
+                    <input type="checkbox" id="printBillCheckbox"/>
                     🖨️ Print Bill
                 </label>
             </div>
@@ -187,7 +191,6 @@
         </div>
     </div>
 </div>
-
 
 <script>
 // ============================================================
@@ -277,7 +280,6 @@ const billingList = document.getElementById('billingList');
 const itemsGrid = document.getElementById('itemsGrid');
 const subtotalEl = document.getElementById('subtotal');
 const discountAmountEl = document.getElementById('discountAmount');
-const taxEl = document.getElementById('tax');
 const totalEl = document.getElementById('total');
 const payBtn = document.getElementById('payBtn');
 const clearCartBtn = document.getElementById('clearCartBtn');
@@ -422,6 +424,11 @@ backToCategoriesBtn.addEventListener('click', function() {
     renderItems();
 });
 
+refreshItemsBtn.addEventListener('click', function() {
+    loadData();
+    renderItems();
+});
+
 // ============================================================
 //  ADD TO CART
 // ============================================================
@@ -497,6 +504,9 @@ function updateDiscount(id, value) {
     updateBilling();
 }
 
+// ============================================================
+//  CALCULATE TOTALS (FIXED)
+// ============================================================
 function calculateTotals() {
     const subtotal = cart.reduce((sum, item) => sum + item.price * item.quantity, 0);
     const itemDiscounts = cart.reduce((sum, item) => {
@@ -504,13 +514,20 @@ function calculateTotals() {
         return sum + (total * (item.discount || 0)) / 100;
     }, 0);
     const discount = (subtotal * discountPercent) / 100 + itemDiscounts;
-    const total = subtotal - discount; // Tax අයින් කරන ලදි
+    const total = subtotal - discount;
 
+    // Rs. currency භාවිතා කරන්න
     subtotalEl.textContent = `Rs. ${subtotal.toFixed(2)}`;
     discountAmountEl.textContent = `-Rs. ${discount.toFixed(2)}`;
-    taxEl.textContent = `Rs. 0.00`;
     totalEl.textContent = `Rs. ${total.toFixed(2)}`;
+    
+    // Pay Button එක Enable/Disable කිරීම
     payBtn.disabled = cart.length === 0;
+    
+    console.log('Cart items:', cart.length);
+    console.log('Subtotal:', subtotal);
+    console.log('Total:', total);
+    console.log('PayBtn disabled:', payBtn.disabled);
 }
 
 discountInput.addEventListener('input', function() {
@@ -525,11 +542,6 @@ clearCartBtn.addEventListener('click', function() {
     cart = [];
     saveCart();
     updateBilling();
-});
-
-refreshItemsBtn.addEventListener('click', function() {
-    loadData();
-    renderItems();
 });
 
 // ============================================================
@@ -616,7 +628,7 @@ payBtn.addEventListener('click', function() {
         return sum + (total * (item.discount || 0)) / 100;
     }, 0);
     const discount = (subtotal * discountPercent) / 100 + itemDiscounts;
-    const total = subtotal - discount; // Tax අයින් කරන ලදි
+    const total = subtotal - discount;
     
     currentBill = {
         items: cart.map(c => ({ name: c.name, qty: c.quantity, price: c.price, discount: c.discount || 0 })),
@@ -740,7 +752,7 @@ paymentModal.addEventListener('click', function(e) {
 });
 
 // ============================================================
-//  PRINT BILL FUNCTION (Tax අයින් කරපු)
+//  PRINT BILL FUNCTION
 // ============================================================
 function printBill(bill) {
     const printWindow = window.open('', '_blank', 'width=400,height=600');
@@ -883,7 +895,7 @@ document.addEventListener('keydown', function(e) {
 });
 
 // ============================================================
-//  HISTORY (Tax අයින් කරපු)
+//  HISTORY
 // ============================================================
 function renderHistory() {
     if (history.length === 0) {
@@ -916,7 +928,7 @@ clearHistoryBtn.addEventListener('click', function() {
 });
 
 // ============================================================
-//  REPORT (Tax අයින් කරපු)
+//  REPORT
 // ============================================================
 function updateReport() {
     const today = new Date().toDateString();
@@ -1029,7 +1041,6 @@ loadData();
 renderItems();
 updateBilling();
 setTimeout(updateFullscreenUI, 100);
-
 </script>
 
 </body>
