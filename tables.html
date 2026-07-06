@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
-    <title>Table Management</title>
+    <title>Table Management - Hotel POS</title>
     <link rel="stylesheet" href="style-tables.css" />
 </head>
 <body>
@@ -11,21 +11,73 @@
 <!-- ===== HEADER ===== -->
 <div class="main-header">
     <div class="header-left">
+        <button class="hamburger-btn" id="hamburgerBtn" onclick="toggleDropdown()">
+            <span></span>
+            <span></span>
+            <span></span>
+        </button>
         <h1>🪑 TABLE MANAGEMENT</h1>
         <span class="datetime" id="datetime">--</span>
     </div>
     <div class="header-right">
         <button onclick="window.location.href='index.html'" class="back-btn">🏠 Back to POS</button>
+        <button id="refreshBtn" class="refresh-btn">⟳ Refresh</button>
     </div>
 </div>
 
+<!-- ===== DROPDOWN MENU ===== -->
+<div class="dropdown-menu" id="dropdownMenu">
+    <div class="dropdown-content">
+        <a href="index.html" class="dropdown-item">
+            <span class="drop-icon">🧾</span>
+            <span class="drop-text">POS</span>
+        </a>
+        <a href="index.html#history" class="dropdown-item" onclick="switchTab('history')">
+            <span class="drop-icon">📜</span>
+            <span class="drop-text">History</span>
+        </a>
+        <a href="report.html" class="dropdown-item">
+            <span class="drop-icon">📊</span>
+            <span class="drop-text">Report</span>
+        </a>
+        <a href="items.html" class="dropdown-item">
+            <span class="drop-icon">📋</span>
+            <span class="drop-text">Menu</span>
+        </a>
+        <a href="tables.html" class="dropdown-item active-link">
+            <span class="drop-icon">🪑</span>
+            <span class="drop-text">Tables</span>
+        </a>
+        <a href="stock.html" class="dropdown-item">
+            <span class="drop-icon">📦</span>
+            <span class="drop-text">Stock</span>
+        </a>
+        <a href="settings.html" class="dropdown-item">
+            <span class="drop-icon">⚙️</span>
+            <span class="drop-text">Settings</span>
+        </a>
+        <div class="dropdown-divider"></div>
+        <a href="#" class="dropdown-item" onclick="toggleFullScreen();">
+            <span class="drop-icon">⛶</span>
+            <span class="drop-text">Full Screen</span>
+        </a>
+        <a href="#" class="dropdown-item" onclick="logout();">
+            <span class="drop-icon">🚪</span>
+            <span class="drop-text">Logout</span>
+        </a>
+    </div>
+</div>
+
+<!-- ===== DROPDOWN OVERLAY ===== -->
+<div class="dropdown-overlay" id="dropdownOverlay" onclick="closeDropdown()"></div>
+
 <!-- ===== ACTIONS BAR ===== -->
 <div class="actions-bar">
-    <button class="active" id="showAllBtn">📋 All</button>
+    <button class="active" id="showAllBtn">📋 All Tables</button>
     <button id="showActiveBtn">🟡 Active</button>
     <button id="showEmptyBtn">🟢 Empty</button>
     <button id="showSummaryBtn">📊 Summary</button>
-    <button id="refreshBtn">⟳ Refresh</button>
+    <button id="clearAllBtn" class="clear-btn">🗑️ Clear All</button>
 </div>
 
 <!-- ===== TABLE GRID ===== -->
@@ -49,7 +101,7 @@
                 <div class="line total"><span>TOTAL</span><span id="modalTotal">Rs. 0.00</span></div>
                 <div class="modal-actions">
                     <button class="pay-btn" id="payTableBtn">💳 Pay & Close</button>
-                    <button class="close-btn-red" id="closeTableBtn">🚪 Close</button>
+                    <button class="close-btn-red" id="closeTableBtn">🚪 Close Table</button>
                 </div>
             </div>
         </div>
@@ -77,7 +129,7 @@
             </div>
             <div class="print-option">
                 <label>
-                    <input type="checkbox" id="tablePrintBillCheckbox"/>
+                    <input type="checkbox" id="tablePrintBillCheckbox" checked />
                     🖨️ Print Bill
                 </label>
             </div>
@@ -88,6 +140,9 @@
         </div>
     </div>
 </div>
+
+<!-- ===== TOAST NOTIFICATION ===== -->
+<div id="toast"></div>
 
 <script>
 // ============================================================
@@ -137,18 +192,16 @@ function saveCustomers() { localStorage.setItem(CUSTOMER_ORDERS_KEY, JSON.string
 function saveHistory() { localStorage.setItem(HISTORY_KEY, JSON.stringify(history)); }
 
 // ============================================================
-//  FORCE INITIALIZE TABLES (if empty)
+//  FORCE INITIALIZE TABLES
 // ============================================================
 function forceInitTables() {
     const stored = localStorage.getItem(TABLE_ORDERS_KEY);
     if (!stored || stored === '{}') {
-        console.log('No table data found! Initializing...');
         const newOrders = {};
         for (let i = 1; i <= TABLE_COUNT; i++) {
             newOrders[i] = [];
         }
         localStorage.setItem(TABLE_ORDERS_KEY, JSON.stringify(newOrders));
-        console.log('Tables initialized!');
     }
 }
 
@@ -183,6 +236,27 @@ function updateClock() {
 }
 updateClock();
 setInterval(updateClock, 1000);
+
+// ============================================================
+//  DROPDOWN MENU
+// ============================================================
+function toggleDropdown() {
+    const btn = document.getElementById('hamburgerBtn');
+    const menu = document.getElementById('dropdownMenu');
+    const overlay = document.getElementById('dropdownOverlay');
+    
+    btn.classList.toggle('open');
+    menu.classList.toggle('open');
+    overlay.classList.toggle('active');
+    document.body.style.overflow = menu.classList.contains('open') ? 'hidden' : '';
+}
+
+function closeDropdown() {
+    document.getElementById('hamburgerBtn').classList.remove('open');
+    document.getElementById('dropdownMenu').classList.remove('open');
+    document.getElementById('dropdownOverlay').classList.remove('active');
+    document.body.style.overflow = '';
+}
 
 // ============================================================
 //  RENDER TABLES
@@ -231,6 +305,10 @@ function renderTables(filter = 'all') {
         return;
     }
     
+    if (html === '') {
+        html = '<div class="empty-state">No tables match this filter</div>';
+    }
+    
     html += `
         <div class="summary-bar">
             <span>📦 Total Items: ${totalItems}</span>
@@ -239,7 +317,7 @@ function renderTables(filter = 'all') {
         </div>
     `;
     
-    grid.innerHTML = html || '<div class="empty-state">No tables match this filter</div>';
+    grid.innerHTML = html;
 }
 
 // ============================================================
@@ -249,6 +327,7 @@ function renderSummary() {
     let html = '<div class="summary-grid">';
     let grandTotal = 0;
     let grandItems = 0;
+    let activeCount = 0;
     
     for (let i = 1; i <= TABLE_COUNT; i++) {
         const items = tableOrders[i] || [];
@@ -256,6 +335,7 @@ function renderSummary() {
         const count = items.length;
         grandTotal += subtotal;
         grandItems += count;
+        if (count > 0) activeCount++;
         
         const status = count > 0 ? 'active' : 'empty';
         const statusText = count > 0 ? '🟡 Active' : '🟢 Empty';
@@ -272,9 +352,18 @@ function renderSummary() {
     
     html += `
         <div class="summary-grand">
-            <span>📊 GRAND TOTAL</span>
-            <span>${grandItems} items</span>
-            <span style="color:#16a34a; font-size:1.4rem;">Rs. ${grandTotal.toFixed(2)}</span>
+            <div class="grand-item">
+                <span>📊 Active Tables</span>
+                <span class="grand-value">${activeCount}/${TABLE_COUNT}</span>
+            </div>
+            <div class="grand-item">
+                <span>📦 Total Items</span>
+                <span class="grand-value">${grandItems}</span>
+            </div>
+            <div class="grand-item">
+                <span>💰 Grand Total</span>
+                <span class="grand-value" style="color:#16a34a;">Rs. ${grandTotal.toFixed(2)}</span>
+            </div>
         </div>
     </div>`;
     
@@ -306,7 +395,7 @@ function renderTableOrderItems(tableNum) {
         const total = item.price * item.quantity;
         html += `
             <div class="order-item">
-                <span>${item.name}</span>
+                <span class="item-name">${item.name}</span>
                 <div class="qty-control">
                     <button onclick="changeTableQty(${tableNum}, ${index}, -1)">−</button>
                     <span>${item.quantity}</span>
@@ -324,7 +413,7 @@ function renderTableOrderItems(tableNum) {
 function updateModalTotals(tableNum) {
     const items = tableOrders[tableNum] || [];
     const subtotal = items.reduce((sum, item) => sum + item.price * item.quantity, 0);
-    const total = subtotal; // Tax අයින් කරන ලදි
+    const total = subtotal;
     
     modalSubtotal.textContent = `Rs. ${subtotal.toFixed(2)}`;
     modalTotal.textContent = `Rs. ${total.toFixed(2)}`;
@@ -357,7 +446,7 @@ document.getElementById('closeTableBtn').addEventListener('click', function() {
     if (!currentTable) return;
     const items = tableOrders[currentTable] || [];
     if (items.length === 0) {
-        alert('Table is already empty!');
+        showToast('Table is already empty!');
         return;
     }
     if (confirm(`Close Table ${currentTable}?`)) {
@@ -365,11 +454,12 @@ document.getElementById('closeTableBtn').addEventListener('click', function() {
         saveTables();
         renderTables(currentFilter);
         modal.classList.remove('open');
+        showToast(`✅ Table ${currentTable} closed!`);
     }
 });
 
 // ============================================================
-//  PRINT BILL FUNCTION (Tax අයින් කරපු)
+//  PRINT BILL FUNCTION
 // ============================================================
 function printBill(bill) {
     const printWindow = window.open('', '_blank', 'width=400,height=600');
@@ -389,19 +479,21 @@ function printBill(bill) {
         <head>
             <title>Bill #${bill.id}</title>
             <style>
-                body { font-family: Arial, sans-serif; padding: 20px; max-width: 350px; margin: 0 auto; }
+                * { margin: 0; padding: 0; box-sizing: border-box; }
+                body { font-family: 'Courier New', monospace; padding: 20px; max-width: 350px; margin: 0 auto; background: white; }
                 .header { text-align: center; border-bottom: 2px dashed #333; padding-bottom: 10px; margin-bottom: 10px; }
-                .header h1 { margin: 0; font-size: 1.2rem; }
+                .header h1 { margin: 0; font-size: 1.4rem; }
                 .header p { margin: 4px 0; color: #666; font-size: 0.8rem; }
-                table { width: 100%; border-collapse: collapse; font-size: 0.85rem; }
-                th { text-align: left; border-bottom: 1px solid #ddd; padding: 4px 0; }
+                table { width: 100%; border-collapse: collapse; font-size: 0.8rem; }
+                th { text-align: left; border-bottom: 1px solid #ddd; padding: 4px 0; font-size: 0.7rem; color: #666; }
                 td { padding: 4px 0; border-bottom: 1px solid #eee; }
                 .totals { margin-top: 10px; border-top: 2px solid #333; padding-top: 10px; }
-                .totals div { display: flex; justify-content: space-between; font-size: 0.9rem; padding: 2px 0; }
+                .totals div { display: flex; justify-content: space-between; font-size: 0.85rem; padding: 2px 0; }
                 .totals .grand { font-weight: 700; font-size: 1.1rem; border-top: 1px solid #ddd; padding-top: 6px; margin-top: 4px; }
                 .totals .received { color: #16a34a; }
                 .totals .change { color: #16a34a; }
                 .footer { text-align: center; margin-top: 20px; font-size: 0.8rem; color: #666; border-top: 2px dashed #333; padding-top: 10px; }
+                .thankyou { font-size: 0.9rem; font-weight: 600; color: #333; }
             </style>
         </head>
         <body>
@@ -410,6 +502,7 @@ function printBill(bill) {
                 <p>${bill.date}</p>
                 <p>Bill #${bill.id}</p>
                 ${bill.table ? `<p>🪑 Table ${bill.table}</p>` : ''}
+                <p style="font-size:0.7rem;color:#999;">Thank you for your visit!</p>
             </div>
             
             <table>
@@ -434,7 +527,8 @@ function printBill(bill) {
             </div>
             
             <div class="footer">
-                <p>Thank you! Come again! 🍽️</p>
+                <p class="thankyou">Thank you! Come again! 🍽️</p>
+                <p style="margin-top:4px;font-size:0.7rem;">Have a great day! 😊</p>
             </div>
             
             <script>
@@ -442,7 +536,7 @@ function printBill(bill) {
                     window.print();
                     setTimeout(function() {
                         window.close();
-                    }, 500);
+                    }, 800);
                 };
             <\/script>
         </body>
@@ -459,12 +553,12 @@ document.getElementById('payTableBtn').addEventListener('click', function() {
     if (!currentTable) return;
     const items = tableOrders[currentTable] || [];
     if (items.length === 0) {
-        alert('No items to pay!');
+        showToast('No items to pay!');
         return;
     }
     
     const subtotal = items.reduce((sum, item) => sum + item.price * item.quantity, 0);
-    const total = subtotal; // Tax අයින් කරන ලදි
+    const total = subtotal;
     
     currentTableBill = {
         table: currentTable,
@@ -474,7 +568,7 @@ document.getElementById('payTableBtn').addEventListener('click', function() {
     };
     
     tablePaymentDetails.innerHTML = `
-        <div style="margin-bottom:8px;font-weight:700;">🪑 Table ${currentTable}</div>
+        <div style="margin-bottom:8px;font-weight:700;color:#8b5cf6;">🪑 Table ${currentTable}</div>
         ${items.map(item => `
             <div class="pay-line">
                 <span>${item.name} x${item.quantity}</span>
@@ -496,6 +590,7 @@ document.getElementById('payTableBtn').addEventListener('click', function() {
     
     tablePaymentModal.classList.add('open');
     modal.classList.remove('open');
+    setTimeout(() => tableAmountReceived.focus(), 100);
 });
 
 // ============================================================
@@ -533,21 +628,26 @@ tableAmountReceived.addEventListener('input', function() {
     }
 });
 
+// Enter key support
+tableAmountReceived.addEventListener('keydown', function(e) {
+    if (e.key === 'Enter' && !confirmTablePaymentBtn.disabled) {
+        confirmTablePaymentBtn.click();
+    }
+});
+
 // ============================================================
 //  CONFIRM TABLE PAYMENT
 // ============================================================
 confirmTablePaymentBtn.addEventListener('click', function() {
-    console.log('Confirm button clicked!');
-    
     if (!currentTableBill) {
-        alert('No bill to process!');
+        showToast('No bill to process!');
         return;
     }
     
     const received = parseFloat(tableAmountReceived.value) || 0;
     
     if (received < currentTableBill.total) {
-        alert(`❌ Insufficient amount!\nTotal: Rs. ${currentTableBill.total.toFixed(2)}\nReceived: Rs. ${received.toFixed(2)}\nRemaining: Rs. ${(currentTableBill.total - received).toFixed(2)}`);
+        showToast(`❌ Insufficient amount!\nTotal: Rs. ${currentTableBill.total.toFixed(2)}\nReceived: Rs. ${received.toFixed(2)}\nRemaining: Rs. ${(currentTableBill.total - received).toFixed(2)}`);
         return;
     }
     
@@ -579,7 +679,7 @@ confirmTablePaymentBtn.addEventListener('click', function() {
         printBill(bill);
     }
     
-    alert(`✅ Payment Successful!\nTable ${bill.table}\nTotal: Rs. ${bill.total.toFixed(2)}\nReceived: Rs. ${bill.received.toFixed(2)}\nChange: Rs. ${bill.change.toFixed(2)}\nThank you! 🍽️`);
+    showToast(`✅ Payment Successful!\nTable ${bill.table}\nTotal: Rs. ${bill.total.toFixed(2)}\nReceived: Rs. ${bill.received.toFixed(2)}\nChange: Rs. ${bill.change.toFixed(2)}`);
     
     currentTableBill = null;
     currentTable = null;
@@ -615,10 +715,38 @@ tablePaymentModal.addEventListener('click', function(e) {
 });
 
 // ============================================================
+//  CLEAR ALL TABLES
+// ============================================================
+document.getElementById('clearAllBtn').addEventListener('click', function() {
+    if (!confirm('⚠️ Clear all tables? This will remove all orders from all tables!')) return;
+    if (!confirm('🔴 Are you sure? This cannot be undone!')) return;
+    
+    for (let i = 1; i <= TABLE_COUNT; i++) {
+        tableOrders[i] = [];
+    }
+    saveTables();
+    renderTables(currentFilter);
+    showToast('✅ All tables cleared!');
+});
+
+// ============================================================
 //  CLOSE MODALS
 // ============================================================
 document.getElementById('closeModalBtn').addEventListener('click', () => modal.classList.remove('open'));
 modal.addEventListener('click', (e) => { if (e.target === modal) modal.classList.remove('open'); });
+
+// ============================================================
+//  TOAST NOTIFICATION
+// ============================================================
+function showToast(message) {
+    const toast = document.getElementById('toast');
+    toast.textContent = message;
+    toast.className = 'show';
+    clearTimeout(toast._timeout);
+    toast._timeout = setTimeout(() => {
+        toast.className = '';
+    }, 3000);
+}
 
 // ============================================================
 //  FILTER BUTTONS
@@ -650,6 +778,65 @@ document.getElementById('showSummaryBtn').addEventListener('click', function() {
 document.getElementById('refreshBtn').addEventListener('click', function() {
     loadData();
     renderTables(currentFilter);
+    showToast('🔄 Refreshed!');
+});
+
+// ============================================================
+//  FULL SCREEN
+// ============================================================
+function toggleFullScreen() {
+    if (!document.fullscreenElement && !document.webkitFullscreenElement) {
+        const el = document.documentElement;
+        if (el.requestFullscreen) {
+            el.requestFullscreen();
+        } else if (el.webkitRequestFullscreen) {
+            el.webkitRequestFullscreen();
+        }
+    } else {
+        if (document.exitFullscreen) {
+            document.exitFullscreen();
+        } else if (document.webkitExitFullscreen) {
+            document.webkitExitFullscreen();
+        }
+    }
+}
+
+// ============================================================
+//  LOGOUT
+// ============================================================
+function logout() {
+    if (confirm('Are you sure you want to logout?')) {
+        localStorage.removeItem('hotel_logged_in');
+        localStorage.removeItem('hotel_username');
+        window.location.href = 'login.html';
+    }
+}
+
+// ============================================================
+//  CHECK LOGIN STATUS
+// ============================================================
+function checkLoginStatus() {
+    const isLoggedIn = localStorage.getItem('hotel_logged_in');
+    if (isLoggedIn !== 'true') {
+        window.location.href = 'login.html';
+    }
+}
+
+// ============================================================
+//  KEYBOARD SHORTCUTS
+// ============================================================
+document.addEventListener('keydown', (e) => {
+    if (e.key === 'Escape') {
+        modal.classList.remove('open');
+        tablePaymentModal.classList.remove('open');
+        closeDropdown();
+    }
+    if ((e.ctrlKey || e.metaKey) && e.key === 'r') {
+        e.preventDefault();
+        loadData();
+        renderTables(currentFilter);
+        showToast('🔄 Refreshed!');
+    }
 });
 
 // ============================================================
@@ -658,13 +845,21 @@ document.getElementById('refreshBtn').addEventListener('click', function() {
 window.changeTableQty = changeTableQty;
 window.removeTableItem = removeTableItem;
 window.openTableModal = openTableModal;
+window.toggleDropdown = toggleDropdown;
+window.closeDropdown = closeDropdown;
+window.toggleFullScreen = toggleFullScreen;
+window.logout = logout;
+window.showToast = showToast;
 
 // ============================================================
 //  INIT
 // ============================================================
-forceInitTables();
-loadData();
-renderTables('all');
+document.addEventListener('DOMContentLoaded', function() {
+    checkLoginStatus();
+    forceInitTables();
+    loadData();
+    renderTables('all');
+});
 </script>
 
 </body>

@@ -1,0 +1,184 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
+    <title>Login - Hotel POS</title>
+    <link rel="stylesheet" href="style-login.css" />
+</head>
+<body>
+
+<div class="login-container">
+    <div class="login-box">
+        <div class="login-header">
+            <div class="logo-icon">🍽️</div>
+            <h1>HOTEL POS</h1>
+            <p>Point of Sale System</p>
+        </div>
+        
+        <div class="login-form">
+            <div class="input-group">
+                <label for="username">👤 Username</label>
+                <input type="text" id="username" placeholder="Enter username" value="admin" autofocus />
+            </div>
+            
+            <div class="input-group">
+                <label for="password">🔒 Password</label>
+                <div class="password-wrapper">
+                    <input type="password" id="password" placeholder="Enter password" />
+                    <button type="button" class="toggle-password" onclick="togglePassword()" aria-label="Toggle password visibility">
+                        👁️
+                    </button>
+                </div>
+            </div>
+            
+            <button class="login-btn" onclick="handleLogin()">
+                <span>🚀</span> Login
+            </button>
+            
+            <div class="login-error" id="loginError"></div>
+            
+            <div class="login-footer">
+                <span>Default Password: <strong>admin123</strong></span>
+                <span class="demo-hint">💡 Demo credentials</span>
+            </div>
+        </div>
+    </div>
+    
+    <div class="login-footer-text">
+        <p>© 2024 Hotel POS System. All rights reserved.</p>
+    </div>
+</div>
+
+<script>
+// ============================================================
+//  LOGIN FUNCTIONS
+// ============================================================
+
+// Get stored password (default: admin123)
+function getStoredPassword() {
+    const stored = localStorage.getItem('hotel_password');
+    return stored || 'admin123';
+}
+
+// Handle Login
+function handleLogin() {
+    const username = document.getElementById('username').value.trim();
+    const password = document.getElementById('password').value;
+    const errorEl = document.getElementById('loginError');
+    
+    const storedPassword = getStoredPassword();
+    
+    // Clear previous error
+    errorEl.style.display = 'none';
+    errorEl.textContent = '';
+    
+    if (!username) {
+        showError('❌ Please enter username!');
+        document.getElementById('username').focus();
+        return;
+    }
+    
+    if (!password) {
+        showError('❌ Please enter password!');
+        document.getElementById('password').focus();
+        return;
+    }
+    
+    if (password === storedPassword) {
+        // Success - set login session
+        localStorage.setItem('hotel_logged_in', 'true');
+        localStorage.setItem('hotel_username', username);
+        
+        // Add loading animation to button
+        const btn = document.querySelector('.login-btn');
+        btn.innerHTML = '<span>⏳</span> Logging in...';
+        btn.disabled = true;
+        
+        setTimeout(() => {
+            window.location.href = 'index.html';
+        }, 500);
+    } else {
+        showError('❌ Invalid password! Please try again.');
+        document.getElementById('password').value = '';
+        document.getElementById('password').focus();
+        
+        // Shake animation
+        const box = document.querySelector('.login-box');
+        box.style.animation = 'shake 0.5s ease';
+        setTimeout(() => {
+            box.style.animation = '';
+        }, 500);
+    }
+}
+
+// Show error message
+function showError(message) {
+    const errorEl = document.getElementById('loginError');
+    errorEl.textContent = message;
+    errorEl.style.display = 'block';
+}
+
+// Toggle password visibility
+function togglePassword() {
+    const passwordInput = document.getElementById('password');
+    const btn = document.querySelector('.toggle-password');
+    if (passwordInput.type === 'password') {
+        passwordInput.type = 'text';
+        btn.textContent = '🙈';
+        btn.setAttribute('aria-label', 'Hide password');
+    } else {
+        passwordInput.type = 'password';
+        btn.textContent = '👁️';
+        btn.setAttribute('aria-label', 'Show password');
+    }
+}
+
+// Enter key support
+document.getElementById('password').addEventListener('keydown', function(e) {
+    if (e.key === 'Enter') {
+        e.preventDefault();
+        handleLogin();
+    }
+});
+
+document.getElementById('username').addEventListener('keydown', function(e) {
+    if (e.key === 'Enter') {
+        e.preventDefault();
+        document.getElementById('password').focus();
+    }
+});
+
+// Auto-focus on username if not logged in
+document.addEventListener('DOMContentLoaded', function() {
+    // Check if already logged in
+    if (localStorage.getItem('hotel_logged_in') === 'true') {
+        window.location.href = 'index.html';
+    }
+    
+    // Focus username field
+    setTimeout(() => {
+        document.getElementById('username').focus();
+    }, 100);
+});
+
+// Prevent form submission
+document.querySelector('.login-form').addEventListener('submit', function(e) {
+    e.preventDefault();
+    handleLogin();
+});
+
+// Add shake animation dynamically
+const style = document.createElement('style');
+style.textContent = `
+    @keyframes shake {
+        0%, 100% { transform: translateX(0); }
+        10%, 30%, 50%, 70%, 90% { transform: translateX(-10px); }
+        20%, 40%, 60%, 80% { transform: translateX(10px); }
+    }
+`;
+document.head.appendChild(style);
+</script>
+
+</body>
+</html>

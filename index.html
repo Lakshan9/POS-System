@@ -3,8 +3,280 @@
 <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
-    <title>Hotel POS</title>
+    <title>Hotel POS System</title>
     <link rel="stylesheet" href="style.css" />
+    <style>
+        /* ===== EDIT BILL MODAL STYLES ===== */
+        .modal-wide {
+            max-width: 600px;
+        }
+        
+        .edit-bill-items {
+            max-height: 300px;
+            overflow-y: auto;
+            margin-bottom: 8px;
+        }
+        
+        .edit-bill-item {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            padding: 8px 12px;
+            background: #f8fafc;
+            border-radius: 10px;
+            margin-bottom: 6px;
+        }
+        
+        .edit-bill-item .item-name {
+            flex: 1;
+            font-weight: 500;
+        }
+        
+        .edit-bill-item .qty-control {
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+        
+        .edit-bill-item .qty-control button {
+            width: 26px;
+            height: 26px;
+            border: 1px solid #e2e8f0;
+            background: white;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 0.8rem;
+            transition: all 0.2s;
+        }
+        
+        .edit-bill-item .qty-control button:hover {
+            background: #8b5cf6;
+            color: white;
+            border-color: #8b5cf6;
+        }
+        
+        .edit-bill-item .qty-control span {
+            min-width: 20px;
+            text-align: center;
+            font-weight: 600;
+        }
+        
+        .edit-bill-item .item-price {
+            font-weight: 600;
+            color: #16a34a;
+            min-width: 80px;
+            text-align: right;
+        }
+        
+        .edit-bill-item .remove-item-btn {
+            background: transparent;
+            border: none;
+            color: #ef4444;
+            cursor: pointer;
+            font-size: 0.9rem;
+            padding: 4px;
+            border-radius: 4px;
+            transition: all 0.2s;
+        }
+        
+        .edit-bill-item .remove-item-btn:hover {
+            background: #fee2e2;
+        }
+        
+        .edit-discount-row {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            padding: 12px 0;
+            border-top: 1px solid #e2e8f0;
+            margin-top: 8px;
+        }
+        
+        .edit-discount-row label {
+            font-weight: 500;
+            font-size: 0.85rem;
+            color: #475569;
+        }
+        
+        .edit-discount-row input {
+            width: 70px;
+            padding: 4px 8px;
+            border: 2px solid #e2e8f0;
+            border-radius: 6px;
+            font-size: 0.85rem;
+            text-align: center;
+        }
+        
+        .edit-discount-row input:focus {
+            outline: none;
+            border-color: #8b5cf6;
+        }
+        
+        .edit-bill-summary {
+            border-top: 2px solid #e2e8f0;
+            padding-top: 16px;
+            margin-top: 12px;
+        }
+        
+        .edit-bill-summary .line {
+            display: flex;
+            justify-content: space-between;
+            padding: 4px 0;
+            font-size: 0.9rem;
+        }
+        
+        .edit-bill-summary .line.discount {
+            color: #ef4444;
+        }
+        
+        .edit-bill-summary .line.total {
+            font-weight: 700;
+            font-size: 1.1rem;
+            border-top: 1px solid #e2e8f0;
+            padding-top: 8px;
+            margin-top: 4px;
+        }
+        
+        .edit-actions {
+            display: flex;
+            gap: 10px;
+            margin-top: 16px;
+        }
+        
+        .save-edit-btn {
+            padding: 10px 20px;
+            background: #22c55e;
+            color: white;
+            border: none;
+            border-radius: 10px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s;
+            flex: 1;
+        }
+        
+        .save-edit-btn:hover {
+            background: #16a34a;
+        }
+        
+        .edit-note {
+            margin-top: 12px;
+            padding: 8px 14px;
+            background: #fef3c7;
+            border-radius: 8px;
+            font-size: 0.8rem;
+            color: #d97706;
+            text-align: center;
+        }
+        
+        /* History Edit Badge */
+        .edit-badge {
+            background: #fef3c7;
+            color: #d97706;
+            padding: 2px 10px;
+            border-radius: 12px;
+            font-size: 0.65rem;
+            font-weight: 600;
+        }
+        
+        .history-item.edited {
+            border-left-color: #f59e0b;
+            background: #fffbeb;
+        }
+        
+        .edited-label {
+            color: #d97706;
+            font-weight: 600;
+        }
+        
+        .h-top {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 6px;
+            gap: 8px;
+            flex-wrap: wrap;
+        }
+        
+        .history-actions-buttons {
+            display: flex;
+            gap: 4px;
+            align-items: center;
+        }
+        
+        .history-actions-buttons button {
+            background: transparent;
+            border: none;
+            cursor: pointer;
+            font-size: 0.9rem;
+            padding: 4px 8px;
+            border-radius: 4px;
+            transition: all 0.2s;
+        }
+        
+        .history-actions-buttons .print-btn {
+            color: #3b82f6;
+        }
+        
+        .history-actions-buttons .print-btn:hover {
+            background: #dbeafe;
+            transform: scale(1.1);
+        }
+        
+        .history-actions-buttons .edit-btn {
+            color: #8b5cf6;
+        }
+        
+        .history-actions-buttons .edit-btn:hover {
+            background: #f5f3ff;
+            transform: scale(1.1);
+        }
+        
+        .history-actions {
+            display: flex;
+            gap: 10px;
+            flex-wrap: wrap;
+        }
+        
+        @media (max-width: 480px) {
+            .edit-bill-item {
+                flex-wrap: wrap;
+                gap: 6px;
+            }
+            
+            .edit-bill-item .item-name {
+                flex-basis: 100%;
+                font-size: 0.9rem;
+            }
+            
+            .edit-actions {
+                flex-direction: column;
+            }
+            
+            .edit-discount-row {
+                flex-wrap: wrap;
+            }
+            
+            .modal-wide {
+                max-width: 95%;
+            }
+            
+            .h-top {
+                flex-direction: column;
+                align-items: flex-start;
+                gap: 4px;
+            }
+            
+            .history-actions {
+                flex-direction: column;
+                width: 100%;
+            }
+            
+            .history-actions button {
+                width: 100%;
+            }
+        }
+    </style>
 </head>
 <body>
 
@@ -21,6 +293,8 @@
     </div>
     <div class="header-right">
         <button class="tab-btn fullscreen-btn" onclick="toggleFullScreen()" id="fullscreenBtn">⛶ Full</button>
+        <button class="tab-btn" onclick="window.location.href='settings.html'" style="background:#8b5cf6;color:#fff;">⚙️</button>
+        <button class="tab-btn" onclick="logout()" style="background:#ef4444;color:#fff;">🚪 Logout</button>
     </div>
 </div>
 
@@ -35,7 +309,7 @@
             <span class="drop-icon">📜</span>
             <span class="drop-text">History</span>
         </a>
-        <a href="#" class="dropdown-item" onclick="switchTab('report');closeDropdown();">
+        <a href="report.html" class="dropdown-item" onclick="closeDropdown();">
             <span class="drop-icon">📊</span>
             <span class="drop-text">Report</span>
         </a>
@@ -47,6 +321,14 @@
             <span class="drop-icon">🪑</span>
             <span class="drop-text">Tables</span>
         </a>
+        <a href="stock.html" class="dropdown-item" onclick="closeDropdown();">
+            <span class="drop-icon">📦</span>
+            <span class="drop-text">Stock</span>
+        </a>
+        <a href="settings.html" class="dropdown-item" onclick="closeDropdown();">
+            <span class="drop-icon">⚙️</span>
+            <span class="drop-text">Settings</span>
+        </a>
         <div class="dropdown-divider"></div>
         <a href="#" class="dropdown-item" onclick="toggleFullScreen();closeDropdown();">
             <span class="drop-icon">⛶</span>
@@ -54,6 +336,9 @@
         </a>
     </div>
 </div>
+
+<!-- ===== DROPDOWN OVERLAY ===== -->
+<div class="dropdown-overlay" id="dropdownOverlay"></div>
 
 <!-- ===== POS VIEW ===== -->
 <div id="view-pos" class="pos-container active">
@@ -97,7 +382,7 @@
         </div>
     </div>
 
-    <!-- ===== RIGHT: CATEGORIES ===== -->
+    <!-- ===== RIGHT: CATEGORIES & ITEMS ===== -->
     <div class="right-items">
         <div class="items-header">
             <span>📂 Categories</span>
@@ -114,22 +399,16 @@
 
 <!-- ===== HISTORY VIEW ===== -->
 <div id="view-history" class="view-container">
-    <h2>📜 Bill History <button id="clearHistoryBtn">Clear All</button></h2>
+    <h2>
+        📜 Bill History
+        <div class="history-actions">
+            <button id="printHistoryBtn" style="background:#3b82f6;color:white;border:none;padding:6px 16px;border-radius:8px;cursor:pointer;">🖨️ Print All</button>
+            <button id="clearHistoryBtn" style="background:#ef4444;color:white;border:none;padding:6px 16px;border-radius:8px;cursor:pointer;">Clear All</button>
+        </div>
+    </h2>
     <div class="history-list" id="historyList">
         <div class="empty-state">No bills yet</div>
     </div>
-</div>
-
-<!-- ===== REPORT VIEW ===== -->
-<div id="view-report" class="view-container">
-    <h2>📊 Daily Report <button id="exportReportBtn">⬇ Export CSV</button></h2>
-    <div class="report-summary" id="reportSummary">
-        <div class="report-card"><div class="num" id="reportOrders">0</div><div class="label">Orders</div></div>
-        <div class="report-card"><div class="num" id="reportItems">0</div><div class="label">Items Sold</div></div>
-        <div class="report-card"><div class="num" id="reportRevenue">Rs. 0.00</div><div class="label">Revenue</div></div>
-        <div class="report-card"><div class="num" id="reportTax">Rs. 0.00</div><div class="label">Tax</div></div>
-    </div>
-    <div id="reportDetail"></div>
 </div>
 
 <!-- ===== HOLD MODAL ===== -->
@@ -175,7 +454,7 @@
             </div>
             <div class="print-option">
                 <label>
-                    <input type="checkbox" id="printBillCheckbox"/>
+                    <input type="checkbox" id="printBillCheckbox" checked />
                     🖨️ Print Bill
                 </label>
             </div>
@@ -187,27 +466,64 @@
     </div>
 </div>
 
+<!-- ===== EDIT BILL MODAL ===== -->
+<div class="modal-overlay" id="editBillModal">
+    <div class="modal modal-wide">
+        <div class="modal-header">
+            <h2>✎ Edit Bill #<span id="editBillId">0</span></h2>
+            <button class="close-btn" id="closeEditBillModalBtn">✕</button>
+        </div>
+        <div class="modal-body">
+            <div class="edit-bill-items" id="editBillItems">
+                <div class="empty-state">No items</div>
+            </div>
+            <div class="edit-bill-summary">
+                <div class="line"><span>Subtotal</span><span id="editSubtotal">Rs. 0.00</span></div>
+                <div class="line discount"><span>Discount</span><span id="editDiscount">-Rs. 0.00</span></div>
+                <div class="line total"><span>TOTAL</span><span id="editTotal">Rs. 0.00</span></div>
+                <div class="edit-actions">
+                    <button class="save-edit-btn" id="saveEditBillBtn">💾 Save Changes</button>
+                    <button class="cancel-btn" id="cancelEditBillBtn">✕ Cancel</button>
+                </div>
+                <div class="edit-note">
+                    <span>✏️ Edit note: This bill will be marked as modified</span>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- ===== TOAST NOTIFICATION ===== -->
+<div id="toast"></div>
+
 <script>
 // ============================================================
-//  DATA
+//  DATA STORAGE KEYS
 // ============================================================
 const STORAGE_KEY = 'hotel_items';
 const CART_KEY = 'hotel_cart';
 const HISTORY_KEY = 'hotel_history';
 const TABLE_ORDERS_KEY = 'hotel_table_orders';
 const CUSTOMER_ORDERS_KEY = 'hotel_customer_orders';
+const STOCK_KEY = 'hotel_stock';
 
+// ============================================================
+//  GLOBAL VARIABLES
+// ============================================================
 let items = [];
 let cart = [];
 let history = [];
 let discountPercent = 0;
 let tableOrders = {};
 let customerOrders = {};
+let stockData = [];
 let selectedCategory = null;
 let currentBill = null;
+let editingBillId = null;
+let editedBillData = null;
 
 // ============================================================
-//  LOAD / SAVE
+//  LOAD / SAVE FUNCTIONS
 // ============================================================
 function loadData() {
     try {
@@ -248,6 +564,19 @@ function loadData() {
         
         const storedCustomers = localStorage.getItem(CUSTOMER_ORDERS_KEY);
         customerOrders = storedCustomers ? JSON.parse(storedCustomers) : {};
+
+        const storedStock = localStorage.getItem(STOCK_KEY);
+        if (storedStock) {
+            stockData = JSON.parse(storedStock);
+        } else {
+            stockData = items.map(item => ({
+                id: item.id,
+                name: item.name,
+                stock: 15,
+                minStock: 5
+            }));
+            saveStock();
+        }
         
     } catch (e) {
         console.error('Load error:', e);
@@ -256,6 +585,7 @@ function loadData() {
         history = [];
         tableOrders = {};
         customerOrders = {};
+        stockData = [];
         for (let i = 1; i <= 12; i++) {
             tableOrders[i] = [];
         }
@@ -267,6 +597,35 @@ function saveCart() { localStorage.setItem(CART_KEY, JSON.stringify(cart)); }
 function saveHistory() { localStorage.setItem(HISTORY_KEY, JSON.stringify(history)); }
 function saveTables() { localStorage.setItem(TABLE_ORDERS_KEY, JSON.stringify(tableOrders)); }
 function saveCustomers() { localStorage.setItem(CUSTOMER_ORDERS_KEY, JSON.stringify(customerOrders)); }
+function saveStock() { localStorage.setItem(STOCK_KEY, JSON.stringify(stockData)); }
+
+// ============================================================
+//  STOCK HELPER FUNCTIONS
+// ============================================================
+function getStockForItem(itemId) {
+    const stockItem = stockData.find(s => s.id === itemId);
+    return stockItem ? stockItem.stock : 0;
+}
+
+function getStockColor(stock) {
+    if (stock < 5) return 'stock-danger';
+    else if (stock < 10) return 'stock-warning';
+    else return 'stock-success';
+}
+
+function getStockStatus(stock) {
+    if (stock < 5) return '🔴 Very Low';
+    else if (stock < 10) return '🟡 Low';
+    else return '🟢 In Stock';
+}
+
+function updateStock(itemId, quantity) {
+    const stockItem = stockData.find(s => s.id === itemId);
+    if (stockItem) {
+        stockItem.stock = Math.max(0, stockItem.stock - quantity);
+        saveStock();
+    }
+}
 
 // ============================================================
 //  DOM REFS
@@ -290,12 +649,7 @@ const refreshItemsBtn = document.getElementById('refreshItemsBtn');
 const backToCategoriesBtn = document.getElementById('backToCategoriesBtn');
 const historyList = document.getElementById('historyList');
 const clearHistoryBtn = document.getElementById('clearHistoryBtn');
-const reportOrders = document.getElementById('reportOrders');
-const reportItems = document.getElementById('reportItems');
-const reportRevenue = document.getElementById('reportRevenue');
-const reportTax = document.getElementById('reportTax');
-const reportDetail = document.getElementById('reportDetail');
-const exportReportBtn = document.getElementById('exportReportBtn');
+const printHistoryBtn = document.getElementById('printHistoryBtn');
 const paymentModal = document.getElementById('paymentModal');
 const paymentDetails = document.getElementById('paymentDetails');
 const amountReceived = document.getElementById('amountReceived');
@@ -303,6 +657,16 @@ const changeAmount = document.getElementById('changeAmount');
 const confirmPaymentBtn = document.getElementById('confirmPaymentBtn');
 const cancelPaymentBtn = document.getElementById('cancelPaymentBtn');
 const closePaymentModalBtn = document.getElementById('closePaymentModalBtn');
+const printBillCheckbox = document.getElementById('printBillCheckbox');
+const editBillModal = document.getElementById('editBillModal');
+const editBillId = document.getElementById('editBillId');
+const editBillItems = document.getElementById('editBillItems');
+const editSubtotal = document.getElementById('editSubtotal');
+const editDiscount = document.getElementById('editDiscount');
+const editTotal = document.getElementById('editTotal');
+const saveEditBillBtn = document.getElementById('saveEditBillBtn');
+const cancelEditBillBtn = document.getElementById('cancelEditBillBtn');
+const closeEditBillModalBtn = document.getElementById('closeEditBillModalBtn');
 
 // ============================================================
 //  CLOCK
@@ -317,7 +681,38 @@ updateClock();
 setInterval(updateClock, 1000);
 
 // ============================================================
-//  RENDER CATEGORIES & ITEMS (Right Column)
+//  DROPDOWN MENU
+// ============================================================
+const hamburgerBtn = document.getElementById('hamburgerBtn');
+const dropdownMenu = document.getElementById('dropdownMenu');
+const dropdownOverlay = document.getElementById('dropdownOverlay');
+
+function toggleDropdown() {
+    hamburgerBtn.classList.toggle('open');
+    dropdownMenu.classList.toggle('open');
+    dropdownOverlay.classList.toggle('active');
+    document.body.style.overflow = dropdownMenu.classList.contains('open') ? 'hidden' : '';
+}
+
+function closeDropdown() {
+    hamburgerBtn.classList.remove('open');
+    dropdownMenu.classList.remove('open');
+    dropdownOverlay.classList.remove('active');
+    document.body.style.overflow = '';
+}
+
+hamburgerBtn.addEventListener('click', toggleDropdown);
+dropdownOverlay.addEventListener('click', closeDropdown);
+
+document.addEventListener('keydown', function(e) {
+    if (e.key === 'Escape') {
+        closeDropdown();
+        editBillModal.classList.remove('open');
+    }
+});
+
+// ============================================================
+//  RENDER CATEGORIES & ITEMS
 // ============================================================
 function renderItems() {
     const categories = getCategories();
@@ -403,10 +798,19 @@ function renderCategoryItems(category) {
     
     let html = `<div class="category-label">${catName}</div>`;
     catItems.forEach(item => {
+        const stockQty = getStockForItem(item.id);
+        const stockColor = getStockColor(stockQty);
+        const stockStatus = getStockStatus(stockQty);
+        const isOutOfStock = stockQty <= 0;
+        
         html += `
-            <button class="item-btn" onclick="addToCart('${item.name}', ${item.price})">
+            <button class="item-btn ${stockColor} ${isOutOfStock ? 'out-of-stock' : ''}" 
+                    onclick="${isOutOfStock ? '' : `addToCart(${item.id})`}"
+                    ${isOutOfStock ? 'disabled' : ''}>
                 <span class="item-name">${item.name}</span>
                 <span class="item-price">Rs. ${item.price.toFixed(2)}</span>
+                <span class="item-stock ${stockColor}">${stockQty} (${stockStatus})</span>
+                ${isOutOfStock ? '<span class="out-of-stock-label">Out of Stock</span>' : ''}
             </button>
         `;
     });
@@ -422,21 +826,33 @@ backToCategoriesBtn.addEventListener('click', function() {
 refreshItemsBtn.addEventListener('click', function() {
     loadData();
     renderItems();
+    showToast('🔄 Items refreshed!');
 });
 
 // ============================================================
 //  ADD TO CART
 // ============================================================
-function addToCart(name, price) {
-    const item = items.find(i => i.name === name);
+function addToCart(itemId) {
+    const item = items.find(i => i.id === itemId);
     if (!item) return;
+    
+    const stockQty = getStockForItem(itemId);
+    if (stockQty <= 0) {
+        showToast(`❌ ${item.name} is out of stock!`);
+        return;
+    }
     
     const existing = cart.find(c => c.id === item.id);
     if (existing) {
+        if (existing.quantity >= stockQty) {
+            showToast(`❌ Not enough stock for ${item.name}! Available: ${stockQty}`);
+            return;
+        }
         existing.quantity += 1;
     } else {
         cart.push({ ...item, quantity: 1, discount: 0 });
     }
+    
     saveCart();
     updateBilling();
 }
@@ -474,7 +890,16 @@ function updateBilling() {
 function changeQty(id, delta) {
     const item = cart.find(c => c.id === id);
     if (!item) return;
-    item.quantity += delta;
+    
+    const stockQty = getStockForItem(id);
+    const newQty = item.quantity + delta;
+    
+    if (newQty > stockQty) {
+        showToast(`❌ Not enough stock! Available: ${stockQty}`);
+        return;
+    }
+    
+    item.quantity = newQty;
     if (item.quantity <= 0) {
         cart = cart.filter(c => c.id !== id);
     }
@@ -500,7 +925,7 @@ function updateDiscount(id, value) {
 }
 
 // ============================================================
-//  CALCULATE TOTALS (FIXED)
+//  CALCULATE TOTALS
 // ============================================================
 function calculateTotals() {
     const subtotal = cart.reduce((sum, item) => sum + item.price * item.quantity, 0);
@@ -511,18 +936,11 @@ function calculateTotals() {
     const discount = (subtotal * discountPercent) / 100 + itemDiscounts;
     const total = subtotal - discount;
 
-    // Rs. currency භාවිතා කරන්න
     subtotalEl.textContent = `Rs. ${subtotal.toFixed(2)}`;
     discountAmountEl.textContent = `-Rs. ${discount.toFixed(2)}`;
     totalEl.textContent = `Rs. ${total.toFixed(2)}`;
     
-    // Pay Button එක Enable/Disable කිරීම
     payBtn.disabled = cart.length === 0;
-    
-    console.log('Cart items:', cart.length);
-    console.log('Subtotal:', subtotal);
-    console.log('Total:', total);
-    console.log('PayBtn disabled:', payBtn.disabled);
 }
 
 discountInput.addEventListener('input', function() {
@@ -534,6 +952,8 @@ discountInput.addEventListener('input', function() {
 });
 
 clearCartBtn.addEventListener('click', function() {
+    if (cart.length === 0) return;
+    if (!confirm('Clear all items from cart?')) return;
     cart = [];
     saveCart();
     updateBilling();
@@ -544,7 +964,7 @@ clearCartBtn.addEventListener('click', function() {
 // ============================================================
 holdBtn.addEventListener('click', function() {
     if (cart.length === 0) {
-        alert('Cart is empty!');
+        showToast('Cart is empty!');
         return;
     }
     holdModal.classList.add('open');
@@ -564,7 +984,7 @@ holdToTableBtn.addEventListener('click', function() {
     if (tableNum === null) return;
     const num = parseInt(tableNum);
     if (isNaN(num) || num < 1 || num > 12) {
-        alert('Invalid table number!');
+        showToast('Invalid table number!');
         return;
     }
     
@@ -581,14 +1001,14 @@ holdToTableBtn.addEventListener('click', function() {
     saveCart();
     saveTables();
     updateBilling();
-    alert(`✅ Order held to Table ${num}`);
+    showToast(`✅ Order held to Table ${num}`);
 });
 
 holdToCustomerBtn.addEventListener('click', function() {
     holdModal.classList.remove('open');
     const customerName = prompt('Enter customer name:', '');
     if (!customerName || customerName.trim() === '') {
-        alert('Customer name is required!');
+        showToast('Customer name is required!');
         return;
     }
     const name = customerName.trim();
@@ -608,7 +1028,7 @@ holdToCustomerBtn.addEventListener('click', function() {
     saveCart();
     saveCustomers();
     updateBilling();
-    alert(`✅ Order held to Customer "${name}"`);
+    showToast(`✅ Order held to Customer "${name}"`);
 });
 
 // ============================================================
@@ -626,7 +1046,13 @@ payBtn.addEventListener('click', function() {
     const total = subtotal - discount;
     
     currentBill = {
-        items: cart.map(c => ({ name: c.name, qty: c.quantity, price: c.price, discount: c.discount || 0 })),
+        items: cart.map(c => ({ 
+            id: c.id,
+            name: c.name, 
+            qty: c.quantity, 
+            price: c.price, 
+            discount: c.discount || 0 
+        })),
         subtotal: subtotal,
         discount: discount,
         total: total
@@ -653,6 +1079,7 @@ payBtn.addEventListener('click', function() {
     confirmPaymentBtn.disabled = true;
     
     paymentModal.classList.add('open');
+    setTimeout(() => amountReceived.focus(), 100);
 });
 
 // Calculate change on input
@@ -688,15 +1115,27 @@ amountReceived.addEventListener('input', function() {
     }
 });
 
+// Enter key to confirm payment
+amountReceived.addEventListener('keydown', function(e) {
+    if (e.key === 'Enter' && !confirmPaymentBtn.disabled) {
+        confirmPaymentBtn.click();
+    }
+});
+
 // Confirm Payment
 confirmPaymentBtn.addEventListener('click', function() {
     if (!currentBill) return;
     
     const received = parseFloat(amountReceived.value) || 0;
     if (received < currentBill.total) {
-        alert(`❌ Insufficient amount!\nTotal: Rs. ${currentBill.total.toFixed(2)}\nReceived: Rs. ${received.toFixed(2)}\nRemaining: Rs. ${(currentBill.total - received).toFixed(2)}`);
+        showToast(`❌ Insufficient amount!\nTotal: Rs. ${currentBill.total.toFixed(2)}\nReceived: Rs. ${received.toFixed(2)}\nRemaining: Rs. ${(currentBill.total - received).toFixed(2)}`);
         return;
     }
+    
+    // Update stock
+    currentBill.items.forEach(item => {
+        updateStock(item.id, item.qty);
+    });
     
     const bill = {
         id: Date.now(),
@@ -706,13 +1145,13 @@ confirmPaymentBtn.addEventListener('click', function() {
         discount: currentBill.discount,
         total: currentBill.total,
         received: received,
-        change: received - currentBill.total
+        change: received - currentBill.total,
+        edited: false
     };
     history.push(bill);
     saveHistory();
     
-    const printOption = document.getElementById('printBillCheckbox');
-    const shouldPrint = printOption ? printOption.checked : true;
+    const shouldPrint = printBillCheckbox ? printBillCheckbox.checked : true;
     
     paymentModal.classList.remove('open');
     
@@ -720,11 +1159,12 @@ confirmPaymentBtn.addEventListener('click', function() {
         printBill(bill);
     }
     
-    alert(`✅ Payment Successful!\nTotal: Rs. ${bill.total.toFixed(2)}\nReceived: Rs. ${bill.received.toFixed(2)}\nChange: Rs. ${bill.change.toFixed(2)}\nThank you! 🍽️`);
+    showToast(`✅ Payment Successful!\nTotal: Rs. ${bill.total.toFixed(2)}\nReceived: Rs. ${bill.received.toFixed(2)}\nChange: Rs. ${bill.change.toFixed(2)}\nThank you! 🍽️`);
     
     cart = [];
     saveCart();
     updateBilling();
+    renderItems();
     currentBill = null;
 });
 
@@ -747,10 +1187,23 @@ paymentModal.addEventListener('click', function(e) {
 });
 
 // ============================================================
-//  PRINT BILL FUNCTION
+//  PRINT FUNCTIONS
 // ============================================================
+
+// Print Single Bill
 function printBill(bill) {
     const printWindow = window.open('', '_blank', 'width=400,height=600');
+    if (!printWindow) {
+        showToast('❌ Please allow popups for printing!');
+        return;
+    }
+    
+    const isEdited = bill.edited || false;
+    const editedText = isEdited ? ' (Edited)' : '';
+    const editedInfo = isEdited ? `
+        <p style="color:#d97706;font-size:0.7rem;">✏️ Edited on: ${bill.editedDate || ''}</p>
+        <p style="color:#d97706;font-size:0.7rem;text-decoration:line-through;">Original Total: Rs. ${(bill.originalTotal || bill.total).toFixed(2)}</p>
+    ` : '';
     
     const itemsHtml = bill.items.map(item => `
         <tr>
@@ -765,30 +1218,94 @@ function printBill(bill) {
         <!DOCTYPE html>
         <html>
         <head>
-            <title>Bill #${bill.id}</title>
+            <title>Bill #${bill.id}${editedText}</title>
             <style>
-                body { font-family: Arial, sans-serif; padding: 20px; max-width: 350px; margin: 0 auto; }
-                .header { text-align: center; border-bottom: 2px dashed #333; padding-bottom: 10px; margin-bottom: 10px; }
-                .header h1 { margin: 0; font-size: 1.2rem; }
+                * { margin: 0; padding: 0; box-sizing: border-box; }
+                body { 
+                    font-family: 'Courier New', monospace; 
+                    padding: 20px; 
+                    max-width: 350px; 
+                    margin: 0 auto; 
+                    background: white; 
+                }
+                .header { 
+                    text-align: center; 
+                    border-bottom: 2px dashed #333; 
+                    padding-bottom: 10px; 
+                    margin-bottom: 10px; 
+                }
+                .header h1 { margin: 0; font-size: 1.4rem; }
                 .header p { margin: 4px 0; color: #666; font-size: 0.8rem; }
-                table { width: 100%; border-collapse: collapse; font-size: 0.85rem; }
-                th { text-align: left; border-bottom: 1px solid #ddd; padding: 4px 0; }
-                td { padding: 4px 0; border-bottom: 1px solid #eee; }
-                .totals { margin-top: 10px; border-top: 2px solid #333; padding-top: 10px; }
-                .totals div { display: flex; justify-content: space-between; font-size: 0.9rem; padding: 2px 0; }
-                .totals .grand { font-weight: 700; font-size: 1.1rem; border-top: 1px solid #ddd; padding-top: 6px; margin-top: 4px; }
+                table { 
+                    width: 100%; 
+                    border-collapse: collapse; 
+                    font-size: 0.8rem; 
+                }
+                th { 
+                    text-align: left; 
+                    border-bottom: 1px solid #ddd; 
+                    padding: 4px 0; 
+                    font-size: 0.7rem; 
+                    color: #666; 
+                }
+                td { 
+                    padding: 4px 0; 
+                    border-bottom: 1px solid #eee; 
+                }
+                .totals { 
+                    margin-top: 10px; 
+                    border-top: 2px solid #333; 
+                    padding-top: 10px; 
+                }
+                .totals div { 
+                    display: flex; 
+                    justify-content: space-between; 
+                    font-size: 0.85rem; 
+                    padding: 2px 0; 
+                }
+                .totals .grand { 
+                    font-weight: 700; 
+                    font-size: 1.1rem; 
+                    border-top: 1px solid #ddd; 
+                    padding-top: 6px; 
+                    margin-top: 4px; 
+                }
                 .totals .received { color: #16a34a; }
                 .totals .change { color: #16a34a; }
-                .footer { text-align: center; margin-top: 20px; font-size: 0.8rem; color: #666; border-top: 2px dashed #333; padding-top: 10px; }
+                .footer { 
+                    text-align: center; 
+                    margin-top: 20px; 
+                    font-size: 0.8rem; 
+                    color: #666; 
+                    border-top: 2px dashed #333; 
+                    padding-top: 10px; 
+                }
+                .edit-note {
+                    text-align: center;
+                    margin: 8px 0;
+                    padding: 8px;
+                    background: #fef3c7;
+                    border-radius: 4px;
+                    font-size: 0.7rem;
+                    color: #d97706;
+                }
             </style>
         </head>
         <body>
             <div class="header">
                 <h1>🍽️ HOTEL POS</h1>
                 <p>${bill.date}</p>
-                <p>Bill #${bill.id}</p>
+                <p>Bill #${bill.id}${editedText}</p>
                 ${bill.table ? `<p>🪑 Table ${bill.table}</p>` : ''}
+                <p style="font-size:0.7rem;color:#999;">Thank you for your visit!</p>
             </div>
+            
+            ${isEdited ? `
+                <div class="edit-note">
+                    ✏️ This bill has been edited<br/>
+                    Edited on: ${bill.editedDate || ''}
+                </div>
+            ` : ''}
             
             <table>
                 <thead>
@@ -808,12 +1325,14 @@ function printBill(bill) {
                 <div><span>Subtotal</span><span>Rs. ${bill.subtotal.toFixed(2)}</span></div>
                 ${bill.discount > 0 ? `<div><span>Discount</span><span>-Rs. ${bill.discount.toFixed(2)}</span></div>` : ''}
                 <div class="grand"><span>TOTAL</span><span>Rs. ${bill.total.toFixed(2)}</span></div>
-                <div class="received"><span>Received</span><span>Rs. ${bill.received.toFixed(2)}</span></div>
-                <div class="change"><span>Change</span><span>Rs. ${bill.change.toFixed(2)}</span></div>
+                ${isEdited ? `<div style="color:#d97706;text-decoration:line-through;"><span>Original Total</span><span>Rs. ${(bill.originalTotal || bill.total).toFixed(2)}</span></div>` : ''}
+                ${bill.received ? `<div class="received"><span>Received</span><span>Rs. ${bill.received.toFixed(2)}</span></div>` : ''}
+                ${bill.change ? `<div class="change"><span>Change</span><span>Rs. ${bill.change.toFixed(2)}</span></div>` : ''}
             </div>
             
             <div class="footer">
-                <p>Thank you! Come again! 🍽️</p>
+                <p style="font-weight:600;">Thank you! Come again! 🍽️</p>
+                <p style="margin-top:4px;font-size:0.7rem;">Have a great day! 😊</p>
             </div>
             
             <script>
@@ -821,7 +1340,7 @@ function printBill(bill) {
                     window.print();
                     setTimeout(function() {
                         window.close();
-                    }, 500);
+                    }, 800);
                 };
             <\/script>
         </body>
@@ -830,6 +1349,410 @@ function printBill(bill) {
     
     printWindow.document.close();
 }
+
+// Print Single Bill from History
+function printBillFromHistory(billId) {
+    const bill = history.find(b => b.id === billId);
+    if (!bill) {
+        showToast('❌ Bill not found!');
+        return;
+    }
+    printBill(bill);
+}
+
+// Print All Bills from History
+function printAllHistory() {
+    if (history.length === 0) {
+        showToast('❌ No bills to print!');
+        return;
+    }
+    
+    const printWindow = window.open('', '_blank', 'width=500,height=800');
+    if (!printWindow) {
+        showToast('❌ Please allow popups for printing!');
+        return;
+    }
+    
+    let allBillsHtml = '';
+    let grandTotal = 0;
+    let grandItems = 0;
+    
+    const sortedHistory = [...history].sort((a, b) => a.id - b.id);
+    
+    sortedHistory.forEach((bill, index) => {
+        const isEdited = bill.edited || false;
+        const editedText = isEdited ? ' (Edited)' : '';
+        const itemsHtml = bill.items.map(item => `
+            <tr>
+                <td>${item.name}</td>
+                <td style="text-align:center;">${item.qty}</td>
+                <td style="text-align:right;">Rs. ${item.price.toFixed(2)}</td>
+                <td style="text-align:right;">Rs. ${(item.price * item.qty).toFixed(2)}</td>
+            </tr>
+        `).join('');
+        
+        allBillsHtml += `
+            <div class="bill-print" style="${index > 0 ? 'page-break-before: always;' : ''}">
+                <div class="header">
+                    <h1>🍽️ HOTEL POS</h1>
+                    <p>${bill.date}</p>
+                    <p>Bill #${bill.id}${editedText}</p>
+                    ${bill.table ? `<p>🪑 Table ${bill.table}</p>` : ''}
+                    ${isEdited ? `<p style="color:#d97706;">✏️ Edited on: ${bill.editedDate || ''}</p>` : ''}
+                    ${isEdited ? `<p style="color:#d97706;text-decoration:line-through;">Original Total: Rs. ${(bill.originalTotal || bill.total).toFixed(2)}</p>` : ''}
+                </div>
+                
+                <table>
+                    <thead>
+                        <tr>
+                            <th>Item</th>
+                            <th style="text-align:center;">Qty</th>
+                            <th style="text-align:right;">Price</th>
+                            <th style="text-align:right;">Total</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        ${itemsHtml}
+                    </tbody>
+                </table>
+                
+                <div class="totals">
+                    <div><span>Subtotal</span><span>Rs. ${bill.subtotal.toFixed(2)}</span></div>
+                    ${bill.discount > 0 ? `<div><span>Discount</span><span>-Rs. ${bill.discount.toFixed(2)}</span></div>` : ''}
+                    <div class="grand"><span>TOTAL</span><span>Rs. ${bill.total.toFixed(2)}</span></div>
+                    ${bill.received ? `<div class="received"><span>Received</span><span>Rs. ${bill.received.toFixed(2)}</span></div>` : ''}
+                    ${bill.change ? `<div class="change"><span>Change</span><span>Rs. ${bill.change.toFixed(2)}</span></div>` : ''}
+                </div>
+                
+                <div class="footer">
+                    <p>Thank you! Come again! 🍽️</p>
+                </div>
+            </div>
+        `;
+        
+        grandTotal += bill.total;
+        grandItems += bill.items.reduce((sum, item) => sum + item.qty, 0);
+    });
+    
+    allBillsHtml += `
+        <div class="grand-summary" style="page-break-before: always; text-align: center; padding-top: 50px;">
+            <h2>📊 GRAND SUMMARY</h2>
+            <div style="font-size: 1.2rem; margin-top: 20px;">
+                <p>Total Bills: <strong>${history.length}</strong></p>
+                <p>Total Items: <strong>${grandItems}</strong></p>
+                <p>Total Revenue: <strong>Rs. ${grandTotal.toFixed(2)}</strong></p>
+                <p style="margin-top: 20px; color: #666;">Printed on: ${new Date().toLocaleString()}</p>
+            </div>
+        </div>
+    `;
+    
+    printWindow.document.write(`
+        <!DOCTYPE html>
+        <html>
+        <head>
+            <title>All Bills - Hotel POS</title>
+            <style>
+                * { margin: 0; padding: 0; box-sizing: border-box; }
+                body { 
+                    font-family: 'Courier New', monospace; 
+                    padding: 20px; 
+                    max-width: 400px; 
+                    margin: 0 auto; 
+                    background: white; 
+                }
+                .header { 
+                    text-align: center; 
+                    border-bottom: 2px dashed #333; 
+                    padding-bottom: 10px; 
+                    margin-bottom: 10px; 
+                }
+                .header h1 { margin: 0; font-size: 1.4rem; }
+                .header p { margin: 4px 0; color: #666; font-size: 0.8rem; }
+                table { 
+                    width: 100%; 
+                    border-collapse: collapse; 
+                    font-size: 0.8rem; 
+                }
+                th { 
+                    text-align: left; 
+                    border-bottom: 1px solid #ddd; 
+                    padding: 4px 0; 
+                    font-size: 0.7rem; 
+                    color: #666; 
+                }
+                td { 
+                    padding: 4px 0; 
+                    border-bottom: 1px solid #eee; 
+                }
+                .totals { 
+                    margin-top: 10px; 
+                    border-top: 2px solid #333; 
+                    padding-top: 10px; 
+                }
+                .totals div { 
+                    display: flex; 
+                    justify-content: space-between; 
+                    font-size: 0.85rem; 
+                    padding: 2px 0; 
+                }
+                .totals .grand { 
+                    font-weight: 700; 
+                    font-size: 1.1rem; 
+                    border-top: 1px solid #ddd; 
+                    padding-top: 6px; 
+                    margin-top: 4px; 
+                }
+                .totals .received { color: #16a34a; }
+                .totals .change { color: #16a34a; }
+                .footer { 
+                    text-align: center; 
+                    margin-top: 20px; 
+                    font-size: 0.8rem; 
+                    color: #666; 
+                    border-top: 2px dashed #333; 
+                    padding-top: 10px; 
+                }
+                .grand-summary {
+                    text-align: center;
+                    padding-top: 50px;
+                }
+                .grand-summary h2 {
+                    font-size: 1.8rem;
+                    margin-bottom: 20px;
+                }
+                .grand-summary p {
+                    font-size: 1.2rem;
+                    margin: 8px 0;
+                }
+                @media print {
+                    .bill-print {
+                        page-break-after: always;
+                    }
+                    .bill-print:last-child {
+                        page-break-after: avoid;
+                    }
+                }
+            </style>
+        </head>
+        <body>
+            ${allBillsHtml}
+            <script>
+                window.onload = function() {
+                    window.print();
+                    setTimeout(function() {
+                        window.close();
+                    }, 1000);
+                };
+            <\/script>
+        </body>
+        </html>
+    `);
+    
+    printWindow.document.close();
+}
+
+// ============================================================
+//  EDIT BILL FUNCTIONS
+// ============================================================
+
+// Open Edit Bill Modal
+function openEditBill(billId) {
+    const bill = history.find(b => b.id === billId);
+    if (!bill) {
+        showToast('❌ Bill not found!');
+        return;
+    }
+    
+    editingBillId = billId;
+    editedBillData = JSON.parse(JSON.stringify(bill));
+    
+    document.getElementById('editBillId').textContent = billId;
+    renderEditBillItems(editedBillData);
+    updateEditTotals(editedBillData);
+    
+    editBillModal.classList.add('open');
+}
+
+// Render Edit Bill Items
+function renderEditBillItems(bill) {
+    const container = document.getElementById('editBillItems');
+    
+    if (!bill || !bill.items || bill.items.length === 0) {
+        container.innerHTML = '<div class="empty-state">No items</div>';
+        return;
+    }
+    
+    let html = '';
+    bill.items.forEach((item, index) => {
+        html += `
+            <div class="edit-bill-item">
+                <span class="item-name">${item.name}</span>
+                <div class="qty-control">
+                    <button onclick="changeEditQty(${index}, -1)">−</button>
+                    <span>${item.qty}</span>
+                    <button onclick="changeEditQty(${index}, 1)">+</button>
+                </div>
+                <span class="item-price">Rs. ${(item.price * item.qty).toFixed(2)}</span>
+                <button class="remove-item-btn" onclick="removeEditItem(${index})">✕</button>
+            </div>
+        `;
+    });
+    
+    html += `
+        <div class="edit-discount-row">
+            <label>Discount %</label>
+            <input type="number" id="editDiscountInput" value="${bill.discountPercent || 0}" min="0" max="100" step="1" onchange="updateEditDiscount(this.value)" />
+        </div>
+    `;
+    
+    container.innerHTML = html;
+}
+
+// Change Quantity in Edit
+function changeEditQty(index, delta) {
+    if (!editedBillData || !editedBillData.items[index]) return;
+    editedBillData.items[index].qty += delta;
+    if (editedBillData.items[index].qty <= 0) {
+        editedBillData.items.splice(index, 1);
+    }
+    renderEditBillItems(editedBillData);
+    updateEditTotals(editedBillData);
+}
+
+// Remove Item from Edit
+function removeEditItem(index) {
+    if (!editedBillData || !editedBillData.items[index]) return;
+    editedBillData.items.splice(index, 1);
+    renderEditBillItems(editedBillData);
+    updateEditTotals(editedBillData);
+}
+
+// Update Edit Totals
+function updateEditTotals(bill) {
+    const subtotal = bill.items.reduce((sum, item) => sum + (item.price * item.qty), 0);
+    const discountPercent = bill.discountPercent || 0;
+    const discount = (subtotal * discountPercent) / 100;
+    const total = subtotal - discount;
+    
+    document.getElementById('editSubtotal').textContent = `Rs. ${subtotal.toFixed(2)}`;
+    document.getElementById('editDiscount').textContent = `-Rs. ${discount.toFixed(2)}`;
+    document.getElementById('editTotal').textContent = `Rs. ${total.toFixed(2)}`;
+    
+    bill.subtotal = subtotal;
+    bill.discount = discount;
+    bill.total = total;
+}
+
+// Update Edit Discount
+function updateEditDiscount(value) {
+    if (!editedBillData) return;
+    const val = parseFloat(value) || 0;
+    editedBillData.discountPercent = Math.min(Math.max(val, 0), 100);
+    updateEditTotals(editedBillData);
+}
+
+// Save Edited Bill
+function saveEditBill() {
+    if (!editingBillId || !editedBillData) return;
+    
+    const index = history.findIndex(b => b.id === editingBillId);
+    if (index === -1) {
+        showToast('❌ Bill not found!');
+        return;
+    }
+    
+    // Mark as edited
+    editedBillData.edited = true;
+    editedBillData.editedDate = new Date().toLocaleString('en-US', { 
+        month: '2-digit', day: '2-digit', year: 'numeric', 
+        hour: '2-digit', minute: '2-digit', second: '2-digit' 
+    });
+    editedBillData.originalTotal = history[index].total;
+    
+    // Update history
+    history[index] = editedBillData;
+    saveHistory();
+    
+    editBillModal.classList.remove('open');
+    renderHistory();
+    showToast('✅ Bill updated successfully!');
+    
+    editingBillId = null;
+    editedBillData = null;
+}
+
+// Cancel Edit
+function cancelEditBill() {
+    editBillModal.classList.remove('open');
+    editingBillId = null;
+    editedBillData = null;
+}
+
+// ============================================================
+//  HISTORY FUNCTIONS
+// ============================================================
+function renderHistory() {
+    if (history.length === 0) {
+        historyList.innerHTML = `<div class="empty-state">No bills yet</div>`;
+        return;
+    }
+    
+    historyList.innerHTML = history.slice().reverse().map(bill => {
+        const isEdited = bill.edited || false;
+        const editBadge = isEdited ? '<span class="edit-badge">✏️ Edited</span>' : '';
+        
+        return `
+            <div class="history-item ${isEdited ? 'edited' : ''}">
+                <div class="h-top">
+                    <span>#${bill.id}</span>
+                    <span>${bill.date}</span>
+                    <span class="h-total">Rs. ${bill.total.toFixed(2)}</span>
+                    ${editBadge}
+                    <div class="history-actions-buttons">
+                        <button class="print-btn" onclick="printBillFromHistory(${bill.id})" title="Print Bill">🖨️</button>
+                        <button class="edit-btn" onclick="openEditBill(${bill.id})" title="Edit Bill">✏️</button>
+                    </div>
+                </div>
+                <div class="h-items">
+                    ${bill.items.map(i => `${i.name} x${i.qty}`).join(' • ')}
+                    ${bill.discount > 0 ? ` • Discount: Rs. ${bill.discount.toFixed(2)}` : ''}
+                    ${bill.received ? ` • Received: Rs. ${bill.received.toFixed(2)}` : ''}
+                    ${bill.change ? ` • Change: Rs. ${bill.change.toFixed(2)}` : ''}
+                    ${isEdited ? ' • <span class="edited-label">✏️ Modified</span>' : ''}
+                </div>
+            </div>
+        `;
+    }).join('');
+}
+
+// Clear History
+clearHistoryBtn.addEventListener('click', function() {
+    if (!confirm('⚠️ Clear all bill history? This cannot be undone!')) return;
+    history = [];
+    saveHistory();
+    renderHistory();
+    showToast('✅ History cleared!');
+});
+
+// Print All History
+printHistoryBtn.addEventListener('click', function() {
+    if (history.length === 0) {
+        showToast('❌ No bills to print!');
+        return;
+    }
+    printAllHistory();
+});
+
+// ============================================================
+//  EDIT MODAL EVENT LISTENERS
+// ============================================================
+saveEditBillBtn.addEventListener('click', saveEditBill);
+cancelEditBillBtn.addEventListener('click', cancelEditBill);
+closeEditBillModalBtn.addEventListener('click', cancelEditBill);
+
+editBillModal.addEventListener('click', function(e) {
+    if (e.target === editBillModal) cancelEditBill();
+});
 
 // ============================================================
 //  TABS
@@ -841,181 +1764,71 @@ function switchTab(tab) {
     } else if (tab === 'history') {
         document.getElementById('view-history').classList.add('active');
         renderHistory();
-    } else if (tab === 'report') {
-        document.getElementById('view-report').classList.add('active');
-        updateReport();
     }
-    document.querySelectorAll('.tab-btn').forEach(btn => {
-        btn.classList.toggle('active', btn.dataset.tab === tab);
-    });
     closeDropdown();
 }
-
-document.querySelectorAll('.tab-btn').forEach(btn => {
-    btn.addEventListener('click', () => switchTab(btn.dataset.tab));
-});
-
-// ============================================================
-//  DROPDOWN MENU
-// ============================================================
-const hamburgerBtn = document.getElementById('hamburgerBtn');
-const dropdownMenu = document.getElementById('dropdownMenu');
-
-const overlay = document.createElement('div');
-overlay.className = 'dropdown-overlay';
-overlay.id = 'dropdownOverlay';
-document.body.appendChild(overlay);
-
-function toggleDropdown() {
-    hamburgerBtn.classList.toggle('open');
-    dropdownMenu.classList.toggle('open');
-    overlay.classList.toggle('active');
-    document.body.style.overflow = dropdownMenu.classList.contains('open') ? 'hidden' : '';
-}
-
-function closeDropdown() {
-    hamburgerBtn.classList.remove('open');
-    dropdownMenu.classList.remove('open');
-    overlay.classList.remove('active');
-    document.body.style.overflow = '';
-}
-
-hamburgerBtn.addEventListener('click', toggleDropdown);
-overlay.addEventListener('click', closeDropdown);
-
-document.addEventListener('keydown', function(e) {
-    if (e.key === 'Escape') {
-        closeDropdown();
-    }
-});
-
-// ============================================================
-//  HISTORY
-// ============================================================
-function renderHistory() {
-    if (history.length === 0) {
-        historyList.innerHTML = `<div class="empty-state">No bills yet</div>`;
-        return;
-    }
-    historyList.innerHTML = history.slice().reverse().map(bill => `
-        <div class="history-item">
-            <div class="h-top">
-                <span>#${bill.id}</span>
-                <span>${bill.date}</span>
-                <span class="h-total">Rs. ${bill.total.toFixed(2)}</span>
-            </div>
-            <div class="h-items">
-                ${bill.items.map(i => `${i.name} x${i.qty}`).join(' • ')}
-                ${bill.discount > 0 ? ` • Discount: Rs. ${bill.discount.toFixed(2)}` : ''}
-                ${bill.received ? ` • Received: Rs. ${bill.received.toFixed(2)}` : ''}
-                ${bill.change ? ` • Change: Rs. ${bill.change.toFixed(2)}` : ''}
-            </div>
-        </div>
-    `).join('');
-}
-
-clearHistoryBtn.addEventListener('click', function() {
-    if (!confirm('Clear all bill history?')) return;
-    history = [];
-    saveHistory();
-    renderHistory();
-    updateReport();
-});
-
-// ============================================================
-//  REPORT
-// ============================================================
-function updateReport() {
-    const today = new Date().toDateString();
-    const todayBills = history.filter(bill => new Date(bill.date).toDateString() === today);
-    const orders = todayBills.length;
-    const totalItems = todayBills.reduce((sum, b) => sum + b.items.reduce((s, i) => s + i.qty, 0), 0);
-    const revenue = todayBills.reduce((sum, b) => sum + b.total, 0);
-
-    reportOrders.textContent = orders;
-    reportItems.textContent = totalItems;
-    reportRevenue.textContent = `Rs. ${revenue.toFixed(2)}`;
-    reportTax.textContent = `Rs. 0.00`;
-
-    if (todayBills.length === 0) {
-        reportDetail.innerHTML = '<div class="empty-state">No sales today</div>';
-    } else {
-        reportDetail.innerHTML = todayBills.slice().reverse().map(bill => `
-            <div style="border-bottom:1px solid #f1f5f9; padding:6px 0; font-size:0.85rem;">
-                <strong>${bill.date}</strong>
-                <span style="float:right;color:#16a34a;font-weight:600;">Rs. ${bill.total.toFixed(2)}</span>
-                <div style="font-size:0.75rem;color:#94a3b8;">${bill.items.map(i => `${i.name} x${i.qty}`).join(' • ')}</div>
-            </div>
-        `).join('');
-    }
-}
-
-exportReportBtn.addEventListener('click', function() {
-    const today = new Date().toDateString();
-    const todayBills = history.filter(bill => new Date(bill.date).toDateString() === today);
-    if (todayBills.length === 0) {
-        alert('No sales today to export.');
-        return;
-    }
-    let csv = 'Bill ID,Date,Items,Total,Discount,Received,Change\n';
-    todayBills.forEach(bill => {
-        const itemsStr = bill.items.map(i => `${i.name} x${i.qty}`).join('; ');
-        csv += `${bill.id},${bill.date},"${itemsStr}",${bill.total.toFixed(2)},${(bill.discount || 0).toFixed(2)},${(bill.received || 0).toFixed(2)},${(bill.change || 0).toFixed(2)}\n`;
-    });
-    const blob = new Blob([csv], { type: 'text/csv' });
-    const url = URL.createObjectURL(blob);
-    const a = document.createElement('a');
-    a.href = url;
-    a.download = `daily_report_${new Date().toISOString().split('T')[0]}.csv`;
-    a.click();
-    URL.revokeObjectURL(url);
-});
 
 // ============================================================
 //  FULL SCREEN
 // ============================================================
 function toggleFullScreen() {
-    const btn = document.getElementById('fullscreenBtn');
-    
     if (!document.fullscreenElement && !document.webkitFullscreenElement) {
         const el = document.documentElement;
-        if (el.requestFullscreen) {
-            el.requestFullscreen();
-        } else if (el.webkitRequestFullscreen) {
-            el.webkitRequestFullscreen();
-        } else if (el.msRequestFullscreen) {
-            el.msRequestFullscreen();
-        }
+        if (el.requestFullscreen) el.requestFullscreen();
+        else if (el.webkitRequestFullscreen) el.webkitRequestFullscreen();
     } else {
-        if (document.exitFullscreen) {
-            document.exitFullscreen();
-        } else if (document.webkitExitFullscreen) {
-            document.webkitExitFullscreen();
-        } else if (document.msExitFullscreen) {
-            document.msExitFullscreen();
-        }
+        if (document.exitFullscreen) document.exitFullscreen();
+        else if (document.webkitExitFullscreen) document.webkitExitFullscreen();
     }
 }
 
-function updateFullscreenUI() {
-    const btn = document.getElementById('fullscreenBtn');
-    if (!btn) return;
-    
-    const isFullscreen = document.fullscreenElement || document.webkitFullscreenElement;
-    
-    if (isFullscreen) {
-        btn.textContent = '⛶ Exit';
-        btn.classList.add('exit');
-        document.body.classList.add('fullscreen-mode');
-    } else {
-        btn.textContent = '⛶ Full';
-        btn.classList.remove('exit');
-        document.body.classList.remove('fullscreen-mode');
+// ============================================================
+//  LOGOUT
+// ============================================================
+function logout() {
+    if (confirm('Are you sure you want to logout?')) {
+        localStorage.removeItem('hotel_logged_in');
+        localStorage.removeItem('hotel_username');
+        window.location.href = 'login.html';
     }
 }
 
-document.addEventListener('fullscreenchange', updateFullscreenUI);
-document.addEventListener('webkitfullscreenchange', updateFullscreenUI);
+// ============================================================
+//  CHECK LOGIN STATUS
+// ============================================================
+function checkLoginStatus() {
+    const isLoggedIn = localStorage.getItem('hotel_logged_in');
+    if (isLoggedIn !== 'true') {
+        window.location.href = 'login.html';
+    }
+}
+
+// ============================================================
+//  TOAST NOTIFICATION
+// ============================================================
+function showToast(message) {
+    let toast = document.getElementById('toast');
+    if (!toast) {
+        toast = document.createElement('div');
+        toast.id = 'toast';
+        toast.style.cssText = `
+            position: fixed; bottom: 30px; left: 50%; transform: translateX(-50%) translateY(100px);
+            background: #1e293b; color: white; padding: 14px 28px; border-radius: 12px;
+            font-size: 0.95rem; z-index: 9999; opacity: 0; transition: all 0.5s ease;
+            box-shadow: 0 10px 40px rgba(0,0,0,0.3); max-width: 90%; text-align: center;
+            pointer-events: none; white-space: pre-line;
+        `;
+        document.body.appendChild(toast);
+    }
+    toast.textContent = message;
+    toast.style.opacity = '1';
+    toast.style.transform = 'translateX(-50%) translateY(0)';
+    clearTimeout(toast._timeout);
+    toast._timeout = setTimeout(() => {
+        toast.style.opacity = '0';
+        toast.style.transform = 'translateX(-50%) translateY(100px)';
+    }, 3000);
+}
 
 // ============================================================
 //  EXPORT FUNCTIONS
@@ -1028,14 +1841,26 @@ window.toggleFullScreen = toggleFullScreen;
 window.selectCategory = selectCategory;
 window.switchTab = switchTab;
 window.closeDropdown = closeDropdown;
+window.logout = logout;
+window.printBillFromHistory = printBillFromHistory;
+window.printAllHistory = printAllHistory;
+window.printBill = printBill;
+window.openEditBill = openEditBill;
+window.changeEditQty = changeEditQty;
+window.removeEditItem = removeEditItem;
+window.updateEditDiscount = updateEditDiscount;
+window.saveEditBill = saveEditBill;
+window.cancelEditBill = cancelEditBill;
 
 // ============================================================
 //  INIT
 // ============================================================
-loadData();
-renderItems();
-updateBilling();
-setTimeout(updateFullscreenUI, 100);
+document.addEventListener('DOMContentLoaded', function() {
+    checkLoginStatus();
+    loadData();
+    renderItems();
+    updateBilling();
+});
 </script>
 
 </body>

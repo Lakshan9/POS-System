@@ -1,0 +1,872 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
+    <title>Settings - Hotel POS</title>
+    <link rel="stylesheet" href="style-settings.css" />
+</head>
+<body>
+
+<!-- ===== HEADER ===== -->
+<div class="main-header">
+    <div class="header-left">
+        <button class="hamburger-btn" id="hamburgerBtn" onclick="toggleDropdown()">
+            <span></span>
+            <span></span>
+            <span></span>
+        </button>
+        <h1>⚙️ SETTINGS</h1>
+        <span class="datetime" id="datetime">--</span>
+    </div>
+    <div class="header-right">
+        <button onclick="window.location.href='index.html'" class="back-btn">🏠 Back to POS</button>
+    </div>
+</div>
+
+<!-- ===== DROPDOWN MENU ===== -->
+<div class="dropdown-menu" id="dropdownMenu">
+    <div class="dropdown-content">
+        <a href="index.html" class="dropdown-item">
+            <span class="drop-icon">🧾</span>
+            <span class="drop-text">POS</span>
+        </a>
+        <a href="index.html#history" class="dropdown-item" onclick="switchTab('history')">
+            <span class="drop-icon">📜</span>
+            <span class="drop-text">History</span>
+        </a>
+        <a href="report.html" class="dropdown-item">
+            <span class="drop-icon">📊</span>
+            <span class="drop-text">Report</span>
+        </a>
+        <a href="items.html" class="dropdown-item">
+            <span class="drop-icon">📋</span>
+            <span class="drop-text">Menu</span>
+        </a>
+        <a href="tables.html" class="dropdown-item">
+            <span class="drop-icon">🪑</span>
+            <span class="drop-text">Tables</span>
+        </a>
+        <a href="stock.html" class="dropdown-item">
+            <span class="drop-icon">📦</span>
+            <span class="drop-text">Stock</span>
+        </a>
+        <a href="settings.html" class="dropdown-item active-link">
+            <span class="drop-icon">⚙️</span>
+            <span class="drop-text">Settings</span>
+        </a>
+        <div class="dropdown-divider"></div>
+        <a href="#" class="dropdown-item" onclick="toggleFullScreen();">
+            <span class="drop-icon">⛶</span>
+            <span class="drop-text">Full Screen</span>
+        </a>
+        <a href="#" class="dropdown-item" onclick="logout();">
+            <span class="drop-icon">🚪</span>
+            <span class="drop-text">Logout</span>
+        </a>
+    </div>
+</div>
+
+<!-- ===== DROPDOWN OVERLAY ===== -->
+<div class="dropdown-overlay" id="dropdownOverlay" onclick="closeDropdown()"></div>
+
+<!-- ===== SETTINGS CONTENT ===== -->
+<div class="settings-container">
+
+    <!-- ===== TOAST NOTIFICATION ===== -->
+    <div id="toast"></div>
+
+    <!-- ===== General Settings ===== -->
+    <div class="settings-section">
+        <h2>📋 General Settings</h2>
+        <div class="settings-group">
+            <div class="setting-item">
+                <div class="setting-info">
+                    <span class="setting-label">Tax Rate</span>
+                    <span class="setting-desc">Tax percentage applied to all orders</span>
+                </div>
+                <div class="setting-control">
+                    <input type="number" id="taxRate" value="0" min="0" max="100" step="0.5" />
+                    <span class="setting-unit">%</span>
+                    <button class="save-setting-btn" onclick="saveSetting('taxRate')">💾 Save</button>
+                </div>
+            </div>
+
+            <div class="setting-item">
+                <div class="setting-info">
+                    <span class="setting-label">Currency</span>
+                    <span class="setting-desc">Currency symbol for all prices</span>
+                </div>
+                <div class="setting-control">
+                    <select id="currency">
+                        <option value="Rs.">Rs. (Sri Lanka Rupee)</option>
+                        <option value="$">$ (US Dollar)</option>
+                        <option value="€">€ (Euro)</option>
+                        <option value="£">£ (British Pound)</option>
+                        <option value="₹">₹ (Indian Rupee)</option>
+                    </select>
+                    <button class="save-setting-btn" onclick="saveSetting('currency')">💾 Save</button>
+                </div>
+            </div>
+
+            <div class="setting-item">
+                <div class="setting-info">
+                    <span class="setting-label">Low Stock Alert</span>
+                    <span class="setting-desc">Minimum stock quantity before alert</span>
+                </div>
+                <div class="setting-control">
+                    <input type="number" id="lowStockAlert" value="5" min="1" max="50" step="1" />
+                    <button class="save-setting-btn" onclick="saveSetting('lowStockAlert')">💾 Save</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- ===== Appearance Settings ===== -->
+    <div class="settings-section">
+        <h2>🎨 Appearance Settings</h2>
+        <div class="settings-group">
+            <div class="setting-item">
+                <div class="setting-info">
+                    <span class="setting-label">Theme</span>
+                    <span class="setting-desc">Choose your preferred theme</span>
+                </div>
+                <div class="setting-control">
+                    <select id="theme">
+                        <option value="light">☀️ Light</option>
+                        <option value="dark">🌙 Dark</option>
+                        <option value="blue">🔵 Blue</option>
+                        <option value="green">🟢 Green</option>
+                    </select>
+                    <button class="save-setting-btn" onclick="saveSetting('theme')">💾 Save</button>
+                </div>
+            </div>
+
+            <div class="setting-item">
+                <div class="setting-info">
+                    <span class="setting-label">Font Size</span>
+                    <span class="setting-desc">Adjust text size</span>
+                </div>
+                <div class="setting-control">
+                    <select id="fontSize">
+                        <option value="small">Small</option>
+                        <option value="medium" selected>Medium</option>
+                        <option value="large">Large</option>
+                        <option value="xlarge">Extra Large</option>
+                    </select>
+                    <button class="save-setting-btn" onclick="saveSetting('fontSize')">💾 Save</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- ===== Print Settings ===== -->
+    <div class="settings-section">
+        <h2>🖨️ Print Settings</h2>
+        <div class="settings-group">
+            <div class="setting-item">
+                <div class="setting-info">
+                    <span class="setting-label">Auto Print Bill</span>
+                    <span class="setting-desc">Automatically print bill after payment</span>
+                </div>
+                <div class="setting-control">
+                    <label class="switch">
+                        <input type="checkbox" id="autoPrint" />
+                        <span class="slider"></span>
+                    </label>
+                </div>
+            </div>
+
+            <div class="setting-item">
+                <div class="setting-info">
+                    <span class="setting-label">Print Copies</span>
+                    <span class="setting-desc">Number of copies to print</span>
+                </div>
+                <div class="setting-control">
+                    <input type="number" id="printCopies" value="1" min="1" max="5" step="1" />
+                    <button class="save-setting-btn" onclick="saveSetting('printCopies')">💾 Save</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- ===== Security Settings ===== -->
+    <div class="settings-section">
+        <h2>🔒 Security Settings</h2>
+        <div class="settings-group">
+            
+            <!-- ===== Login Password ===== -->
+            <div class="setting-item password-setting">
+                <div class="setting-info">
+                    <span class="setting-label" style="color:#8b5cf6;">🔑 Login Password</span>
+                    <span class="setting-desc">Password used to login to the system</span>
+                </div>
+                <div class="setting-control password-input-group">
+                    <div class="password-row">
+                        <div class="password-toggle" style="flex:1; min-width:120px;">
+                            <input type="password" id="currentLoginPassword" placeholder="Current Password" />
+                            <button class="toggle-btn" onclick="togglePasswordVisibility('currentLoginPassword', this)">👁️</button>
+                        </div>
+                    </div>
+                    <div class="password-row">
+                        <div class="password-toggle" style="flex:1; min-width:120px;">
+                            <input type="password" id="newLoginPassword" placeholder="New Login Password" oninput="checkLoginPasswordStrength(this.value); checkLoginPasswordMatch()" />
+                            <button class="toggle-btn" onclick="togglePasswordVisibility('newLoginPassword', this)">👁️</button>
+                        </div>
+                        <div class="password-toggle" style="flex:1; min-width:120px;">
+                            <input type="password" id="confirmLoginPassword" placeholder="Confirm Password" oninput="checkLoginPasswordMatch()" />
+                            <button class="toggle-btn" onclick="togglePasswordVisibility('confirmLoginPassword', this)">👁️</button>
+                        </div>
+                        <button class="update-password-btn login-btn" onclick="updateLoginPassword()">🔑 Update Login</button>
+                    </div>
+                    <div class="password-strength" id="loginPasswordStrength">
+                        <div class="strength-bar">
+                            <div class="strength-fill" id="loginStrengthFill"></div>
+                        </div>
+                        <span class="strength-text" id="loginStrengthText">Enter password</span>
+                    </div>
+                    <div class="password-requirements">
+                        <span class="req-item invalid" id="loginReqLength">❌ Min 4 characters</span>
+                        <span class="req-item invalid" id="loginReqLetter">❌ At least 1 letter</span>
+                        <span class="req-item invalid" id="loginReqNumber">❌ At least 1 number</span>
+                    </div>
+                    <div class="password-match" id="loginPasswordMatch"></div>
+                </div>
+            </div>
+
+            <div class="divider"></div>
+
+            <!-- ===== Stock Password ===== -->
+            <div class="setting-item password-setting">
+                <div class="setting-info">
+                    <span class="setting-label" style="color:#f59e0b;">📦 Stock Password</span>
+                    <span class="setting-desc">Password used to access Stock Management</span>
+                </div>
+                <div class="setting-control password-input-group">
+                    <div class="password-row">
+                        <div class="password-toggle" style="flex:1; min-width:120px;">
+                            <input type="password" id="currentStockPassword" placeholder="Current Password" />
+                            <button class="toggle-btn" onclick="togglePasswordVisibility('currentStockPassword', this)">👁️</button>
+                        </div>
+                    </div>
+                    <div class="password-row">
+                        <div class="password-toggle" style="flex:1; min-width:120px;">
+                            <input type="password" id="newStockPassword" placeholder="New Stock Password" oninput="checkStockPasswordStrength(this.value); checkStockPasswordMatch()" />
+                            <button class="toggle-btn" onclick="togglePasswordVisibility('newStockPassword', this)">👁️</button>
+                        </div>
+                        <div class="password-toggle" style="flex:1; min-width:120px;">
+                            <input type="password" id="confirmStockPassword" placeholder="Confirm Password" oninput="checkStockPasswordMatch()" />
+                            <button class="toggle-btn" onclick="togglePasswordVisibility('confirmStockPassword', this)">👁️</button>
+                        </div>
+                        <button class="update-password-btn stock-btn" onclick="updateStockPassword()">🔑 Update Stock</button>
+                    </div>
+                    <div class="password-strength" id="stockPasswordStrength">
+                        <div class="strength-bar">
+                            <div class="strength-fill" id="stockStrengthFill"></div>
+                        </div>
+                        <span class="strength-text" id="stockStrengthText">Enter password</span>
+                    </div>
+                    <div class="password-requirements">
+                        <span class="req-item invalid" id="stockReqLength">❌ Min 4 characters</span>
+                        <span class="req-item invalid" id="stockReqLetter">❌ At least 1 letter</span>
+                        <span class="req-item invalid" id="stockReqNumber">❌ At least 1 number</span>
+                    </div>
+                    <div class="password-match" id="stockPasswordMatch"></div>
+                </div>
+            </div>
+
+            <div class="password-info-box">
+                <span>💡</span>
+                <div>
+                    <strong>Default Passwords:</strong><br/>
+                    Login Password: <code>admin123</code> &nbsp;|&nbsp; Stock Password: <code>stock123</code>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- ===== Data Management ===== -->
+    <div class="settings-section">
+        <h2>💾 Data Management</h2>
+        <div class="settings-group">
+            <div class="setting-item">
+                <div class="setting-info">
+                    <span class="setting-label">Export All Data</span>
+                    <span class="setting-desc">Export all data as JSON file</span>
+                </div>
+                <div class="setting-control">
+                    <button class="export-btn" onclick="exportAllData()">⬇ Export</button>
+                </div>
+            </div>
+
+            <div class="setting-item">
+                <div class="setting-info">
+                    <span class="setting-label">Import Data</span>
+                    <span class="setting-desc">Import data from JSON file</span>
+                </div>
+                <div class="setting-control">
+                    <input type="file" id="importFile" accept=".json" style="display:none;" />
+                    <button class="import-btn" onclick="document.getElementById('importFile').click()">📂 Import</button>
+                </div>
+            </div>
+
+            <div class="setting-item danger">
+                <div class="setting-info">
+                    <span class="setting-label" style="color:#ef4444;">Clear All Data</span>
+                    <span class="setting-desc" style="color:#ef4444;">⚠️ This will delete all data permanently</span>
+                </div>
+                <div class="setting-control">
+                    <button class="clear-btn" onclick="clearAllData()">🗑️ Clear All</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+</div>
+
+<!-- ===== FOOTER ===== -->
+<div class="footer">
+    <p>© 2026 Hotel POS System - All Rights Reserved</p>
+</div>
+
+<script>
+// ============================================================
+//  DATA KEYS
+// ============================================================
+const SETTINGS_KEY = 'hotel_settings';
+const LOGIN_PASSWORD_KEY = 'hotel_password';
+const STOCK_PASSWORD_KEY = 'hotel_stock_password';
+
+// ============================================================
+//  GET STORED PASSWORDS
+// ============================================================
+function getLoginPassword() {
+    return localStorage.getItem(LOGIN_PASSWORD_KEY) || 'admin123';
+}
+
+function getStockPassword() {
+    return localStorage.getItem(STOCK_PASSWORD_KEY) || 'stock123';
+}
+
+// ============================================================
+//  LOAD SETTINGS
+// ============================================================
+function loadSettings() {
+    try {
+        const settings = JSON.parse(localStorage.getItem(SETTINGS_KEY) || '{}');
+        
+        if (settings.taxRate !== undefined) document.getElementById('taxRate').value = settings.taxRate;
+        if (settings.currency) document.getElementById('currency').value = settings.currency;
+        if (settings.lowStockAlert !== undefined) document.getElementById('lowStockAlert').value = settings.lowStockAlert;
+        if (settings.theme) {
+            document.getElementById('theme').value = settings.theme;
+            applyTheme(settings.theme);
+        }
+        if (settings.fontSize) {
+            document.getElementById('fontSize').value = settings.fontSize;
+            applyFontSize(settings.fontSize);
+        }
+        if (settings.autoPrint !== undefined) document.getElementById('autoPrint').checked = settings.autoPrint;
+        if (settings.printCopies !== undefined) document.getElementById('printCopies').value = settings.printCopies;
+    } catch (e) {
+        console.log('No settings found');
+    }
+}
+
+// ============================================================
+//  SAVE SETTING
+// ============================================================
+function saveSetting(key) {
+    let settings = {};
+    try {
+        settings = JSON.parse(localStorage.getItem(SETTINGS_KEY) || '{}');
+    } catch (e) {
+        settings = {};
+    }
+    
+    let value;
+    switch(key) {
+        case 'taxRate':
+            value = parseFloat(document.getElementById('taxRate').value) || 0;
+            break;
+        case 'currency':
+            value = document.getElementById('currency').value;
+            break;
+        case 'lowStockAlert':
+            value = parseInt(document.getElementById('lowStockAlert').value) || 5;
+            break;
+        case 'theme':
+            value = document.getElementById('theme').value;
+            break;
+        case 'fontSize':
+            value = document.getElementById('fontSize').value;
+            break;
+        case 'autoPrint':
+            value = document.getElementById('autoPrint').checked;
+            break;
+        case 'printCopies':
+            value = parseInt(document.getElementById('printCopies').value) || 1;
+            break;
+        default:
+            return;
+    }
+    
+    settings[key] = value;
+    localStorage.setItem(SETTINGS_KEY, JSON.stringify(settings));
+    
+    const btn = event.target;
+    const originalText = btn.textContent;
+    btn.textContent = '✅ Saved!';
+    btn.style.background = '#16a34a';
+    btn.style.color = 'white';
+    setTimeout(() => {
+        btn.textContent = originalText;
+        btn.style.background = '';
+        btn.style.color = '';
+    }, 1500);
+    
+    if (key === 'theme') {
+        applyTheme(value);
+    }
+    if (key === 'fontSize') {
+        applyFontSize(value);
+    }
+}
+
+// ============================================================
+//  APPLY THEME
+// ============================================================
+function applyTheme(theme) {
+    const body = document.body;
+    body.classList.remove('theme-light', 'theme-dark', 'theme-blue', 'theme-green');
+    if (theme !== 'light') {
+        body.classList.add(`theme-${theme}`);
+    }
+}
+
+// ============================================================
+//  APPLY FONT SIZE
+// ============================================================
+function applyFontSize(size) {
+    const body = document.body;
+    body.classList.remove('font-small', 'font-medium', 'font-large', 'font-xlarge');
+    body.classList.add(`font-${size}`);
+}
+
+// ============================================================
+//  TOGGLE PASSWORD VISIBILITY
+// ============================================================
+function togglePasswordVisibility(inputId, btn) {
+    const input = document.getElementById(inputId);
+    if (input.type === 'password') {
+        input.type = 'text';
+        btn.textContent = '🙈';
+    } else {
+        input.type = 'password';
+        btn.textContent = '👁️';
+    }
+}
+
+// ============================================================
+//  LOGIN PASSWORD FUNCTIONS
+// ============================================================
+function checkLoginPasswordStrength(password) {
+    checkPasswordStrength(password, 'login');
+}
+
+function checkLoginPasswordMatch() {
+    checkPasswordMatch('login');
+}
+
+function updateLoginPassword() {
+    const current = document.getElementById('currentLoginPassword').value;
+    const newPass = document.getElementById('newLoginPassword').value;
+    const confirm = document.getElementById('confirmLoginPassword').value;
+    
+    if (!current || !newPass || !confirm) {
+        showToast('❌ Please fill all fields!');
+        return;
+    }
+    
+    const storedPassword = getLoginPassword();
+    
+    if (current !== storedPassword) {
+        showToast('❌ Current login password is incorrect!');
+        document.getElementById('currentLoginPassword').value = '';
+        document.getElementById('currentLoginPassword').focus();
+        return;
+    }
+    
+    if (newPass.length < 4) {
+        showToast('❌ Password must be at least 4 characters!');
+        document.getElementById('newLoginPassword').value = '';
+        document.getElementById('newLoginPassword').focus();
+        return;
+    }
+    
+    if (newPass !== confirm) {
+        showToast('❌ Passwords do not match!');
+        document.getElementById('confirmLoginPassword').value = '';
+        document.getElementById('confirmLoginPassword').focus();
+        return;
+    }
+    
+    localStorage.setItem(LOGIN_PASSWORD_KEY, newPass);
+    showToast('✅ Login password changed successfully!');
+    
+    document.getElementById('currentLoginPassword').value = '';
+    document.getElementById('newLoginPassword').value = '';
+    document.getElementById('confirmLoginPassword').value = '';
+    document.getElementById('loginPasswordMatch').textContent = '';
+    document.getElementById('loginPasswordMatch').className = 'password-match';
+    document.getElementById('loginStrengthText').textContent = 'Enter password';
+    document.getElementById('loginStrengthFill').style.width = '0%';
+    document.getElementById('loginPasswordStrength').className = 'password-strength';
+    resetRequirements('login');
+}
+
+// ============================================================
+//  STOCK PASSWORD FUNCTIONS
+// ============================================================
+function checkStockPasswordStrength(password) {
+    checkPasswordStrength(password, 'stock');
+}
+
+function checkStockPasswordMatch() {
+    checkPasswordMatch('stock');
+}
+
+function updateStockPassword() {
+    const current = document.getElementById('currentStockPassword').value;
+    const newPass = document.getElementById('newStockPassword').value;
+    const confirm = document.getElementById('confirmStockPassword').value;
+    
+    if (!current || !newPass || !confirm) {
+        showToast('❌ Please fill all fields!');
+        return;
+    }
+    
+    const storedPassword = getStockPassword();
+    
+    if (current !== storedPassword) {
+        showToast('❌ Current stock password is incorrect!');
+        document.getElementById('currentStockPassword').value = '';
+        document.getElementById('currentStockPassword').focus();
+        return;
+    }
+    
+    if (newPass.length < 4) {
+        showToast('❌ Password must be at least 4 characters!');
+        document.getElementById('newStockPassword').value = '';
+        document.getElementById('newStockPassword').focus();
+        return;
+    }
+    
+    if (newPass !== confirm) {
+        showToast('❌ Passwords do not match!');
+        document.getElementById('confirmStockPassword').value = '';
+        document.getElementById('confirmStockPassword').focus();
+        return;
+    }
+    
+    localStorage.setItem(STOCK_PASSWORD_KEY, newPass);
+    showToast('✅ Stock password changed successfully!');
+    
+    document.getElementById('currentStockPassword').value = '';
+    document.getElementById('newStockPassword').value = '';
+    document.getElementById('confirmStockPassword').value = '';
+    document.getElementById('stockPasswordMatch').textContent = '';
+    document.getElementById('stockPasswordMatch').className = 'password-match';
+    document.getElementById('stockStrengthText').textContent = 'Enter password';
+    document.getElementById('stockStrengthFill').style.width = '0%';
+    document.getElementById('stockPasswordStrength').className = 'password-strength';
+    resetRequirements('stock');
+}
+
+// ============================================================
+//  PASSWORD HELPER FUNCTIONS
+// ============================================================
+function checkPasswordStrength(password, type) {
+    const prefix = type === 'login' ? 'login' : 'stock';
+    const strengthBar = document.getElementById(`${prefix}StrengthFill`);
+    const strengthText = document.getElementById(`${prefix}StrengthText`);
+    const reqLength = document.getElementById(`${prefix}ReqLength`);
+    const reqLetter = document.getElementById(`${prefix}ReqLetter`);
+    const reqNumber = document.getElementById(`${prefix}ReqNumber`);
+    
+    const hasLength = password.length >= 4;
+    const hasLetter = /[a-zA-Z]/.test(password);
+    const hasNumber = /[0-9]/.test(password);
+    
+    reqLength.textContent = hasLength ? '✅ Min 4 characters' : '❌ Min 4 characters';
+    reqLength.className = 'req-item ' + (hasLength ? 'valid' : 'invalid');
+    
+    reqLetter.textContent = hasLetter ? '✅ At least 1 letter' : '❌ At least 1 letter';
+    reqLetter.className = 'req-item ' + (hasLetter ? 'valid' : 'invalid');
+    
+    reqNumber.textContent = hasNumber ? '✅ At least 1 number' : '❌ At least 1 number';
+    reqNumber.className = 'req-item ' + (hasNumber ? 'valid' : 'invalid');
+    
+    let score = 0;
+    if (hasLength) score++;
+    if (hasLetter) score++;
+    if (hasNumber) score++;
+    if (password.length >= 8) score++;
+    
+    const strengthClasses = ['', 'strength-weak', 'strength-medium', 'strength-strong', 'strength-very-strong'];
+    const strengthLabels = ['', 'Weak', 'Medium', 'Strong', 'Very Strong'];
+    const colors = ['', '#ef4444', '#f59e0b', '#3b82f6', '#16a34a'];
+    
+    const level = Math.min(score, 4);
+    const parent = document.getElementById(`${prefix}PasswordStrength`);
+    parent.className = 'password-strength ' + strengthClasses[level];
+    strengthBar.style.width = (level * 25) + '%';
+    strengthBar.style.background = colors[level];
+    strengthText.textContent = level > 0 ? strengthLabels[level] : 'Enter password';
+}
+
+function checkPasswordMatch(type) {
+    const prefix = type === 'login' ? 'login' : 'stock';
+    const newPass = document.getElementById(`new${prefix === 'login' ? 'Login' : 'Stock'}Password`).value;
+    const confirmPass = document.getElementById(`confirm${prefix === 'login' ? 'Login' : 'Stock'}Password`).value;
+    const matchEl = document.getElementById(`${prefix}PasswordMatch`);
+    
+    if (confirmPass.length === 0) {
+        matchEl.textContent = '';
+        matchEl.className = 'password-match';
+        return;
+    }
+    
+    if (newPass === confirmPass) {
+        matchEl.textContent = '✅ Passwords match!';
+        matchEl.className = 'password-match match';
+    } else {
+        matchEl.textContent = '❌ Passwords do not match!';
+        matchEl.className = 'password-match no-match';
+    }
+}
+
+function resetRequirements(type) {
+    const prefix = type === 'login' ? 'login' : 'stock';
+    document.getElementById(`${prefix}ReqLength`).textContent = '❌ Min 4 characters';
+    document.getElementById(`${prefix}ReqLength`).className = 'req-item invalid';
+    document.getElementById(`${prefix}ReqLetter`).textContent = '❌ At least 1 letter';
+    document.getElementById(`${prefix}ReqLetter`).className = 'req-item invalid';
+    document.getElementById(`${prefix}ReqNumber`).textContent = '❌ At least 1 number';
+    document.getElementById(`${prefix}ReqNumber`).className = 'req-item invalid';
+}
+
+// ============================================================
+//  EXPORT ALL DATA
+// ============================================================
+function exportAllData() {
+    const data = {
+        items: JSON.parse(localStorage.getItem('hotel_items') || '[]'),
+        cart: JSON.parse(localStorage.getItem('hotel_cart') || '[]'),
+        history: JSON.parse(localStorage.getItem('hotel_history') || '[]'),
+        stock: JSON.parse(localStorage.getItem('hotel_stock') || '[]'),
+        tableOrders: JSON.parse(localStorage.getItem('hotel_table_orders') || '{}'),
+        customerOrders: JSON.parse(localStorage.getItem('hotel_customer_orders') || '{}'),
+        settings: JSON.parse(localStorage.getItem(SETTINGS_KEY) || '{}'),
+        categories: JSON.parse(localStorage.getItem('hotel_categories') || '[]'),
+        exportDate: new Date().toISOString()
+    };
+    
+    const blob = new Blob([JSON.stringify(data, null, 2)], { type: 'application/json' });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = `hotel_pos_backup_${new Date().toISOString().split('T')[0]}.json`;
+    document.body.appendChild(a);
+    a.click();
+    document.body.removeChild(a);
+    URL.revokeObjectURL(url);
+    
+    showToast('✅ Data exported successfully!');
+}
+
+// ============================================================
+//  IMPORT DATA
+// ============================================================
+document.getElementById('importFile').addEventListener('change', function(e) {
+    const file = e.target.files[0];
+    if (!file) return;
+    
+    const reader = new FileReader();
+    reader.onload = function(event) {
+        try {
+            const data = JSON.parse(event.target.result);
+            
+            if (data.items) localStorage.setItem('hotel_items', JSON.stringify(data.items));
+            if (data.cart) localStorage.setItem('hotel_cart', JSON.stringify(data.cart));
+            if (data.history) localStorage.setItem('hotel_history', JSON.stringify(data.history));
+            if (data.stock) localStorage.setItem('hotel_stock', JSON.stringify(data.stock));
+            if (data.tableOrders) localStorage.setItem('hotel_table_orders', JSON.stringify(data.tableOrders));
+            if (data.customerOrders) localStorage.setItem('hotel_customer_orders', JSON.stringify(data.customerOrders));
+            if (data.settings) localStorage.setItem(SETTINGS_KEY, JSON.stringify(data.settings));
+            if (data.categories) localStorage.setItem('hotel_categories', JSON.stringify(data.categories));
+            
+            showToast('✅ Data imported successfully!');
+            loadSettings();
+        } catch (e) {
+            showToast('❌ Invalid file format!');
+        }
+    };
+    reader.readAsText(file);
+    this.value = '';
+});
+
+// ============================================================
+//  CLEAR ALL DATA
+// ============================================================
+function clearAllData() {
+    if (!confirm('⚠️ Are you sure you want to delete ALL data?\nThis action cannot be undone!')) return;
+    if (!confirm('🔴 Really? All data including items, history, stock will be deleted!')) return;
+    
+    const keys = [
+        'hotel_items',
+        'hotel_cart',
+        'hotel_history',
+        'hotel_stock',
+        'hotel_table_orders',
+        'hotel_customer_orders',
+        'hotel_categories',
+        SETTINGS_KEY,
+        'hotel_logged_in',
+        'hotel_username'
+    ];
+    
+    keys.forEach(key => localStorage.removeItem(key));
+    
+    showToast('✅ All data cleared!');
+    setTimeout(() => {
+        window.location.href = 'index.html';
+    }, 1000);
+}
+
+// ============================================================
+//  CLOCK
+// ============================================================
+function updateClock() {
+    const now = new Date();
+    const d = now.toLocaleDateString('en-US', { month: '2-digit', day: '2-digit', year: 'numeric' });
+    const t = now.toLocaleTimeString('en-US', { hour12: true, hour: '2-digit', minute: '2-digit', second: '2-digit' });
+    document.getElementById('datetime').textContent = `${d} ${t}`;
+}
+updateClock();
+setInterval(updateClock, 1000);
+
+// ============================================================
+//  DROPDOWN MENU
+// ============================================================
+function toggleDropdown() {
+    const btn = document.getElementById('hamburgerBtn');
+    const menu = document.getElementById('dropdownMenu');
+    const overlay = document.getElementById('dropdownOverlay');
+    
+    btn.classList.toggle('open');
+    menu.classList.toggle('open');
+    overlay.classList.toggle('active');
+    document.body.style.overflow = menu.classList.contains('open') ? 'hidden' : '';
+}
+
+function closeDropdown() {
+    document.getElementById('hamburgerBtn').classList.remove('open');
+    document.getElementById('dropdownMenu').classList.remove('open');
+    document.getElementById('dropdownOverlay').classList.remove('active');
+    document.body.style.overflow = '';
+}
+
+// ============================================================
+//  TOAST NOTIFICATION
+// ============================================================
+function showToast(message) {
+    const toast = document.getElementById('toast');
+    toast.textContent = message;
+    toast.className = 'show';
+    clearTimeout(toast._timeout);
+    toast._timeout = setTimeout(() => {
+        toast.className = '';
+    }, 3000);
+}
+
+// ============================================================
+//  FULL SCREEN
+// ============================================================
+function toggleFullScreen() {
+    if (!document.fullscreenElement && !document.webkitFullscreenElement) {
+        const el = document.documentElement;
+        if (el.requestFullscreen) {
+            el.requestFullscreen();
+        } else if (el.webkitRequestFullscreen) {
+            el.webkitRequestFullscreen();
+        }
+    } else {
+        if (document.exitFullscreen) {
+            document.exitFullscreen();
+        } else if (document.webkitExitFullscreen) {
+            document.webkitExitFullscreen();
+        }
+    }
+}
+
+// ============================================================
+//  LOGOUT
+// ============================================================
+function logout() {
+    if (confirm('Are you sure you want to logout?')) {
+        localStorage.removeItem('hotel_logged_in');
+        localStorage.removeItem('hotel_username');
+        window.location.href = 'login.html';
+    }
+}
+
+// ============================================================
+//  CHECK LOGIN STATUS
+// ============================================================
+function checkLoginStatus() {
+    const isLoggedIn = localStorage.getItem('hotel_logged_in');
+    if (isLoggedIn !== 'true') {
+        window.location.href = 'login.html';
+    }
+}
+
+// ============================================================
+//  KEYBOARD SHORTCUTS
+// ============================================================
+document.addEventListener('keydown', (e) => {
+    if (e.key === 'Escape') {
+        closeDropdown();
+    }
+});
+
+// ============================================================
+//  EXPORT FUNCTIONS
+// ============================================================
+window.saveSetting = saveSetting;
+window.exportAllData = exportAllData;
+window.clearAllData = clearAllData;
+window.togglePasswordVisibility = togglePasswordVisibility;
+window.checkLoginPasswordStrength = checkLoginPasswordStrength;
+window.checkLoginPasswordMatch = checkLoginPasswordMatch;
+window.updateLoginPassword = updateLoginPassword;
+window.checkStockPasswordStrength = checkStockPasswordStrength;
+window.checkStockPasswordMatch = checkStockPasswordMatch;
+window.updateStockPassword = updateStockPassword;
+window.toggleDropdown = toggleDropdown;
+window.closeDropdown = closeDropdown;
+window.toggleFullScreen = toggleFullScreen;
+window.logout = logout;
+window.showToast = showToast;
+
+// ============================================================
+//  INIT
+// ============================================================
+document.addEventListener('DOMContentLoaded', function() {
+    checkLoginStatus();
+    loadSettings();
+});
+</script>
+
+</body>
+</html>
