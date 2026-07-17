@@ -13,6 +13,152 @@ body {
     color: #1e293b;
     min-height: 100vh;
     overflow-x: hidden;
+    transition: background 0.3s, color 0.3s;
+}
+
+/* ============================================================
+   THEMES
+   ============================================================ */
+body.theme-dark {
+    background: #0f172a;
+    color: #f1f5f9;
+}
+
+body.theme-dark .actions-bar {
+    background: #1e293b;
+    border-bottom-color: #334155;
+}
+
+body.theme-dark .actions-bar button {
+    background: #1e293b;
+    border-color: #334155;
+    color: #94a3b8;
+}
+
+body.theme-dark .actions-bar button.active {
+    background: #8b5cf6;
+    color: white;
+    border-color: #8b5cf6;
+}
+
+body.theme-dark .summary-card {
+    background: #1e293b;
+}
+
+body.theme-dark .summary-card .num {
+    color: #f1f5f9;
+}
+
+body.theme-dark .stock-table {
+    background: #1e293b;
+}
+
+body.theme-dark .stock-table thead {
+    background: #0f172a;
+}
+
+body.theme-dark .stock-table th {
+    color: #94a3b8;
+}
+
+body.theme-dark .stock-table td {
+    color: #f1f5f9;
+    border-bottom-color: #334155;
+}
+
+body.theme-dark .stock-table tbody tr:hover {
+    background: #0f172a;
+}
+
+body.theme-dark .modal {
+    background: #1e293b;
+}
+
+body.theme-dark .modal-header {
+    border-bottom-color: #334155;
+}
+
+body.theme-dark .modal-header h2 {
+    color: #f1f5f9;
+}
+
+body.theme-dark .modal-body label {
+    color: #94a3b8;
+}
+
+body.theme-dark .modal-body input,
+body.theme-dark .modal-body select {
+    background: #0f172a;
+    border-color: #334155;
+    color: #f1f5f9;
+}
+
+body.theme-dark .dropdown-menu {
+    background: #1e293b;
+}
+
+body.theme-dark .dropdown-item {
+    color: #f1f5f9;
+}
+
+body.theme-dark .dropdown-item:hover {
+    background: #334155;
+}
+
+body.theme-dark .cleanup-header {
+    background: #1e293b;
+}
+
+body.theme-dark .cleanup-content {
+    background: #1e293b;
+}
+
+body.theme-dark .unsold-item {
+    border-bottom-color: #334155;
+}
+
+body.theme-dark .unsold-item:hover {
+    background: #0f172a;
+}
+
+body.theme-dark .password-box {
+    background: #1e293b;
+}
+
+body.theme-dark .password-header h2 {
+    color: #f1f5f9;
+}
+
+body.theme-dark .password-header p {
+    color: #94a3b8;
+}
+
+body.theme-dark .password-input-group input {
+    background: #0f172a;
+    border-color: #334155;
+    color: #f1f5f9;
+}
+
+body.theme-dark .password-footer {
+    border-top-color: #334155;
+    color: #94a3b8;
+}
+
+/* Font Sizes */
+body.font-small {
+    font-size: 14px;
+}
+
+body.font-medium {
+    font-size: 16px;
+}
+
+body.font-large {
+    font-size: 18px;
+}
+
+body.font-xlarge {
+    font-size: 20px;
 }
 
 /* ============================================================
@@ -59,7 +205,7 @@ body {
     gap: 8px;
 }
 
-.back-btn, .refresh-btn {
+.back-btn, .refresh-btn, .lock-btn {
     padding: 6px 16px;
     border: none;
     border-radius: 8px;
@@ -84,6 +230,15 @@ body {
 }
 .refresh-btn:hover {
     background: rgba(255,255,255,0.2);
+    transform: scale(1.02);
+}
+
+.lock-btn {
+    background: #ef4444;
+    color: white;
+}
+.lock-btn:hover {
+    background: #dc2626;
     transform: scale(1.02);
 }
 
@@ -219,11 +374,178 @@ body {
 }
 
 /* ============================================================
-   STOCK SUMMARY
+   PASSWORD OVERLAY
+   ============================================================ */
+.password-overlay {
+    display: flex;
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100vw;
+    height: 100vh;
+    background: linear-gradient(135deg, #0f172a, #1e293b);
+    z-index: 9999;
+    align-items: center;
+    justify-content: center;
+    padding: 20px;
+}
+
+.password-box {
+    background: white;
+    border-radius: 24px;
+    padding: 40px 36px;
+    max-width: 400px;
+    width: 100%;
+    box-shadow: 0 20px 60px rgba(0,0,0,0.5);
+    animation: modalSlideIn 0.4s ease;
+}
+
+@keyframes modalSlideIn {
+    from {
+        opacity: 0;
+        transform: scale(0.9) translateY(20px);
+    }
+    to {
+        opacity: 1;
+        transform: scale(1) translateY(0);
+    }
+}
+
+@keyframes shake {
+    0%, 100% { transform: translateX(0); }
+    10%, 30%, 50%, 70%, 90% { transform: translateX(-10px); }
+    20%, 40%, 60%, 80% { transform: translateX(10px); }
+}
+
+.password-header {
+    text-align: center;
+    margin-bottom: 28px;
+}
+
+.lock-icon {
+    font-size: 3.5rem;
+    display: block;
+    margin-bottom: 8px;
+}
+
+.password-header h2 {
+    font-size: 1.5rem;
+    font-weight: 700;
+    color: #0f172a;
+}
+
+.password-header p {
+    color: #94a3b8;
+    font-size: 0.9rem;
+    margin-top: 4px;
+}
+
+.password-input-group {
+    position: relative;
+    margin-bottom: 16px;
+}
+
+.password-input-group input {
+    width: 100%;
+    padding: 12px 48px 12px 16px;
+    border: 2px solid #e2e8f0;
+    border-radius: 12px;
+    font-size: 1rem;
+    background: #f8fafc;
+}
+
+.password-input-group input:focus {
+    outline: none;
+    border-color: #8b5cf6;
+}
+
+.toggle-password-btn {
+    position: absolute;
+    right: 12px;
+    top: 50%;
+    transform: translateY(-50%);
+    background: transparent;
+    border: none;
+    cursor: pointer;
+    font-size: 1.1rem;
+    padding: 4px 8px;
+    border-radius: 6px;
+    color: #94a3b8;
+}
+
+.toggle-password-btn:hover {
+    background: #f1f5f9;
+    color: #475569;
+}
+
+.password-error {
+    display: none;
+    padding: 10px 14px;
+    background: #fef2f2;
+    border: 2px solid #fca5a5;
+    border-radius: 10px;
+    color: #dc2626;
+    font-size: 0.85rem;
+    font-weight: 500;
+    margin-bottom: 16px;
+    text-align: center;
+}
+
+.password-submit-btn {
+    width: 100%;
+    padding: 12px;
+    background: linear-gradient(135deg, #8b5cf6, #7c3aed);
+    color: white;
+    border: none;
+    border-radius: 12px;
+    font-size: 1rem;
+    font-weight: 700;
+    cursor: pointer;
+    transition: all 0.3s;
+    margin-bottom: 10px;
+}
+
+.password-submit-btn:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 8px 25px rgba(139, 92, 246, 0.4);
+}
+
+.password-cancel-btn {
+    width: 100%;
+    padding: 12px;
+    background: #e2e8f0;
+    color: #475569;
+    border: none;
+    border-radius: 12px;
+    font-size: 1rem;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.3s;
+    margin-bottom: 16px;
+}
+
+.password-cancel-btn:hover {
+    background: #cbd5e1;
+}
+
+.password-footer {
+    text-align: center;
+    font-size: 0.8rem;
+    color: #94a3b8;
+    padding-top: 12px;
+    border-top: 1px solid #e2e8f0;
+}
+
+.password-footer strong {
+    color: #8b5cf6;
+}
+
+/* ============================================================
+   SUMMARY CARDS
    ============================================================ */
 .stock-summary {
     display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+    grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
     gap: 16px;
     padding: 20px;
     max-width: 1200px;
@@ -277,19 +599,10 @@ body {
     letter-spacing: 0.5px;
 }
 
-.summary-card.warning .num {
-    color: #d97706;
-}
-.summary-card.warning .card-icon {
-    background: #fef3c7;
-}
-
-.summary-card.success .num {
-    color: #16a34a;
-}
-.summary-card.success .card-icon {
-    background: #d1fae5;
-}
+.summary-card.warning .num { color: #d97706; }
+.summary-card.warning .card-icon { background: #fef3c7; }
+.summary-card.success .num { color: #16a34a; }
+.summary-card.success .card-icon { background: #d1fae5; }
 
 /* ============================================================
    ACTIONS BAR
@@ -339,7 +652,6 @@ body {
     background: #22c55e;
     color: white;
     border-color: #22c55e;
-    margin-left: auto;
 }
 
 .actions-bar .add-btn:hover {
@@ -356,6 +668,33 @@ body {
 .actions-bar .export-btn:hover {
     background: #2563eb;
     border-color: #2563eb;
+}
+
+.cleanup-btn-header {
+    background: #8b5cf6;
+    color: white;
+    border: none !important;
+    border-radius: 10px;
+    padding: 8px 18px;
+    cursor: pointer;
+    font-weight: 500;
+    transition: all 0.3s;
+    margin-left: auto;
+}
+
+.cleanup-btn-header:hover {
+    background: #7c3aed;
+    transform: scale(1.02);
+}
+
+.admin-badge {
+    background: #8b5cf6;
+    color: white;
+    padding: 2px 10px;
+    border-radius: 12px;
+    font-size: 0.6rem;
+    font-weight: 600;
+    margin-left: 8px;
 }
 
 /* ============================================================
@@ -439,6 +778,16 @@ body {
     color: #dc2626;
 }
 
+tr.stock-danger {
+    border-left: 4px solid #dc2626;
+}
+tr.stock-warning {
+    border-left: 4px solid #d97706;
+}
+tr.stock-success {
+    border-left: 4px solid #16a34a;
+}
+
 /* ============================================================
    ACTION BUTTONS
    ============================================================ */
@@ -465,7 +814,6 @@ body {
     background: #e2e8f0;
     color: #475569;
 }
-
 .action-btn.edit-btn:hover {
     background: #8b5cf6;
     color: white;
@@ -475,7 +823,6 @@ body {
     background: #dbeafe;
     color: #3b82f6;
 }
-
 .action-btn.add-stock-btn:hover {
     background: #3b82f6;
     color: white;
@@ -485,50 +832,152 @@ body {
     background: #fee2e2;
     color: #ef4444;
 }
-
 .action-btn.delete-btn:hover {
     background: #ef4444;
     color: white;
 }
 
 /* ============================================================
-   STOCK COLORS (Table Rows)
+   STOCK CLEANUP SECTION
    ============================================================ */
-tr.stock-success td.stock-qty {
-    color: #16a34a;
+.stock-cleanup-section {
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 0 20px 16px;
 }
 
-tr.stock-warning td.stock-qty {
-    color: #d97706;
+.cleanup-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin: 12px 0;
+    padding: 12px 20px;
+    background: white;
+    border-radius: 12px;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.06);
 }
 
-tr.stock-danger td.stock-qty {
-    color: #dc2626;
+.cleanup-header h3 {
+    font-size: 1rem;
+    font-weight: 600;
 }
 
-tr.stock-danger {
-    border-left: 4px solid #dc2626;
+.cleanup-header p {
+    font-size: 0.8rem;
+    color: #64748b;
 }
 
-tr.stock-warning {
-    border-left: 4px solid #d97706;
+.cleanup-toggle-btn {
+    padding: 6px 16px;
+    border: none;
+    border-radius: 8px;
+    cursor: pointer;
+    font-weight: 500;
+    transition: all 0.3s;
+    background: #8b5cf6;
+    color: white;
 }
 
-tr.stock-success {
-    border-left: 4px solid #16a34a;
+.cleanup-toggle-btn:hover {
+    transform: scale(1.02);
 }
 
-/* ============================================================
-   EMPTY STATE
-   ============================================================ */
-.empty-state {
-    text-align: center;
-    padding: 40px 20px;
-    color: #94a3b8;
+.cleanup-toggle-btn.close {
+    background: #ef4444;
 }
 
-.empty-state p {
-    margin-top: 8px;
+.cleanup-content {
+    background: white;
+    border-radius: 12px;
+    padding: 16px;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.06);
+    margin-bottom: 16px;
+}
+
+.cleanup-list-header {
+    display: grid;
+    grid-template-columns: auto 1fr auto auto auto;
+    gap: 10px;
+    padding: 8px 0;
+    border-bottom: 2px solid #e2e8f0;
+    font-size: 0.75rem;
+    font-weight: 600;
+    color: #64748b;
+}
+
+.unsold-item {
+    display: grid;
+    grid-template-columns: auto 1fr auto auto auto;
+    gap: 10px;
+    padding: 6px 0;
+    border-bottom: 1px solid #f1f5f9;
+    align-items: center;
+    transition: background 0.2s;
+}
+
+.unsold-item:hover {
+    background: #f8fafc;
+}
+
+.unsold-item input[type="checkbox"] {
+    width: 16px;
+    height: 16px;
+    accent-color: #8b5cf6;
+    cursor: pointer;
+}
+
+.cleanup-actions {
+    display: flex;
+    gap: 10px;
+    flex-wrap: wrap;
+    margin-top: 12px;
+    padding-top: 12px;
+    border-top: 2px solid #f1f5f9;
+}
+
+.cleanup-btn {
+    padding: 8px 20px;
+    border: none;
+    border-radius: 8px;
+    cursor: pointer;
+    font-weight: 600;
+    transition: all 0.3s;
+}
+
+.cleanup-btn:hover {
+    transform: scale(1.02);
+}
+
+.cleanup-btn.remove-all {
+    background: #ef4444;
+    color: white;
+}
+.cleanup-btn.remove-all:hover {
+    background: #dc2626;
+}
+
+.cleanup-btn.remove-selected {
+    background: #f59e0b;
+    color: white;
+}
+.cleanup-btn.remove-selected:hover {
+    background: #d97706;
+}
+
+.cleanup-btn.keep-all {
+    background: #22c55e;
+    color: white;
+}
+.cleanup-btn.keep-all:hover {
+    background: #16a34a;
+}
+
+.cleanup-btn.close-cleanup {
+    background: #94a3b8;
+    color: white;
+}
+.cleanup-btn.close-cleanup:hover {
+    background: #64748b;
 }
 
 /* ============================================================
@@ -561,17 +1010,6 @@ tr.stock-success {
     overflow-y: auto;
     box-shadow: 0 20px 60px rgba(0,0,0,0.3);
     animation: modalSlideIn 0.3s ease;
-}
-
-@keyframes modalSlideIn {
-    from {
-        opacity: 0;
-        transform: scale(0.9) translateY(20px);
-    }
-    to {
-        opacity: 1;
-        transform: scale(1) translateY(0);
-    }
 }
 
 .modal-small {
@@ -659,7 +1097,6 @@ tr.stock-success {
     background: #22c55e;
     color: white;
 }
-
 .save-btn:hover {
     background: #16a34a;
 }
@@ -668,7 +1105,6 @@ tr.stock-success {
     background: #ef4444;
     color: white;
 }
-
 .delete-btn:hover {
     background: #dc2626;
 }
@@ -677,7 +1113,6 @@ tr.stock-success {
     background: #e2e8f0;
     color: #475569;
 }
-
 .cancel-btn:hover {
     background: #cbd5e1;
 }
@@ -688,7 +1123,6 @@ tr.stock-success {
 .alert-modal .modal-header.alert-header {
     border-bottom: 2px solid #ef4444;
 }
-
 .alert-modal .modal-header.alert-header h2 {
     color: #ef4444;
 }
@@ -729,9 +1163,9 @@ tr.stock-success {
     justify-content: space-between;
     align-items: center;
     padding: 10px 14px;
-    background: #f8fafc;
-    border-radius: 10px;
     border-left: 4px solid #94a3b8;
+    border-radius: 10px;
+    background: #f8fafc;
 }
 
 .alert-item.danger {
@@ -820,17 +1254,24 @@ tr.stock-success {
 }
 
 /* ============================================================
+   EMPTY STATE
+   ============================================================ */
+.empty-state {
+    text-align: center;
+    padding: 40px 20px;
+    color: #94a3b8;
+}
+
+.empty-state p {
+    margin-top: 8px;
+}
+
+/* ============================================================
    RESPONSIVE
    ============================================================ */
 @media (max-width: 1024px) {
     .stock-table-container {
         padding: 0 12px 12px;
-    }
-    
-    .stock-table th,
-    .stock-table td {
-        padding: 10px 12px;
-        font-size: 0.8rem;
     }
 }
 
@@ -844,7 +1285,7 @@ tr.stock-success {
         padding: 2px 8px;
     }
     
-    .back-btn, .refresh-btn {
+    .back-btn, .refresh-btn, .lock-btn {
         font-size: 0.65rem;
         padding: 4px 10px;
     }
@@ -897,6 +1338,32 @@ tr.stock-success {
     .modal {
         width: 95%;
         border-radius: 16px;
+    }
+    
+    .cleanup-list-header,
+    .unsold-item {
+        grid-template-columns: auto 1fr auto auto;
+        gap: 6px;
+        font-size: 0.7rem;
+    }
+    
+    .cleanup-list-header span:last-child,
+    .unsold-item button {
+        display: none;
+    }
+    
+    .cleanup-actions {
+        flex-direction: column;
+    }
+    
+    .cleanup-actions .cleanup-btn {
+        width: 100%;
+    }
+    
+    .cleanup-header {
+        flex-direction: column;
+        gap: 8px;
+        text-align: center;
     }
 }
 
@@ -1000,218 +1467,4 @@ tr.stock-success {
 
 ::-webkit-scrollbar-thumb:hover {
     background: #94a3b8;
-}
-
-/* ============================================================
-   PASSWORD PROTECTION OVERLAY
-   ============================================================ */
-.password-overlay {
-    position: fixed;
-    top: 0;
-    left: 0;
-    width: 100vw;
-    height: 100vh;
-    background: linear-gradient(135deg, #0f172a, #1e293b);
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    z-index: 9999;
-    padding: 20px;
-}
-
-.password-box {
-    background: white;
-    border-radius: 24px;
-    padding: 40px 36px;
-    max-width: 400px;
-    width: 100%;
-    box-shadow: 0 20px 60px rgba(0,0,0,0.5);
-    animation: modalSlideIn 0.4s ease;
-}
-
-@keyframes modalSlideIn {
-    from {
-        opacity: 0;
-        transform: scale(0.9) translateY(20px);
-    }
-    to {
-        opacity: 1;
-        transform: scale(1) translateY(0);
-    }
-}
-
-@keyframes shake {
-    0%, 100% { transform: translateX(0); }
-    10%, 30%, 50%, 70%, 90% { transform: translateX(-10px); }
-    20%, 40%, 60%, 80% { transform: translateX(10px); }
-}
-
-.password-header {
-    text-align: center;
-    margin-bottom: 28px;
-}
-
-.lock-icon {
-    font-size: 3.5rem;
-    display: block;
-    margin-bottom: 8px;
-}
-
-.password-header h2 {
-    font-size: 1.5rem;
-    font-weight: 700;
-    color: #0f172a;
-}
-
-.password-header p {
-    color: #94a3b8;
-    font-size: 0.9rem;
-    margin-top: 4px;
-}
-
-.password-input-group {
-    position: relative;
-    margin-bottom: 16px;
-}
-
-.password-input-group input {
-    width: 100%;
-    padding: 12px 48px 12px 16px;
-    border: 2px solid #e2e8f0;
-    border-radius: 12px;
-    font-size: 1rem;
-    transition: border-color 0.3s;
-    background: #f8fafc;
-}
-
-.password-input-group input:focus {
-    outline: none;
-    border-color: #8b5cf6;
-}
-
-.toggle-password-btn {
-    position: absolute;
-    right: 12px;
-    top: 50%;
-    transform: translateY(-50%);
-    background: transparent;
-    border: none;
-    cursor: pointer;
-    font-size: 1.1rem;
-    padding: 4px 8px;
-    border-radius: 6px;
-    transition: all 0.2s;
-    color: #94a3b8;
-}
-
-.toggle-password-btn:hover {
-    background: #f1f5f9;
-    color: #475569;
-}
-
-.password-error {
-    display: none;
-    padding: 10px 14px;
-    background: #fef2f2;
-    border: 2px solid #fca5a5;
-    border-radius: 10px;
-    color: #dc2626;
-    font-size: 0.85rem;
-    font-weight: 500;
-    margin-bottom: 16px;
-    text-align: center;
-}
-
-.password-submit-btn {
-    width: 100%;
-    padding: 12px;
-    background: linear-gradient(135deg, #8b5cf6, #7c3aed);
-    color: white;
-    border: none;
-    border-radius: 12px;
-    font-size: 1rem;
-    font-weight: 700;
-    cursor: pointer;
-    transition: all 0.3s;
-    margin-bottom: 10px;
-}
-
-.password-submit-btn:hover {
-    transform: translateY(-2px);
-    box-shadow: 0 8px 25px rgba(139, 92, 246, 0.4);
-}
-
-.password-cancel-btn {
-    width: 100%;
-    padding: 12px;
-    background: #e2e8f0;
-    color: #475569;
-    border: none;
-    border-radius: 12px;
-    font-size: 1rem;
-    font-weight: 600;
-    cursor: pointer;
-    transition: all 0.3s;
-    margin-bottom: 16px;
-}
-
-.password-cancel-btn:hover {
-    background: #cbd5e1;
-}
-
-.password-footer {
-    text-align: center;
-    font-size: 0.8rem;
-    color: #94a3b8;
-    padding-top: 12px;
-    border-top: 1px solid #e2e8f0;
-}
-
-.password-footer strong {
-    color: #8b5cf6;
-}
-
-/* ============================================================
-   LOCK BUTTON (in header)
-   ============================================================ */
-.lock-btn {
-    padding: 6px 16px;
-    border: none;
-    border-radius: 8px;
-    background: #ef4444;
-    color: white;
-    cursor: pointer;
-    font-size: 0.8rem;
-    transition: all 0.3s;
-    font-weight: 500;
-}
-
-.lock-btn:hover {
-    background: #dc2626;
-    transform: scale(1.02);
-}
-
-/* ============================================================
-   MAIN CONTENT WRAPPER
-   ============================================================ */
-.main-content-wrapper {
-    display: none;
-    min-height: 100vh;
-}
-
-/* ============================================================
-   RESPONSIVE FOR PASSWORD
-   ============================================================ */
-@media (max-width: 480px) {
-    .password-box {
-        padding: 28px 20px;
-    }
-    
-    .password-header h2 {
-        font-size: 1.2rem;
-    }
-    
-    .lock-icon {
-        font-size: 2.8rem;
-    }
 }

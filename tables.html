@@ -100,6 +100,8 @@
                 <div class="line"><span>Subtotal</span><span id="modalSubtotal">Rs. 0.00</span></div>
                 <div class="line total"><span>TOTAL</span><span id="modalTotal">Rs. 0.00</span></div>
                 <div class="modal-actions">
+                    <button class="add-items-btn" onclick="addItemsToTable()">➕ Add Items</button>
+                    <button class="load-pos-btn" onclick="loadToPOS()">📤 Load to POS</button>
                     <button class="pay-btn" id="payTableBtn">💳 Pay & Close</button>
                     <button class="close-btn-red" id="closeTableBtn">🚪 Close Table</button>
                 </div>
@@ -119,20 +121,42 @@
             <div class="payment-details" id="tablePaymentDetails">
                 <!-- Rendered by JS -->
             </div>
+            
+            <!-- Payment Method Selection -->
+            <div class="payment-methods-simple">
+                <label>Payment Method</label>
+                <div class="payment-methods-grid">
+                    <button class="payment-method-btn active" data-method="cash" onclick="selectTablePaymentMethod('cash')">💵 Cash</button>
+                    <button class="payment-method-btn" data-method="card" onclick="selectTablePaymentMethod('card')">💳 Card</button>
+                    <button class="payment-method-btn" data-method="mobile" onclick="selectTablePaymentMethod('mobile')">📱 Mobile</button>
+                    <button class="payment-method-btn" data-method="bank" onclick="selectTablePaymentMethod('bank')">🏦 Bank</button>
+                    <button class="payment-method-btn" data-method="credit" onclick="selectTablePaymentMethod('credit')">💰 Credit</button>
+                </div>
+            </div>
+            
+            <!-- Reference Input -->
+            <div class="payment-input-group" id="tablePaymentReferenceGroup" style="display:none;">
+                <label>Reference</label>
+                <input type="text" id="tablePaymentReference" placeholder="Card/Mobile/Bank ref" />
+            </div>
+            
             <div class="payment-input">
                 <label>Amount Received (Rs.)</label>
                 <input type="number" id="tableAmountReceived" placeholder="0.00" step="0.01" min="0" />
             </div>
+            
             <div class="payment-change" id="tablePaymentChange">
                 <span>Change Due:</span>
                 <span id="tableChangeAmount">Rs. 0.00</span>
             </div>
+            
             <div class="print-option">
                 <label>
                     <input type="checkbox" id="tablePrintBillCheckbox" checked />
                     🖨️ Print Bill
                 </label>
             </div>
+            
             <div class="payment-actions">
                 <button class="confirm-btn" id="confirmTablePaymentBtn" disabled>✅ Confirm Payment</button>
                 <button class="cancel-btn" id="cancelTablePaymentBtn">✕ Cancel</button>
@@ -152,6 +176,7 @@ const TABLE_COUNT = 12;
 const TABLE_ORDERS_KEY = 'hotel_table_orders';
 const CUSTOMER_ORDERS_KEY = 'hotel_customer_orders';
 const HISTORY_KEY = 'hotel_history';
+const STOCK_KEY = 'hotel_stock';
 
 let tableOrders = {};
 let customerOrders = {};
@@ -160,6 +185,11 @@ let currentTable = null;
 let currentCustomer = null;
 let currentTableBill = null;
 let currentFilter = 'all';
+
+// ============================================================
+//  TABLE PAYMENT VARIABLES
+// ============================================================
+let tableSelectedMethod = 'cash';
 
 // ============================================================
 //  LOAD / SAVE
@@ -202,6 +232,23 @@ function forceInitTables() {
             newOrders[i] = [];
         }
         localStorage.setItem(TABLE_ORDERS_KEY, JSON.stringify(newOrders));
+    }
+}
+
+// ============================================================
+//  APPLY SAVED THEME
+// ============================================================
+function applySavedTheme() {
+    try {
+        const settings = JSON.parse(localStorage.getItem('hotel_settings') || '{}');
+        if (settings.theme) {
+            document.body.classList.add(`theme-${settings.theme}`);
+        }
+        if (settings.fontSize) {
+            document.body.classList.add(`font-${settings.fontSize}`);
+        }
+    } catch (e) {
+        // No settings found
     }
 }
 
@@ -419,24 +466,113 @@ function updateModalTotals(tableNum) {
     modalTotal.textContent = `Rs. ${total.toFixed(2)}`;
 }
 
+// ============================================================
+//  CHANGE TABLE QTY - WITH STOCK UPDATE
+// ============================================================
 function changeTableQty(tableNum, index, delta) {
     const items = tableOrders[tableNum] || [];
     if (!items[index]) return;
-    items[index].quantity += delta;
-    if (items[index].quantity <= 0) {
+    
+    const item = items[index];
+    const stockData = JSON.parse(localStorage.getItem(STOCK_KEY) || '[]');
+    const stockItem = stockData.find(s => s.id === item.id);
+    
+    if (delta > 0) {
+        if (stockItem && stockItem.stock < delta) {
+            showToast(`❌ Not enough stock for ${item.name}! Available: ${stockItem.stock}`);
+            return;
+        }
+        if (stockItem) {
+            stockItem.stock -= delta;
+        }
+    } else {
+        if (stockItem) {
+            stockItem.stock += Math.abs(delta);
+        }
+    }
+    
+    localStorage.setItem(STOCK_KEY, JSON.stringify(stockData));
+    
+    item.quantity += delta;
+    if (item.quantity <= 0) {
         items.splice(index, 1);
     }
+    
     saveTables();
     renderTableOrderItems(tableNum);
     renderTables(currentFilter);
 }
 
+// ============================================================
+//  REMOVE TABLE ITEM - WITH STOCK RESTORE
+// ============================================================
 function removeTableItem(tableNum, index) {
     const items = tableOrders[tableNum] || [];
+    if (!items[index]) return;
+    
+    const item = items[index];
+    
+    const stockData = JSON.parse(localStorage.getItem(STOCK_KEY) || '[]');
+    const stockItem = stockData.find(s => s.id === item.id);
+    if (stockItem) {
+        stockItem.stock += item.quantity;
+    }
+    localStorage.setItem(STOCK_KEY, JSON.stringify(stockData));
+    
     items.splice(index, 1);
     saveTables();
     renderTableOrderItems(tableNum);
     renderTables(currentFilter);
+}
+
+// ============================================================
+//  ADD ITEMS TO TABLE FROM POS
+// ============================================================
+function addItemsToTable() {
+    if (!currentTable) return;
+    localStorage.setItem('add_to_table', currentTable);
+    window.location.href = 'index.html#pos';
+}
+
+// ============================================================
+//  LOAD TABLE TO POS
+// ============================================================
+function loadToPOS() {
+    if (!currentTable) return;
+    const items = tableOrders[currentTable] || [];
+    if (items.length === 0) {
+        showToast('Table is empty!');
+        return;
+    }
+    
+    const stockData = JSON.parse(localStorage.getItem(STOCK_KEY) || '[]');
+    let stockError = false;
+    
+    items.forEach(item => {
+        const stockItem = stockData.find(s => s.id === item.id);
+        if (stockItem) {
+            if (stockItem.stock < item.quantity) {
+                showToast(`❌ Not enough stock for ${item.name}! Available: ${stockItem.stock}`);
+                stockError = true;
+                return;
+            }
+        }
+    });
+    
+    if (stockError) return;
+    
+    localStorage.setItem('load_table_order', JSON.stringify({
+        table: currentTable,
+        items: items
+    }));
+    
+    tableOrders[currentTable] = [];
+    saveTables();
+    
+    modal.classList.remove('open');
+    showToast(`✅ Table ${currentTable} sent to POS!`);
+    
+    window.location.href = 'index.html#pos';
 }
 
 // ============================================================
@@ -449,12 +585,21 @@ document.getElementById('closeTableBtn').addEventListener('click', function() {
         showToast('Table is already empty!');
         return;
     }
-    if (confirm(`Close Table ${currentTable}?`)) {
+    if (confirm(`Close Table ${currentTable}? This will restore stock.`)) {
+        const stockData = JSON.parse(localStorage.getItem(STOCK_KEY) || '[]');
+        items.forEach(item => {
+            const stockItem = stockData.find(s => s.id === item.id);
+            if (stockItem) {
+                stockItem.stock += item.quantity;
+            }
+        });
+        localStorage.setItem(STOCK_KEY, JSON.stringify(stockData));
+        
         tableOrders[currentTable] = [];
         saveTables();
         renderTables(currentFilter);
         modal.classList.remove('open');
-        showToast(`✅ Table ${currentTable} closed!`);
+        showToast(`✅ Table ${currentTable} closed! Stock restored.`);
     }
 });
 
@@ -463,6 +608,10 @@ document.getElementById('closeTableBtn').addEventListener('click', function() {
 // ============================================================
 function printBill(bill) {
     const printWindow = window.open('', '_blank', 'width=400,height=600');
+    if (!printWindow) {
+        showToast('❌ Please allow popups for printing!');
+        return;
+    }
     
     const itemsHtml = bill.items.map(item => `
         <tr>
@@ -472,6 +621,16 @@ function printBill(bill) {
             <td style="text-align:right;">Rs. ${(item.price * item.qty).toFixed(2)}</td>
         </tr>
     `).join('');
+    
+    let paymentsHtml = '';
+    if (bill.payments && bill.payments.length > 0) {
+        paymentsHtml = bill.payments.map(p => `
+            <div style="display:flex;justify-content:space-between;font-size:0.85rem;padding:2px 0;">
+                <span>${p.methodLabel}${p.reference && p.reference !== '-' ? ` (${p.reference})` : ''}</span>
+                <span>Rs. ${p.amount.toFixed(2)}</span>
+            </div>
+        `).join('');
+    }
     
     printWindow.document.write(`
         <!DOCTYPE html>
@@ -490,8 +649,8 @@ function printBill(bill) {
                 .totals { margin-top: 10px; border-top: 2px solid #333; padding-top: 10px; }
                 .totals div { display: flex; justify-content: space-between; font-size: 0.85rem; padding: 2px 0; }
                 .totals .grand { font-weight: 700; font-size: 1.1rem; border-top: 1px solid #ddd; padding-top: 6px; margin-top: 4px; }
-                .totals .received { color: #16a34a; }
-                .totals .change { color: #16a34a; }
+                .payment-section { margin: 6px 0; padding: 6px 0; border-top: 1px dashed #ddd; border-bottom: 1px dashed #ddd; }
+                .payment-section .title { font-weight: 600; font-size: 0.75rem; color: #666; margin-bottom: 2px; }
                 .footer { text-align: center; margin-top: 20px; font-size: 0.8rem; color: #666; border-top: 2px dashed #333; padding-top: 10px; }
                 .thankyou { font-size: 0.9rem; font-weight: 600; color: #333; }
             </style>
@@ -521,10 +680,33 @@ function printBill(bill) {
             
             <div class="totals">
                 <div><span>Subtotal</span><span>Rs. ${bill.subtotal.toFixed(2)}</span></div>
+                ${bill.discount > 0 ? `<div><span>Discount</span><span>-Rs. ${bill.discount.toFixed(2)}</span></div>` : ''}
                 <div class="grand"><span>TOTAL</span><span>Rs. ${bill.total.toFixed(2)}</span></div>
-                <div class="received"><span>Received</span><span>Rs. ${bill.received.toFixed(2)}</span></div>
-                <div class="change"><span>Change</span><span>Rs. ${bill.change.toFixed(2)}</span></div>
             </div>
+            
+            ${bill.payments && bill.payments.length > 0 ? `
+                <div class="payment-section">
+                    <div class="title">💳 Payment Details</div>
+                    ${paymentsHtml}
+                    <div style="display:flex;justify-content:space-between;font-size:0.85rem;padding-top:4px;border-top:1px solid #ddd;margin-top:4px;">
+                        <span><strong>Total Paid</strong></span>
+                        <span><strong>Rs. ${bill.received.toFixed(2)}</strong></span>
+                    </div>
+                    <div style="display:flex;justify-content:space-between;font-size:0.85rem;">
+                        <span>Change</span>
+                        <span>Rs. ${bill.change.toFixed(2)}</span>
+                    </div>
+                </div>
+            ` : `
+                <div style="display:flex;justify-content:space-between;font-size:0.85rem;padding:4px 0;">
+                    <span>Received</span>
+                    <span>Rs. ${bill.received.toFixed(2)}</span>
+                </div>
+                <div style="display:flex;justify-content:space-between;font-size:0.85rem;padding:2px 0;">
+                    <span>Change</span>
+                    <span>Rs. ${bill.change.toFixed(2)}</span>
+                </div>
+            `}
             
             <div class="footer">
                 <p class="thankyou">Thank you! Come again! 🍽️</p>
@@ -547,6 +729,29 @@ function printBill(bill) {
 }
 
 // ============================================================
+//  SELECT TABLE PAYMENT METHOD
+// ============================================================
+function selectTablePaymentMethod(method) {
+    tableSelectedMethod = method;
+    document.querySelectorAll('#tablePaymentModal .payment-method-btn').forEach(btn => {
+        btn.classList.toggle('active', btn.dataset.method === method);
+    });
+    
+    const refGroup = document.getElementById('tablePaymentReferenceGroup');
+    const refInput = document.getElementById('tablePaymentReference');
+    
+    if (['card', 'mobile', 'bank'].includes(method)) {
+        refGroup.style.display = 'block';
+        refInput.placeholder = method === 'card' ? 'Card (last 4)' : 
+                              method === 'mobile' ? 'Mobile no' : 'Bank ref';
+        refInput.focus();
+    } else {
+        refGroup.style.display = 'none';
+        refInput.value = '';
+    }
+}
+
+// ============================================================
 //  TABLE PAYMENT
 // ============================================================
 document.getElementById('payTableBtn').addEventListener('click', function() {
@@ -556,6 +761,14 @@ document.getElementById('payTableBtn').addEventListener('click', function() {
         showToast('No items to pay!');
         return;
     }
+    
+    // Reset payment method
+    tableSelectedMethod = 'cash';
+    document.querySelectorAll('#tablePaymentModal .payment-method-btn').forEach(btn => {
+        btn.classList.toggle('active', btn.dataset.method === 'cash');
+    });
+    document.getElementById('tablePaymentReferenceGroup').style.display = 'none';
+    document.getElementById('tablePaymentReference').value = '';
     
     const subtotal = items.reduce((sum, item) => sum + item.price * item.quantity, 0);
     const total = subtotal;
@@ -628,7 +841,6 @@ tableAmountReceived.addEventListener('input', function() {
     }
 });
 
-// Enter key support
 tableAmountReceived.addEventListener('keydown', function(e) {
     if (e.key === 'Enter' && !confirmTablePaymentBtn.disabled) {
         confirmTablePaymentBtn.click();
@@ -636,7 +848,7 @@ tableAmountReceived.addEventListener('keydown', function(e) {
 });
 
 // ============================================================
-//  CONFIRM TABLE PAYMENT
+//  CONFIRM TABLE PAYMENT - WITH PAYMENT METHOD
 // ============================================================
 confirmTablePaymentBtn.addEventListener('click', function() {
     if (!currentTableBill) {
@@ -651,6 +863,24 @@ confirmTablePaymentBtn.addEventListener('click', function() {
         return;
     }
     
+    const reference = document.getElementById('tablePaymentReference').value.trim() || '-';
+    
+    const methodIcons = {
+        'cash': '💵',
+        'card': '💳',
+        'mobile': '📱',
+        'bank': '🏦',
+        'credit': '💰'
+    };
+    
+    const methodNames = {
+        'cash': 'Cash',
+        'card': 'Card',
+        'mobile': 'Mobile',
+        'bank': 'Bank',
+        'credit': 'Credit'
+    };
+    
     const bill = {
         id: Date.now(),
         date: new Date().toLocaleString('en-US', { month: '2-digit', day: '2-digit', year: 'numeric', hour: '2-digit', minute: '2-digit', second: '2-digit' }),
@@ -659,18 +889,23 @@ confirmTablePaymentBtn.addEventListener('click', function() {
         subtotal: currentTableBill.subtotal,
         total: currentTableBill.total,
         received: received,
-        change: received - currentTableBill.total
+        change: received - currentTableBill.total,
+        payments: [{
+            method: tableSelectedMethod,
+            methodLabel: `${methodIcons[tableSelectedMethod]} ${methodNames[tableSelectedMethod]}`,
+            amount: received,
+            reference: reference
+        }],
+        edited: false
     };
     
     history.push(bill);
     saveHistory();
     
-    // Clear table
     tableOrders[currentTableBill.table] = [];
     saveTables();
     renderTables(currentFilter);
     
-    // Ask for print
     const shouldPrint = tablePrintBillCheckbox ? tablePrintBillCheckbox.checked : true;
     
     tablePaymentModal.classList.remove('open');
@@ -679,7 +914,10 @@ confirmTablePaymentBtn.addEventListener('click', function() {
         printBill(bill);
     }
     
-    showToast(`✅ Payment Successful!\nTable ${bill.table}\nTotal: Rs. ${bill.total.toFixed(2)}\nReceived: Rs. ${bill.received.toFixed(2)}\nChange: Rs. ${bill.change.toFixed(2)}`);
+    const methodDisplay = `${methodIcons[tableSelectedMethod]} ${methodNames[tableSelectedMethod]}`;
+    let refText = reference !== '-' ? ` (${reference})` : '';
+    
+    showToast(`✅ Payment Successful!\nTable ${bill.table}\n${methodDisplay}${refText}: Rs. ${bill.received.toFixed(2)}\nChange: Rs. ${bill.change.toFixed(2)}`);
     
     currentTableBill = null;
     currentTable = null;
@@ -850,12 +1088,16 @@ window.closeDropdown = closeDropdown;
 window.toggleFullScreen = toggleFullScreen;
 window.logout = logout;
 window.showToast = showToast;
+window.loadToPOS = loadToPOS;
+window.addItemsToTable = addItemsToTable;
+window.selectTablePaymentMethod = selectTablePaymentMethod;
 
 // ============================================================
 //  INIT
 // ============================================================
 document.addEventListener('DOMContentLoaded', function() {
     checkLoginStatus();
+    applySavedTheme();
     forceInitTables();
     loadData();
     renderTables('all');

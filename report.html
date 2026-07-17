@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
-    <title>Daily Report - Hotel POS</title>
+    <title>Business Report - Hotel POS</title>
     <link rel="stylesheet" href="style-report.css" />
 </head>
 <body>
@@ -16,7 +16,7 @@
             <span></span>
             <span></span>
         </button>
-        <h1>📊 DAILY REPORT</h1>
+        <h1>📊 BUSINESS REPORT</h1>
         <span class="datetime" id="datetime">--</span>
     </div>
     <div class="header-right">
@@ -81,6 +81,15 @@
     <button class="filter-btn" data-filter="custom">📅 Custom</button>
 </div>
 
+<!-- ===== CUSTOM DATE FILTER ===== -->
+<div class="filter-bar" id="customFilter" style="display:none;">
+    <label>📅 From:</label>
+    <input type="date" id="fromDate" />
+    <label>To:</label>
+    <input type="date" id="toDate" />
+    <button id="applyCustomFilter">🔍 Apply</button>
+</div>
+
 <!-- ===== SUMMARY CARDS ===== -->
 <div class="report-summary" id="reportSummary">
     <div class="report-card revenue">
@@ -97,11 +106,11 @@
             <div class="label">Total Orders</div>
         </div>
     </div>
-    <div class="report-card items">
+    <div class="report-card items clickable" id="itemsSoldCard" onclick="openItemsSoldModal()">
         <div class="card-icon">📦</div>
         <div class="card-content">
             <div class="num" id="reportItems">0</div>
-            <div class="label">Items Sold</div>
+            <div class="label">Items Sold <span class="click-hint">👆 Click for details</span></div>
         </div>
     </div>
     <div class="report-card discount">
@@ -120,91 +129,120 @@
     </div>
 </div>
 
-<!-- ===== CUSTOM DATE FILTER ===== -->
-<div class="filter-bar" id="customFilter" style="display:none;">
-    <label>📅 From:</label>
-    <input type="date" id="fromDate" />
-    <label>To:</label>
-    <input type="date" id="toDate" />
-    <button id="applyCustomFilter">🔍 Apply</button>
-</div>
+<!-- ===== BUSINESS REPORT GRID ===== -->
+<div class="report-grid" id="reportGrid">
 
-<!-- ===== REPORT CONTENT ===== -->
-<div class="report-content" id="reportContent">
+    <!-- ===== Top Selling Items ===== -->
+    <div class="report-card-modern full-width">
+        <div class="card-title">
+            <span class="icon">🏆</span>
+            Top Selling Items
+            <span style="margin-left:auto;font-size:0.7rem;color:#94a3b8;" id="topItemsDate">Today</span>
+        </div>
+        <div class="top-items-list" id="topItemsList">
+            <!-- Rendered by JS -->
+        </div>
+    </div>
 
-    <!-- ===== BILL LIST SECTION ===== -->
-    <div class="report-section">
-        <div class="section-header">
-            <h2>📋 Sales Report</h2>
-            <span class="section-badge" id="billCount">0 Bills</span>
+    <!-- ===== Payment Method Breakdown ===== -->
+    <div class="report-card-modern">
+        <div class="card-title">
+            <span class="icon">💳</span>
+            Payment Method Breakdown
+        </div>
+        <div class="payment-breakdown" id="paymentBreakdown">
+            <!-- Rendered by JS -->
+        </div>
+    </div>
+
+    <!-- ===== Stock Movement ===== -->
+    <div class="report-card-modern">
+        <div class="card-title">
+            <span class="icon">📦</span>
+            Stock Movement
+        </div>
+        <div class="stock-movement" id="stockMovement">
+            <!-- Rendered by JS -->
+        </div>
+    </div>
+
+    <!-- ===== Peak Hours ===== -->
+    <div class="report-card-modern full-width">
+        <div class="card-title">
+            <span class="icon">⏰</span>
+            Peak Sales Hours
+            <span style="margin-left:auto;font-size:0.7rem;color:#94a3b8;">Number of orders per hour</span>
+        </div>
+        <div class="peak-hours" id="peakHours">
+            <!-- Rendered by JS -->
+        </div>
+    </div>
+
+    <!-- ===== Bill List ===== -->
+    <div class="report-card-modern full-width">
+        <div class="card-title">
+            <span class="icon">📋</span>
+            Bill List
+            <span style="margin-left:auto;font-size:0.7rem;color:#94a3b8;" id="billCount">0 Bills</span>
         </div>
         <div class="bill-list" id="billList">
             <div class="empty-state">No sales data available</div>
         </div>
     </div>
 
-    <!-- ===== ITEM-WISE SALES SECTION ===== -->
-    <div class="report-section">
-        <div class="section-header">
-            <h2>📊 Item-wise Sales</h2>
-            <span class="section-badge" id="itemCount">0 items</span>
+    <!-- ===== REMOVED STOCK SECTION ===== -->
+    <div class="report-card-modern full-width">
+        <div class="card-title">
+            <span class="icon">🗑️</span>
+            Removed Stock Items
+            <span style="margin-left:auto;font-size:0.7rem;color:#94a3b8;" id="removedCount">0 items</span>
         </div>
-        
-        <!-- Item Summary Cards -->
-        <div class="item-summary-cards" id="itemSummaryCards">
-            <!-- Rendered by JS -->
-        </div>
-        
-        <!-- Item Sales Table -->
-        <div class="item-sales-table-container">
-            <table class="item-sales-table" id="itemSalesTable">
-                <thead>
-                    <tr>
-                        <th>#</th>
-                        <th>Item Name</th>
-                        <th>Category</th>
-                        <th>Quantity Sold</th>
-                        <th>Total Revenue</th>
-                        <th>% of Sales</th>
-                    </tr>
-                </thead>
-                <tbody id="itemSalesBody">
-                    <!-- Rendered by JS -->
-                </tbody>
-            </table>
-        </div>
-    </div>
-
-    <!-- ===== TOP SELLING ITEMS ===== -->
-    <div class="report-section">
-        <div class="section-header">
-            <h2>🏆 Top Selling Items</h2>
-            <span class="section-badge">Best Sellers</span>
-        </div>
-        <div class="top-items-grid" id="topItemsGrid">
-            <!-- Rendered by JS -->
-        </div>
-    </div>
-
-    <!-- ===== SALES CHART ===== -->
-    <div class="report-section">
-        <div class="section-header">
-            <h2>📈 Sales Distribution</h2>
-            <span class="section-badge">By Item</span>
-        </div>
-        <div class="sales-chart" id="salesChart">
-            <!-- Rendered by JS -->
+        <div id="removedStockList">
+            <div style="text-align:center;padding:12px;color:#94a3b8;font-size:0.85rem;">
+                No stock items were removed
+            </div>
         </div>
     </div>
 
 </div>
 
-<!-- ===== FOOTER ===== -->
-<div class="footer">
-    <p>© 2026 Hotel POS System - All Rights Reserved</p>
+<!-- ===== ITEMS SOLD MODAL ===== -->
+<div class="modal-overlay" id="itemsSoldModal">
+    <div class="modal modal-wide">
+        <div class="modal-header">
+            <h2>📦 Items Sold Details</h2>
+            <button class="close-btn" id="closeItemsSoldModal">✕</button>
+        </div>
+        <div class="modal-body">
+            <div class="items-sold-summary" id="itemsSoldSummary">
+                <!-- Rendered by JS -->
+            </div>
+            <div class="items-sold-table-container">
+                <table class="items-sold-table" id="itemsSoldTable">
+                    <thead>
+                        <tr>
+                            <th>#</th>
+                            <th>Item Name</th>
+                            <th>Category</th>
+                            <th>Quantity Sold</th>
+                            <th>Total Revenue</th>
+                            <th>% of Sales</th>
+                        </tr>
+                    </thead>
+                    <tbody id="itemsSoldBody">
+                        <!-- Rendered by JS -->
+                    </tbody>
+                </table>
+            </div>
+            <div class="items-sold-footer">
+                <span>Total Items Sold: <strong id="itemsSoldTotal">0</strong></span>
+                <span>Total Revenue: <strong id="itemsSoldRevenue">Rs. 0.00</strong></span>
+            </div>
+        </div>
+    </div>
 </div>
 
-<!-- ===== TOAST NOTIFICATION ===== -->
+<!-- ===== TOAST ===== -->
 <div id="toast"></div>
 
 <script>
@@ -212,8 +250,10 @@
 //  DATA
 // ============================================================
 const HISTORY_KEY = 'hotel_history';
+const STOCK_KEY = 'hotel_stock';
 
 let history = [];
+let stockData = [];
 let currentFilter = 'today';
 
 // ============================================================
@@ -223,8 +263,33 @@ function loadData() {
     try {
         const storedHistory = localStorage.getItem(HISTORY_KEY);
         history = storedHistory ? JSON.parse(storedHistory) : [];
+        
+        const storedStock = localStorage.getItem(STOCK_KEY);
+        stockData = storedStock ? JSON.parse(storedStock) : [];
+        
+        console.log('History loaded:', history.length, 'bills');
+        console.log('Stock loaded:', stockData.length, 'items');
     } catch (e) {
+        console.error('Load error:', e);
         history = [];
+        stockData = [];
+    }
+}
+
+// ============================================================
+//  APPLY SAVED THEME
+// ============================================================
+function applySavedTheme() {
+    try {
+        const settings = JSON.parse(localStorage.getItem('hotel_settings') || '{}');
+        if (settings.theme) {
+            document.body.classList.add(`theme-${settings.theme}`);
+        }
+        if (settings.fontSize) {
+            document.body.classList.add(`font-${settings.fontSize}`);
+        }
+    } catch (e) {
+        // No settings found
     }
 }
 
@@ -239,11 +304,17 @@ const reportDiscount = document.getElementById('reportDiscount');
 const reportAverage = document.getElementById('reportAverage');
 const billList = document.getElementById('billList');
 const billCount = document.getElementById('billCount');
-const itemCount = document.getElementById('itemCount');
+const topItemsList = document.getElementById('topItemsList');
+const topItemsDate = document.getElementById('topItemsDate');
+const paymentBreakdown = document.getElementById('paymentBreakdown');
+const stockMovement = document.getElementById('stockMovement');
+const peakHours = document.getElementById('peakHours');
 const fromDate = document.getElementById('fromDate');
 const toDate = document.getElementById('toDate');
 const customFilter = document.getElementById('customFilter');
 const filterBtns = document.querySelectorAll('.filter-btn');
+const removedStockList = document.getElementById('removedStockList');
+const removedCount = document.getElementById('removedCount');
 
 // ============================================================
 //  CLOCK
@@ -319,22 +390,6 @@ function getDateRange(filter) {
 }
 
 // ============================================================
-//  CATEGORY HELPERS
-// ============================================================
-function getCategoryDisplayName(category) {
-    const names = {
-        'main': 'Main Dishes',
-        'drinks': 'Beverages',
-        'desserts': 'Desserts',
-        'seafood': 'Seafood',
-        'appetizers': 'Appetizers',
-        'soups': 'Soups',
-        'specials': 'Specials'
-    };
-    return names[category] || category || 'Other';
-}
-
-// ============================================================
 //  ANIMATION HELPERS
 // ============================================================
 function animateNumber(element, target) {
@@ -382,7 +437,350 @@ function animateCurrency(element, target) {
 }
 
 // ============================================================
-//  ITEM-WISE SALES FUNCTIONS
+//  CATEGORY HELPERS
+// ============================================================
+function getCategoryDisplayName(category) {
+    const names = {
+        'main': 'Main Dishes',
+        'drinks': 'Beverages',
+        'desserts': 'Desserts',
+        'seafood': 'Seafood',
+        'appetizers': 'Appetizers',
+        'soups': 'Soups',
+        'specials': 'Specials'
+    };
+    return names[category] || category || 'Other';
+}
+
+// ============================================================
+//  TOP SELLING ITEMS
+// ============================================================
+function getTopSellingItems(bills, limit = 5) {
+    const itemSales = {};
+    
+    bills.forEach(bill => {
+        bill.items.forEach(item => {
+            const name = item.name;
+            const qty = item.qty || item.quantity || 1;
+            const price = item.price || 0;
+            
+            if (!itemSales[name]) {
+                itemSales[name] = {
+                    name: name,
+                    quantity: 0,
+                    revenue: 0
+                };
+            }
+            itemSales[name].quantity += qty;
+            itemSales[name].revenue += price * qty;
+        });
+    });
+    
+    return Object.values(itemSales)
+        .sort((a, b) => b.quantity - a.quantity)
+        .slice(0, limit);
+}
+
+function renderTopSellingItems(bills, dateStr) {
+    const topItems = getTopSellingItems(bills, 5);
+    topItemsDate.textContent = dateStr;
+    
+    if (topItems.length === 0) {
+        topItemsList.innerHTML = '<div style="text-align:center;padding:20px;color:#94a3b8;">No items sold</div>';
+        return;
+    }
+    
+    const medals = ['🥇', '🥈', '🥉', '4️⃣', '5️⃣'];
+    topItemsList.innerHTML = topItems.map((item, index) => `
+        <div class="top-item-row">
+            <span class="rank">${medals[index] || '#'}</span>
+            <span class="name">${item.name}</span>
+            <span class="qty">${item.quantity} sold</span>
+            <span class="revenue">Rs. ${item.revenue.toFixed(2)}</span>
+        </div>
+    `).join('');
+}
+
+// ============================================================
+//  PAYMENT METHOD BREAKDOWN
+// ============================================================
+function getPaymentMethodTotals(bills) {
+    const methods = {
+        'cash': { name: 'Cash', icon: '💵', total: 0, count: 0, color: '#16a34a' },
+        'card': { name: 'Card', icon: '💳', total: 0, count: 0, color: '#3b82f6' },
+        'mobile': { name: 'Mobile', icon: '📱', total: 0, count: 0, color: '#d97706' },
+        'bank': { name: 'Bank', icon: '🏦', total: 0, count: 0, color: '#7c3aed' },
+        'credit': { name: 'Credit', icon: '💰', total: 0, count: 0, color: '#dc2626' }
+    };
+    
+    bills.forEach(bill => {
+        if (bill.payments && bill.payments.length > 0) {
+            bill.payments.forEach(payment => {
+                const method = payment.method || 'cash';
+                if (methods[method]) {
+                    methods[method].total += payment.amount || 0;
+                    methods[method].count += 1;
+                }
+            });
+        }
+    });
+    
+    return methods;
+}
+
+function renderPaymentBreakdown(bills) {
+    const methods = getPaymentMethodTotals(bills);
+    const totalAmount = Object.values(methods).reduce((sum, m) => sum + m.total, 0);
+    
+    if (totalAmount === 0) {
+        paymentBreakdown.innerHTML = '<div style="text-align:center;padding:20px;color:#94a3b8;">No payment data available</div>';
+        return;
+    }
+    
+    const order = ['cash', 'card', 'mobile', 'bank', 'credit'];
+    paymentBreakdown.innerHTML = order.map(key => {
+        const m = methods[key];
+        const percentage = (m.total / totalAmount) * 100;
+        return `
+            <div class="payment-bar-row">
+                <span class="label">${m.icon} ${m.name}</span>
+                <div class="bar-track">
+                    <div class="bar-fill" style="width: ${percentage}%; background: ${m.color};"></div>
+                </div>
+                <span class="bar-value">Rs. ${m.total.toFixed(2)} (${percentage.toFixed(1)}%)</span>
+            </div>
+        `;
+    }).join('');
+}
+
+// ============================================================
+//  STOCK MOVEMENT
+// ============================================================
+function getStockMovement(bills) {
+    const soldItems = {};
+    bills.forEach(bill => {
+        bill.items.forEach(item => {
+            const name = item.name;
+            const qty = item.qty || item.quantity || 1;
+            if (!soldItems[name]) soldItems[name] = 0;
+            soldItems[name] += qty;
+        });
+    });
+    
+    let totalAdded = 0;
+    let totalSold = 0;
+    let totalRemaining = 0;
+    
+    if (stockData.length > 0) {
+        stockData.forEach(stock => {
+            const sold = soldItems[stock.name] || 0;
+            totalAdded += stock.stock + sold;
+            totalSold += sold;
+            totalRemaining += stock.stock;
+        });
+    }
+    
+    return { totalAdded, totalSold, totalRemaining };
+}
+
+function renderStockMovement(bills) {
+    const movement = getStockMovement(bills);
+    
+    stockMovement.innerHTML = `
+        <div class="stock-movement-item">
+            <div class="number added">${movement.totalAdded}</div>
+            <div class="label">📥 Total Added</div>
+        </div>
+        <div class="stock-movement-item">
+            <div class="number sold">${movement.totalSold}</div>
+            <div class="label">📤 Total Sold</div>
+        </div>
+        <div class="stock-movement-item" style="grid-column: 1 / -1;">
+            <div class="number remaining">${movement.totalRemaining}</div>
+            <div class="label">📦 Remaining Stock</div>
+        </div>
+    `;
+}
+
+// ============================================================
+//  PEAK HOURS
+// ============================================================
+function getPeakHours(bills) {
+    const hours = {};
+    
+    bills.forEach(bill => {
+        const date = new Date(bill.date);
+        const hour = date.getHours();
+        const hourKey = `${hour.toString().padStart(2, '0')}:00`;
+        if (!hours[hourKey]) hours[hourKey] = 0;
+        hours[hourKey] += 1;
+    });
+    
+    const sorted = Object.keys(hours).sort();
+    return sorted.map(hour => ({
+        hour: hour,
+        count: hours[hour]
+    }));
+}
+
+function renderPeakHours(bills) {
+    const peaks = getPeakHours(bills);
+    
+    if (peaks.length === 0) {
+        peakHours.innerHTML = '<div style="text-align:center;padding:20px;color:#94a3b8;width:100%;">No data available</div>';
+        return;
+    }
+    
+    const maxCount = Math.max(...peaks.map(p => p.count));
+    
+    peakHours.innerHTML = peaks.map(p => {
+        const isHigh = p.count === maxCount && maxCount > 0;
+        return `
+            <div class="peak-hour-item ${isHigh ? 'high' : ''}">
+                <div class="hour">${p.hour}</div>
+                <div class="count">${p.count}</div>
+            </div>
+        `;
+    }).join('');
+}
+
+// ============================================================
+//  REMOVED STOCK FUNCTIONS
+// ============================================================
+function getRemovedStockForDate(date) {
+    const dateStr = date.toDateString();
+    const removedStock = JSON.parse(localStorage.getItem('removed_stock') || '{}');
+    return removedStock[dateStr] || [];
+}
+
+function renderRemovedStock(bills, start, end) {
+    if (!removedStockList) return;
+    
+    let allRemoved = [];
+    let currentDate = new Date(start);
+    while (currentDate <= end) {
+        const removed = getRemovedStockForDate(currentDate);
+        allRemoved = allRemoved.concat(removed);
+        currentDate.setDate(currentDate.getDate() + 1);
+    }
+    
+    if (removedCount) {
+        removedCount.textContent = `${allRemoved.length} items`;
+    }
+    
+    if (allRemoved.length === 0) {
+        removedStockList.innerHTML = `
+            <div style="text-align:center;padding:12px;color:#94a3b8;font-size:0.85rem;">
+                No stock items were removed
+            </div>
+        `;
+        return;
+    }
+    
+    let html = `
+        <div style="display:grid;grid-template-columns:1fr auto auto;gap:8px;padding:6px 0;border-bottom:2px solid #e2e8f0;font-size:0.75rem;font-weight:600;color:#64748b;">
+            <span>Item Name</span>
+            <span>Quantity</span>
+            <span>Removed At</span>
+        </div>
+    `;
+    
+    allRemoved.forEach(item => {
+        html += `
+            <div style="display:grid;grid-template-columns:1fr auto auto;gap:8px;padding:4px 0;border-bottom:1px solid #f1f5f9;font-size:0.85rem;">
+                <span>${item.name}</span>
+                <span style="color:#ef4444;font-weight:600;">-${item.quantity}</span>
+                <span style="color:#94a3b8;font-size:0.75rem;">${item.removedAt || ''}</span>
+            </div>
+        `;
+    });
+    
+    removedStockList.innerHTML = html;
+}
+
+// ============================================================
+//  BILL LIST
+// ============================================================
+function renderBillList(bills, start, end) {
+    const startStr = start.toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' });
+    const endStr = end.toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' });
+    const dateRangeStr = startStr === endStr ? startStr : `${startStr} - ${endStr}`;
+    
+    billCount.textContent = `${bills.length} Bills`;
+    
+    if (bills.length === 0) {
+        billList.innerHTML = `
+            <div class="empty-state">
+                <span style="font-size:3rem;">📭</span>
+                <p>No sales for ${dateRangeStr}</p>
+            </div>
+        `;
+        return;
+    }
+    
+    let html = '';
+    bills.slice().reverse().slice(0, 20).forEach((bill, index) => {
+        const tableInfo = bill.table ? `🪑 Table ${bill.table}` : '🧾 Counter';
+        const isEven = index % 2 === 0;
+        const isEdited = bill.edited || false;
+        const editBadge = isEdited ? '<span class="edit-badge-report">✏️ Edited</span>' : '';
+        
+        let paymentSummary = '';
+        if (bill.payments && bill.payments.length > 0) {
+            paymentSummary = bill.payments.map(p => {
+                const icons = { 'cash': '💵', 'card': '💳', 'mobile': '📱', 'bank': '🏦', 'credit': '💰' };
+                return `${icons[p.method] || '💵'} ${p.methodLabel || p.method}: Rs. ${p.amount.toFixed(2)}`;
+            }).join(' • ');
+        }
+        
+        html += `
+            <div class="bill-item ${isEven ? 'even' : ''} ${isEdited ? 'edited-bill' : ''}">
+                <div class="bill-header">
+                    <div>
+                        <span class="bill-number">#${bill.id}</span>
+                        <span class="bill-table">${tableInfo}</span>
+                        <span class="bill-time">${bill.date}</span>
+                        ${editBadge}
+                    </div>
+                    <div>
+                        <span class="bill-total">Rs. ${bill.total.toFixed(2)}</span>
+                        ${bill.discount > 0 ? `<span class="bill-discount">-Rs. ${bill.discount.toFixed(2)}</span>` : ''}
+                    </div>
+                </div>
+                <div class="bill-items">
+                    ${bill.items.map(item => 
+                        `<span class="bill-item-name">${item.name} <span class="qty">x${item.qty || item.quantity || 1}</span></span>`
+                    ).join(' • ')}
+                </div>
+                ${paymentSummary ? `
+                    <div class="bill-payment-methods">
+                        <span style="font-weight:500;color:#64748b;">💳 Payments:</span>
+                        <span>${paymentSummary}</span>
+                    </div>
+                ` : ''}
+                ${bill.received ? `
+                    <div class="bill-payment">
+                        <span>💵 Received: Rs. ${bill.received.toFixed(2)}</span>
+                        <span>🔄 Change: Rs. ${bill.change.toFixed(2)}</span>
+                    </div>
+                ` : ''}
+            </div>
+        `;
+    });
+    
+    if (bills.length > 20) {
+        html += `
+            <div style="text-align:center;padding:12px;color:#94a3b8;font-size:0.85rem;">
+                Showing last 20 bills out of ${bills.length}
+            </div>
+        `;
+    }
+    
+    billList.innerHTML = html;
+}
+
+// ============================================================
+//  ITEMS SOLD MODAL FUNCTIONS
 // ============================================================
 function getItemWiseSales(bills) {
     const itemSales = {};
@@ -409,234 +807,87 @@ function getItemWiseSales(bills) {
     return Object.values(itemSales).sort((a, b) => b.quantity - a.quantity);
 }
 
-// ============================================================
-//  RENDER FUNCTIONS
-// ============================================================
-function renderBillList(bills, start, end) {
-    const startStr = start.toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' });
-    const endStr = end.toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' });
-    const dateRangeStr = startStr === endStr ? startStr : `${startStr} - ${endStr}`;
-    
-    billCount.textContent = `${bills.length} Bills`;
-    
-    if (bills.length === 0) {
-        billList.innerHTML = `
-            <div class="empty-state">
-                <span style="font-size:3rem;">📭</span>
-                <p>No sales for ${dateRangeStr}</p>
-            </div>
-        `;
+function openItemsSoldModal() {
+    const range = getDateRange(currentFilter);
+    if (!range) {
+        showToast('⚠️ Please select valid dates!');
         return;
     }
     
-    let html = `
-        <div class="bill-list-header">
-            <span>📅 ${dateRangeStr}</span>
-            <span>${bills.length} Bills</span>
-        </div>
-    `;
-    
-    bills.slice().reverse().forEach((bill, index) => {
-        const tableInfo = bill.table ? `🪑 Table ${bill.table}` : '🧾 Counter';
-        const isEven = index % 2 === 0;
-        
-        html += `
-            <div class="bill-item ${isEven ? 'even' : ''}">
-                <div class="bill-header">
-                    <div>
-                        <span class="bill-number">#${bill.id}</span>
-                        <span class="bill-table">${tableInfo}</span>
-                        <span class="bill-time">${bill.date}</span>
-                    </div>
-                    <div>
-                        <span class="bill-total">Rs. ${bill.total.toFixed(2)}</span>
-                        ${bill.discount > 0 ? `<span class="bill-discount">-Rs. ${bill.discount.toFixed(2)}</span>` : ''}
-                    </div>
-                </div>
-                <div class="bill-items">
-                    ${bill.items.map(item => 
-                        `<span class="bill-item-name">${item.name} <span class="qty">x${item.qty || item.quantity || 1}</span></span>`
-                    ).join(' • ')}
-                </div>
-                ${bill.received ? `
-                    <div class="bill-payment">
-                        <span>💵 Received: Rs. ${bill.received.toFixed(2)}</span>
-                        <span>🔄 Change: Rs. ${bill.change.toFixed(2)}</span>
-                    </div>
-                ` : ''}
-            </div>
-        `;
+    const { start, end } = range;
+    const filteredBills = history.filter(bill => {
+        const billDate = new Date(bill.date);
+        return billDate >= start && billDate <= end;
     });
     
-    billList.innerHTML = html;
-}
-
-function renderItemWiseSales(bills) {
-    const itemSales = getItemWiseSales(bills);
+    if (filteredBills.length === 0) {
+        showToast('📭 No sales data available!');
+        return;
+    }
+    
+    const itemSales = getItemWiseSales(filteredBills);
     const totalItems = itemSales.reduce((sum, item) => sum + item.quantity, 0);
     const totalRevenue = itemSales.reduce((sum, item) => sum + item.revenue, 0);
     
-    itemCount.textContent = `${itemSales.length} items`;
-    
-    // Render Summary Cards
-    renderItemSummaryCards(itemSales.slice(0, 4), totalItems);
-    
-    // Render Item Sales Table
-    renderItemSalesTable(itemSales, totalItems, totalRevenue);
-    
-    // Render Top Items Grid
-    renderTopItemsGrid(itemSales.slice(0, 6));
-    
-    // Render Sales Chart
-    renderSalesChart(itemSales, totalItems);
-}
-
-function renderItemSummaryCards(topItems, totalItems) {
-    const container = document.getElementById('itemSummaryCards');
-    
-    if (topItems.length === 0) {
-        container.innerHTML = `
-            <div class="empty-state" style="grid-column:1/-1;">
-                <p>No sales data available</p>
-            </div>
-        `;
-        return;
-    }
-    
-    let html = '';
-    const colors = ['#8b5cf6', '#3b82f6', '#22c55e', '#f59e0b'];
-    const icons = ['🥇', '🥈', '🥉', '📦'];
-    
-    topItems.forEach((item, index) => {
-        const percentage = totalItems > 0 ? ((item.quantity / totalItems) * 100).toFixed(1) : 0;
-        html += `
-            <div class="item-summary-card" style="border-left-color: ${colors[index]};">
-                <div class="item-rank">${icons[index]}</div>
-                <div class="item-summary-info">
-                    <span class="item-summary-name">${item.name}</span>
-                    <span class="item-summary-qty">${item.quantity} sold</span>
-                    <span class="item-summary-revenue">Rs. ${item.revenue.toFixed(2)}</span>
-                </div>
-                <div class="item-summary-bar">
-                    <div class="item-summary-fill" style="width: ${percentage}%; background: ${colors[index]};"></div>
-                    <span class="item-summary-percent">${percentage}%</span>
-                </div>
-            </div>
-        `;
-    });
-    
-    container.innerHTML = html;
-}
-
-function renderItemSalesTable(itemSales, totalItems, totalRevenue) {
-    const tbody = document.getElementById('itemSalesBody');
-    
-    if (itemSales.length === 0) {
-        tbody.innerHTML = `
-            <tr>
-                <td colspan="6" class="empty-state">No sales data available</td>
-            </tr>
-        `;
-        return;
-    }
-    
-    let html = '';
-    itemSales.forEach((item, index) => {
-        const percentage = totalItems > 0 ? ((item.quantity / totalItems) * 100).toFixed(1) : 0;
-        
-        html += `
-            <tr>
-                <td>${index + 1}</td>
-                <td class="item-name">${item.name}</td>
-                <td><span class="category-badge">${getCategoryDisplayName(item.category)}</span></td>
-                <td class="qty-cell">${item.quantity}</td>
-                <td class="revenue-cell">Rs. ${item.revenue.toFixed(2)}</td>
-                <td>
-                    <div class="progress-bar">
-                        <div class="progress-fill" style="width: ${percentage}%; background: #8b5cf6;"></div>
-                        <span class="progress-label">${percentage}%</span>
-                    </div>
-                </td>
-            </tr>
-        `;
-    });
-    
-    // Add total row
-    html += `
-        <tr class="total-row">
-            <td colspan="3"><strong>TOTAL</strong></td>
-            <td><strong>${totalItems}</strong></td>
-            <td><strong>Rs. ${totalRevenue.toFixed(2)}</strong></td>
-            <td><strong>100%</strong></td>
-        </tr>
+    document.getElementById('itemsSoldSummary').innerHTML = `
+        <div class="items-sold-stat">
+            <div class="stat-number">${itemSales.length}</div>
+            <div class="stat-label">Unique Items</div>
+        </div>
+        <div class="items-sold-stat">
+            <div class="stat-number">${totalItems}</div>
+            <div class="stat-label">Total Items Sold</div>
+        </div>
+        <div class="items-sold-stat">
+            <div class="stat-number">Rs. ${totalRevenue.toFixed(2)}</div>
+            <div class="stat-label">Total Revenue</div>
+        </div>
+        <div class="items-sold-stat">
+            <div class="stat-number">${filteredBills.length}</div>
+            <div class="stat-label">Total Bills</div>
+        </div>
     `;
     
-    tbody.innerHTML = html;
-}
-
-function renderTopItemsGrid(topItems) {
-    const container = document.getElementById('topItemsGrid');
-    
-    if (topItems.length === 0) {
-        container.innerHTML = `
-            <div class="empty-state" style="grid-column:1/-1;">
-                <p>No sales data available</p>
-            </div>
-        `;
-        return;
-    }
-    
-    let html = '';
-    const medals = ['🥇', '🥈', '🥉', '4️⃣', '5️⃣', '6️⃣'];
-    
-    topItems.forEach((item, index) => {
-        html += `
-            <div class="top-item-card">
-                <div class="top-item-rank">${medals[index] || '#'}</div>
-                <div class="top-item-info">
-                    <span class="top-item-name">${item.name}</span>
-                    <span class="top-item-qty">${item.quantity} sold</span>
-                    <span class="top-item-revenue">Rs. ${item.revenue.toFixed(2)}</span>
-                </div>
-            </div>
-        `;
-    });
-    
-    container.innerHTML = html;
-}
-
-function renderSalesChart(itemSales, totalItems) {
-    const container = document.getElementById('salesChart');
-    
+    let tableHtml = '';
     if (itemSales.length === 0) {
-        container.innerHTML = `
-            <div class="empty-state">
-                <p>No sales data available</p>
-            </div>
+        tableHtml = `
+            <tr>
+                <td colspan="6" class="empty-state">No items sold</td>
+            </tr>
         `;
-        return;
+    } else {
+        const colors = ['#8b5cf6', '#3b82f6', '#22c55e', '#f59e0b', '#ef4444', '#ec4899'];
+        itemSales.forEach((item, index) => {
+            const percentage = totalItems > 0 ? ((item.quantity / totalItems) * 100).toFixed(1) : 0;
+            const color = colors[index % colors.length];
+            
+            tableHtml += `
+                <tr>
+                    <td>${index + 1}</td>
+                    <td class="item-name">${item.name}</td>
+                    <td><span class="category-badge">${getCategoryDisplayName(item.category)}</span></td>
+                    <td class="qty-cell">${item.quantity}</td>
+                    <td class="revenue-cell">Rs. ${item.revenue.toFixed(2)}</td>
+                    <td>
+                        <div class="progress-bar-mini">
+                            <div class="progress-fill-mini" style="width: ${percentage}%; background: ${color};"></div>
+                            <span class="progress-label-mini">${percentage}%</span>
+                        </div>
+                    </td>
+                </tr>
+            `;
+        });
     }
     
-    const maxQuantity = Math.max(...itemSales.map(item => item.quantity));
-    const colors = ['#8b5cf6', '#3b82f6', '#22c55e', '#f59e0b', '#ef4444', '#ec4899', '#14b8a6', '#8b5cf6'];
+    document.getElementById('itemsSoldBody').innerHTML = tableHtml;
+    document.getElementById('itemsSoldTotal').textContent = totalItems;
+    document.getElementById('itemsSoldRevenue').textContent = `Rs. ${totalRevenue.toFixed(2)}`;
     
-    let html = '';
-    const displayItems = itemSales.slice(0, 8);
-    displayItems.forEach((item, index) => {
-        const height = maxQuantity > 0 ? ((item.quantity / maxQuantity) * 100) : 0;
-        const color = colors[index % colors.length];
-        
-        html += `
-            <div class="chart-bar-container">
-                <div class="chart-bar" style="height: ${Math.max(height, 4)}%; background: ${color};">
-                    <span class="chart-bar-value">${item.quantity}</span>
-                </div>
-                <span class="chart-bar-label">${item.name.length > 10 ? item.name.substring(0, 10) + '...' : item.name}</span>
-            </div>
-        `;
-    });
-    
-    container.innerHTML = html;
+    document.getElementById('itemsSoldModal').classList.add('open');
+}
+
+function closeItemsSoldModal() {
+    document.getElementById('itemsSoldModal').classList.remove('open');
 }
 
 // ============================================================
@@ -668,11 +919,16 @@ function updateReport(filter = 'today') {
     animateCurrency(reportDiscount, discount);
     animateCurrency(reportAverage, average);
     
-    // Render Bill List
-    renderBillList(filteredBills, start, end);
+    // Date string for display
+    const dateStr = start.toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' });
     
-    // Render Item-wise Sales
-    renderItemWiseSales(filteredBills);
+    // Render all sections
+    renderTopSellingItems(filteredBills, dateStr);
+    renderPaymentBreakdown(filteredBills);
+    renderStockMovement(filteredBills);
+    renderPeakHours(filteredBills);
+    renderBillList(filteredBills, start, end);
+    renderRemovedStock(filteredBills, start, end);
 }
 
 // ============================================================
@@ -718,7 +974,6 @@ document.getElementById('applyCustomFilter').addEventListener('click', function(
     updateReport('custom');
 });
 
-// Enter key for custom filter
 fromDate.addEventListener('keydown', (e) => {
     if (e.key === 'Enter') document.getElementById('applyCustomFilter').click();
 });
@@ -747,19 +1002,80 @@ document.getElementById('exportReportBtn').addEventListener('click', function() 
         return;
     }
     
-    // Export Bill Summary
-    let csv = 'Bill ID,Date,Table,Items,Total,Discount,Received,Change\n';
+    let csv = '===== BUSINESS REPORT =====\n';
+    csv += `Date Range: ${start.toLocaleDateString()} - ${end.toLocaleDateString()}\n`;
+    csv += `Generated: ${new Date().toLocaleString()}\n\n`;
+    
+    // Summary
+    const orders = filteredBills.length;
+    const totalItems = filteredBills.reduce((sum, b) => sum + b.items.reduce((s, i) => s + (i.qty || i.quantity || 1), 0), 0);
+    const revenue = filteredBills.reduce((sum, b) => sum + (b.total || 0), 0);
+    const discount = filteredBills.reduce((sum, b) => sum + (b.discount || 0), 0);
+    const average = orders > 0 ? revenue / orders : 0;
+    
+    csv += '===== SUMMARY =====\n';
+    csv += `Total Orders,${orders}\n`;
+    csv += `Total Items Sold,${totalItems}\n`;
+    csv += `Total Revenue,Rs. ${revenue.toFixed(2)}\n`;
+    csv += `Total Discount,Rs. ${discount.toFixed(2)}\n`;
+    csv += `Average Order,Rs. ${average.toFixed(2)}\n\n`;
+    
+    // Top Selling Items
+    const topItems = getTopSellingItems(filteredBills, 5);
+    csv += '===== TOP SELLING ITEMS =====\n';
+    csv += 'Rank,Item Name,Quantity Sold,Revenue\n';
+    topItems.forEach((item, index) => {
+        csv += `${index + 1},${item.name},${item.quantity},Rs. ${item.revenue.toFixed(2)}\n`;
+    });
+    csv += '\n';
+    
+    // Payment Methods
+    const methods = getPaymentMethodTotals(filteredBills);
+    csv += '===== PAYMENT METHODS =====\n';
+    csv += 'Method,Count,Total Amount\n';
+    const order = ['cash', 'card', 'mobile', 'bank', 'credit'];
+    order.forEach(key => {
+        const m = methods[key];
+        if (m.total > 0) {
+            csv += `${m.name},${m.count},Rs. ${m.total.toFixed(2)}\n`;
+        }
+    });
+    csv += '\n';
+    
+    // Stock Movement
+    const movement = getStockMovement(filteredBills);
+    csv += '===== STOCK MOVEMENT =====\n';
+    csv += `Total Added,${movement.totalAdded}\n`;
+    csv += `Total Sold,${movement.totalSold}\n`;
+    csv += `Remaining Stock,${movement.totalRemaining}\n\n`;
+    
+    // Removed Stock
+    let allRemoved = [];
+    let currentDate = new Date(start);
+    while (currentDate <= end) {
+        const removed = getRemovedStockForDate(currentDate);
+        allRemoved = allRemoved.concat(removed);
+        currentDate.setDate(currentDate.getDate() + 1);
+    }
+    if (allRemoved.length > 0) {
+        csv += '===== REMOVED STOCK =====\n';
+        csv += 'Item Name,Quantity,Removed At\n';
+        allRemoved.forEach(item => {
+            csv += `${item.name},${item.quantity},${item.removedAt || ''}\n`;
+        });
+        csv += '\n';
+    }
+    
+    // Bill Details
+    csv += '===== BILL DETAILS =====\n';
+    csv += 'Bill ID,Date,Table,Items,Total,Discount,Received,Change,Payments\n';
     filteredBills.forEach(bill => {
         const itemsStr = bill.items.map(i => `${i.name} x${i.qty || i.quantity || 1}`).join('; ');
-        csv += `${bill.id},${bill.date},${bill.table || 'Counter'},"${itemsStr}",${(bill.total || 0).toFixed(2)},${(bill.discount || 0).toFixed(2)},${(bill.received || 0).toFixed(2)},${(bill.change || 0).toFixed(2)}\n`;
-    });
-    
-    // Add Item-wise Sales
-    const itemSales = getItemWiseSales(filteredBills);
-    csv += '\n\nItem-wise Sales Report\n';
-    csv += 'Item Name,Category,Quantity Sold,Total Revenue\n';
-    itemSales.forEach(item => {
-        csv += `${item.name},${getCategoryDisplayName(item.category)},${item.quantity},${item.revenue.toFixed(2)}\n`;
+        let paymentsStr = '';
+        if (bill.payments && bill.payments.length > 0) {
+            paymentsStr = bill.payments.map(p => `${p.method || 'cash'}:${p.amount.toFixed(2)}`).join('|');
+        }
+        csv += `${bill.id},${bill.date},${bill.table || 'Counter'},"${itemsStr}",${(bill.total || 0).toFixed(2)},${(bill.discount || 0).toFixed(2)},${(bill.received || 0).toFixed(2)},${(bill.change || 0).toFixed(2)},"${paymentsStr}"\n`;
     });
     
     const blob = new Blob([csv], { type: 'text/csv;charset=utf-8;' });
@@ -767,7 +1083,7 @@ document.getElementById('exportReportBtn').addEventListener('click', function() 
     const a = document.createElement('a');
     a.href = url;
     const dateStr = start.toISOString().split('T')[0];
-    a.download = `report_${dateStr}_to_${end.toISOString().split('T')[0]}.csv`;
+    a.download = `business_report_${dateStr}_to_${end.toISOString().split('T')[0]}.csv`;
     document.body.appendChild(a);
     a.click();
     document.body.removeChild(a);
@@ -783,6 +1099,21 @@ document.getElementById('refreshBtn').addEventListener('click', function() {
     loadData();
     updateReport(currentFilter);
     showToast('🔄 Report refreshed!');
+});
+
+// ============================================================
+//  MODAL EVENT LISTENERS
+// ============================================================
+document.getElementById('closeItemsSoldModal').addEventListener('click', closeItemsSoldModal);
+document.getElementById('itemsSoldModal').addEventListener('click', function(e) {
+    if (e.target === this) closeItemsSoldModal();
+});
+
+document.addEventListener('keydown', function(e) {
+    if (e.key === 'Escape') {
+        closeItemsSoldModal();
+        closeDropdown();
+    }
 });
 
 // ============================================================
@@ -840,21 +1171,6 @@ function checkLoginStatus() {
 }
 
 // ============================================================
-//  KEYBOARD SHORTCUTS
-// ============================================================
-document.addEventListener('keydown', (e) => {
-    if (e.key === 'Escape') {
-        closeDropdown();
-    }
-    if ((e.ctrlKey || e.metaKey) && e.key === 'r') {
-        e.preventDefault();
-        loadData();
-        updateReport(currentFilter);
-        showToast('🔄 Refreshed!');
-    }
-});
-
-// ============================================================
 //  EXPORT FUNCTIONS
 // ============================================================
 window.toggleDropdown = toggleDropdown;
@@ -862,15 +1178,17 @@ window.closeDropdown = closeDropdown;
 window.toggleFullScreen = toggleFullScreen;
 window.logout = logout;
 window.showToast = showToast;
+window.openItemsSoldModal = openItemsSoldModal;
+window.closeItemsSoldModal = closeItemsSoldModal;
 
 // ============================================================
 //  INIT
 // ============================================================
 document.addEventListener('DOMContentLoaded', function() {
     checkLoginStatus();
+    applySavedTheme();
     loadData();
     
-    // Set default dates for custom filter
     const today = new Date();
     const weekAgo = new Date(today);
     weekAgo.setDate(today.getDate() - 7);
@@ -879,79 +1197,6 @@ document.addEventListener('DOMContentLoaded', function() {
     
     updateReport('today');
 });
-
-// ============================================================
-//  RENDER BILL LIST WITH EDITED STATUS
-// ============================================================
-
-function renderBillList(bills, start, end) {
-    const startStr = start.toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' });
-    const endStr = end.toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' });
-    const dateRangeStr = startStr === endStr ? startStr : `${startStr} - ${endStr}`;
-    
-    billCount.textContent = `${bills.length} Bills`;
-    
-    if (bills.length === 0) {
-        billList.innerHTML = `
-            <div class="empty-state">
-                <span style="font-size:3rem;">📭</span>
-                <p>No sales for ${dateRangeStr}</p>
-            </div>
-        `;
-        return;
-    }
-    
-    let html = `
-        <div class="bill-list-header">
-            <span>📅 ${dateRangeStr}</span>
-            <span>${bills.length} Bills</span>
-        </div>
-    `;
-    
-    bills.slice().reverse().forEach((bill, index) => {
-        const tableInfo = bill.table ? `🪑 Table ${bill.table}` : '🧾 Counter';
-        const isEven = index % 2 === 0;
-        const isEdited = bill.edited || false;
-        const editBadge = isEdited ? '<span class="edit-badge-report">✏️ Edited</span>' : '';
-        const editedInfo = isEdited ? `
-            <div class="edited-info">
-                <span>🔄 Original: Rs. ${(bill.originalTotal || bill.total).toFixed(2)}</span>
-                <span>✏️ Edited: ${bill.editedDate || ''}</span>
-            </div>
-        ` : '';
-        
-        html += `
-            <div class="bill-item ${isEven ? 'even' : ''} ${isEdited ? 'edited-bill' : ''}">
-                <div class="bill-header">
-                    <div>
-                        <span class="bill-number">#${bill.id}</span>
-                        <span class="bill-table">${tableInfo}</span>
-                        <span class="bill-time">${bill.date}</span>
-                        ${editBadge}
-                    </div>
-                    <div>
-                        <span class="bill-total">Rs. ${bill.total.toFixed(2)}</span>
-                        ${bill.discount > 0 ? `<span class="bill-discount">-Rs. ${bill.discount.toFixed(2)}</span>` : ''}
-                    </div>
-                </div>
-                <div class="bill-items">
-                    ${bill.items.map(item => 
-                        `<span class="bill-item-name">${item.name} <span class="qty">x${item.qty || item.quantity || 1}</span></span>`
-                    ).join(' • ')}
-                </div>
-                ${editedInfo}
-                ${bill.received ? `
-                    <div class="bill-payment">
-                        <span>💵 Received: Rs. ${bill.received.toFixed(2)}</span>
-                        <span>🔄 Change: Rs. ${bill.change.toFixed(2)}</span>
-                    </div>
-                ` : ''}
-            </div>
-        `;
-    });
-    
-    billList.innerHTML = html;
-}
 </script>
 
 </body>

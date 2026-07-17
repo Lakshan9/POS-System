@@ -5,278 +5,6 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
     <title>Hotel POS System</title>
     <link rel="stylesheet" href="style.css" />
-    <style>
-        /* ===== EDIT BILL MODAL STYLES ===== */
-        .modal-wide {
-            max-width: 600px;
-        }
-        
-        .edit-bill-items {
-            max-height: 300px;
-            overflow-y: auto;
-            margin-bottom: 8px;
-        }
-        
-        .edit-bill-item {
-            display: flex;
-            align-items: center;
-            gap: 12px;
-            padding: 8px 12px;
-            background: #f8fafc;
-            border-radius: 10px;
-            margin-bottom: 6px;
-        }
-        
-        .edit-bill-item .item-name {
-            flex: 1;
-            font-weight: 500;
-        }
-        
-        .edit-bill-item .qty-control {
-            display: flex;
-            align-items: center;
-            gap: 6px;
-        }
-        
-        .edit-bill-item .qty-control button {
-            width: 26px;
-            height: 26px;
-            border: 1px solid #e2e8f0;
-            background: white;
-            border-radius: 4px;
-            cursor: pointer;
-            font-size: 0.8rem;
-            transition: all 0.2s;
-        }
-        
-        .edit-bill-item .qty-control button:hover {
-            background: #8b5cf6;
-            color: white;
-            border-color: #8b5cf6;
-        }
-        
-        .edit-bill-item .qty-control span {
-            min-width: 20px;
-            text-align: center;
-            font-weight: 600;
-        }
-        
-        .edit-bill-item .item-price {
-            font-weight: 600;
-            color: #16a34a;
-            min-width: 80px;
-            text-align: right;
-        }
-        
-        .edit-bill-item .remove-item-btn {
-            background: transparent;
-            border: none;
-            color: #ef4444;
-            cursor: pointer;
-            font-size: 0.9rem;
-            padding: 4px;
-            border-radius: 4px;
-            transition: all 0.2s;
-        }
-        
-        .edit-bill-item .remove-item-btn:hover {
-            background: #fee2e2;
-        }
-        
-        .edit-discount-row {
-            display: flex;
-            align-items: center;
-            gap: 12px;
-            padding: 12px 0;
-            border-top: 1px solid #e2e8f0;
-            margin-top: 8px;
-        }
-        
-        .edit-discount-row label {
-            font-weight: 500;
-            font-size: 0.85rem;
-            color: #475569;
-        }
-        
-        .edit-discount-row input {
-            width: 70px;
-            padding: 4px 8px;
-            border: 2px solid #e2e8f0;
-            border-radius: 6px;
-            font-size: 0.85rem;
-            text-align: center;
-        }
-        
-        .edit-discount-row input:focus {
-            outline: none;
-            border-color: #8b5cf6;
-        }
-        
-        .edit-bill-summary {
-            border-top: 2px solid #e2e8f0;
-            padding-top: 16px;
-            margin-top: 12px;
-        }
-        
-        .edit-bill-summary .line {
-            display: flex;
-            justify-content: space-between;
-            padding: 4px 0;
-            font-size: 0.9rem;
-        }
-        
-        .edit-bill-summary .line.discount {
-            color: #ef4444;
-        }
-        
-        .edit-bill-summary .line.total {
-            font-weight: 700;
-            font-size: 1.1rem;
-            border-top: 1px solid #e2e8f0;
-            padding-top: 8px;
-            margin-top: 4px;
-        }
-        
-        .edit-actions {
-            display: flex;
-            gap: 10px;
-            margin-top: 16px;
-        }
-        
-        .save-edit-btn {
-            padding: 10px 20px;
-            background: #22c55e;
-            color: white;
-            border: none;
-            border-radius: 10px;
-            font-weight: 600;
-            cursor: pointer;
-            transition: all 0.3s;
-            flex: 1;
-        }
-        
-        .save-edit-btn:hover {
-            background: #16a34a;
-        }
-        
-        .edit-note {
-            margin-top: 12px;
-            padding: 8px 14px;
-            background: #fef3c7;
-            border-radius: 8px;
-            font-size: 0.8rem;
-            color: #d97706;
-            text-align: center;
-        }
-        
-        /* History Edit Badge */
-        .edit-badge {
-            background: #fef3c7;
-            color: #d97706;
-            padding: 2px 10px;
-            border-radius: 12px;
-            font-size: 0.65rem;
-            font-weight: 600;
-        }
-        
-        .history-item.edited {
-            border-left-color: #f59e0b;
-            background: #fffbeb;
-        }
-        
-        .edited-label {
-            color: #d97706;
-            font-weight: 600;
-        }
-        
-        .h-top {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            margin-bottom: 6px;
-            gap: 8px;
-            flex-wrap: wrap;
-        }
-        
-        .history-actions-buttons {
-            display: flex;
-            gap: 4px;
-            align-items: center;
-        }
-        
-        .history-actions-buttons button {
-            background: transparent;
-            border: none;
-            cursor: pointer;
-            font-size: 0.9rem;
-            padding: 4px 8px;
-            border-radius: 4px;
-            transition: all 0.2s;
-        }
-        
-        .history-actions-buttons .print-btn {
-            color: #3b82f6;
-        }
-        
-        .history-actions-buttons .print-btn:hover {
-            background: #dbeafe;
-            transform: scale(1.1);
-        }
-        
-        .history-actions-buttons .edit-btn {
-            color: #8b5cf6;
-        }
-        
-        .history-actions-buttons .edit-btn:hover {
-            background: #f5f3ff;
-            transform: scale(1.1);
-        }
-        
-        .history-actions {
-            display: flex;
-            gap: 10px;
-            flex-wrap: wrap;
-        }
-        
-        @media (max-width: 480px) {
-            .edit-bill-item {
-                flex-wrap: wrap;
-                gap: 6px;
-            }
-            
-            .edit-bill-item .item-name {
-                flex-basis: 100%;
-                font-size: 0.9rem;
-            }
-            
-            .edit-actions {
-                flex-direction: column;
-            }
-            
-            .edit-discount-row {
-                flex-wrap: wrap;
-            }
-            
-            .modal-wide {
-                max-width: 95%;
-            }
-            
-            .h-top {
-                flex-direction: column;
-                align-items: flex-start;
-                gap: 4px;
-            }
-            
-            .history-actions {
-                flex-direction: column;
-                width: 100%;
-            }
-            
-            .history-actions button {
-                width: 100%;
-            }
-        }
-    </style>
 </head>
 <body>
 
@@ -334,6 +62,10 @@
             <span class="drop-icon">⛶</span>
             <span class="drop-text">Full Screen</span>
         </a>
+        <a href="#" class="dropdown-item" onclick="logout();closeDropdown();">
+            <span class="drop-icon">🚪</span>
+            <span class="drop-text">Logout</span>
+        </a>
     </div>
 </div>
 
@@ -350,6 +82,7 @@
             <div class="billing-actions">
                 <button class="hold-btn" id="holdBtn">⏸ Hold</button>
                 <button class="tables-btn" onclick="window.location.href='tables.html'">🪑 Tables</button>
+                <button class="customer-btn" onclick="openCustomerOrders()">👤 Customer Orders</button>
                 <button class="clear-btn" id="clearCartBtn">🗑 Clear</button>
             </div>
         </div>
@@ -444,23 +177,60 @@
             <div class="payment-details" id="paymentDetails">
                 <!-- Rendered by JS -->
             </div>
-            <div class="payment-input">
-                <label>Amount Received (Rs.)</label>
-                <input type="number" id="amountReceived" placeholder="0.00" step="0.01" min="0" />
+            
+            <div class="payment-methods-simple">
+                <label>Payment Method</label>
+                <div class="payment-methods-grid">
+                    <button class="payment-method-btn active" data-method="cash" onclick="selectPaymentMethod('cash')">💵 Cash</button>
+                    <button class="payment-method-btn" data-method="card" onclick="selectPaymentMethod('card')">💳 Card</button>
+                    <button class="payment-method-btn" data-method="mobile" onclick="selectPaymentMethod('mobile')">📱 Mobile</button>
+                    <button class="payment-method-btn" data-method="bank" onclick="selectPaymentMethod('bank')">🏦 Bank</button>
+                    <button class="payment-method-btn" data-method="credit" onclick="selectPaymentMethod('credit')">💰 Credit</button>
+                </div>
             </div>
-            <div class="payment-change" id="paymentChange">
-                <span>Change Due:</span>
-                <span id="changeAmount">Rs. 0.00</span>
+            
+            <div class="payment-input-simple">
+                <div class="payment-input-group">
+                    <label>Amount Received (Rs.)</label>
+                    <input type="number" id="paymentAmount" placeholder="0.00" step="0.01" min="0" />
+                </div>
+                <div class="payment-input-group" id="paymentReferenceGroup" style="display:none;">
+                    <label>Reference</label>
+                    <input type="text" id="paymentReference" placeholder="Card/Mobile/Bank ref" />
+                </div>
             </div>
-            <div class="print-option">
-                <label>
+            
+            <button class="add-payment-btn-simple" onclick="addPayment()">➕ Add Payment</button>
+            
+            <div class="payment-summary-simple" id="paymentSummary">
+                <div class="payment-list" id="paymentList">
+                    <div class="empty-payment">No payments added</div>
+                </div>
+                <div class="payment-total-simple">
+                    <div class="total-row">
+                        <span>Total:</span>
+                        <span id="paymentTotalDisplay">Rs. 0.00</span>
+                    </div>
+                    <div class="total-row">
+                        <span>Balance:</span>
+                        <span id="paymentBalance">Rs. 0.00</span>
+                    </div>
+                    <div class="total-row change-row" id="changeRow" style="display:none;">
+                        <span>Change:</span>
+                        <span id="paymentChangeDisplay">Rs. 0.00</span>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="payment-actions-simple">
+                <label class="print-checkbox">
                     <input type="checkbox" id="printBillCheckbox" checked />
                     🖨️ Print Bill
                 </label>
-            </div>
-            <div class="payment-actions">
-                <button class="confirm-btn" id="confirmPaymentBtn" disabled>✅ Confirm Payment</button>
-                <button class="cancel-btn" id="cancelPaymentBtn">✕ Cancel</button>
+                <div class="action-buttons">
+                    <button class="confirm-btn" id="confirmPaymentBtn" disabled>✅ Confirm</button>
+                    <button class="cancel-btn" id="cancelPaymentBtn">✕ Cancel</button>
+                </div>
             </div>
         </div>
     </div>
@@ -488,6 +258,24 @@
                 <div class="edit-note">
                     <span>✏️ Edit note: This bill will be marked as modified</span>
                 </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- ===== CUSTOMER ORDERS MODAL ===== -->
+<div class="modal-overlay" id="customerOrdersModal">
+    <div class="modal modal-wide">
+        <div class="modal-header">
+            <h2>👤 Customer Orders</h2>
+            <button class="close-btn" id="closeCustomerOrdersBtn">✕</button>
+        </div>
+        <div class="modal-body">
+            <div class="customer-search">
+                <input type="text" id="customerSearchInput" placeholder="Search customer..." oninput="renderCustomerOrders(this.value)" />
+            </div>
+            <div id="customerOrdersList">
+                <!-- Rendered by JS -->
             </div>
         </div>
     </div>
@@ -521,6 +309,11 @@ let selectedCategory = null;
 let currentBill = null;
 let editingBillId = null;
 let editedBillData = null;
+
+// ===== PAYMENT VARIABLES =====
+let selectedMethod = 'cash';
+let payments = [];
+let paymentTotal = 0;
 
 // ============================================================
 //  LOAD / SAVE FUNCTIONS
@@ -627,46 +420,13 @@ function updateStock(itemId, quantity) {
     }
 }
 
-// ============================================================
-//  DOM REFS
-// ============================================================
-const billingList = document.getElementById('billingList');
-const itemsGrid = document.getElementById('itemsGrid');
-const subtotalEl = document.getElementById('subtotal');
-const discountAmountEl = document.getElementById('discountAmount');
-const totalEl = document.getElementById('total');
-const payBtn = document.getElementById('payBtn');
-const clearCartBtn = document.getElementById('clearCartBtn');
-const holdBtn = document.getElementById('holdBtn');
-const discountInput = document.getElementById('discountInput');
-const datetimeEl = document.getElementById('datetime');
-const holdModal = document.getElementById('holdModal');
-const holdToTableBtn = document.getElementById('holdToTableBtn');
-const holdToCustomerBtn = document.getElementById('holdToCustomerBtn');
-const cancelHoldBtn = document.getElementById('cancelHoldBtn');
-const closeHoldModalBtn = document.getElementById('closeHoldModalBtn');
-const refreshItemsBtn = document.getElementById('refreshItemsBtn');
-const backToCategoriesBtn = document.getElementById('backToCategoriesBtn');
-const historyList = document.getElementById('historyList');
-const clearHistoryBtn = document.getElementById('clearHistoryBtn');
-const printHistoryBtn = document.getElementById('printHistoryBtn');
-const paymentModal = document.getElementById('paymentModal');
-const paymentDetails = document.getElementById('paymentDetails');
-const amountReceived = document.getElementById('amountReceived');
-const changeAmount = document.getElementById('changeAmount');
-const confirmPaymentBtn = document.getElementById('confirmPaymentBtn');
-const cancelPaymentBtn = document.getElementById('cancelPaymentBtn');
-const closePaymentModalBtn = document.getElementById('closePaymentModalBtn');
-const printBillCheckbox = document.getElementById('printBillCheckbox');
-const editBillModal = document.getElementById('editBillModal');
-const editBillId = document.getElementById('editBillId');
-const editBillItems = document.getElementById('editBillItems');
-const editSubtotal = document.getElementById('editSubtotal');
-const editDiscount = document.getElementById('editDiscount');
-const editTotal = document.getElementById('editTotal');
-const saveEditBillBtn = document.getElementById('saveEditBillBtn');
-const cancelEditBillBtn = document.getElementById('cancelEditBillBtn');
-const closeEditBillModalBtn = document.getElementById('closeEditBillModalBtn');
+function addStock(itemId, quantity) {
+    const stockItem = stockData.find(s => s.id === itemId);
+    if (stockItem) {
+        stockItem.stock += quantity;
+        saveStock();
+    }
+}
 
 // ============================================================
 //  CLOCK
@@ -675,7 +435,7 @@ function updateClock() {
     const now = new Date();
     const d = now.toLocaleDateString('en-US', { month: '2-digit', day: '2-digit', year: 'numeric' });
     const t = now.toLocaleTimeString('en-US', { hour12: true, hour: '2-digit', minute: '2-digit', second: '2-digit' });
-    datetimeEl.textContent = `${d} ${t}`;
+    document.getElementById('datetime').textContent = `${d} ${t}`;
 }
 updateClock();
 setInterval(updateClock, 1000);
@@ -707,7 +467,10 @@ dropdownOverlay.addEventListener('click', closeDropdown);
 document.addEventListener('keydown', function(e) {
     if (e.key === 'Escape') {
         closeDropdown();
-        editBillModal.classList.remove('open');
+        document.getElementById('editBillModal').classList.remove('open');
+        document.getElementById('paymentModal').classList.remove('open');
+        document.getElementById('holdModal').classList.remove('open');
+        document.getElementById('customerOrdersModal').classList.remove('open');
     }
 });
 
@@ -736,7 +499,7 @@ function getCategories() {
 }
 
 function renderCategories(categories) {
-    backToCategoriesBtn.style.display = 'none';
+    document.getElementById('backToCategoriesBtn').style.display = 'none';
     
     const categoryNames = {
         'main': { icon: '🍽️', name: 'Main Dishes' },
@@ -747,7 +510,7 @@ function renderCategories(categories) {
     const categoryKeys = Object.keys(categories);
     
     if (categoryKeys.length === 0) {
-        itemsGrid.innerHTML = `
+        document.getElementById('itemsGrid').innerHTML = `
             <div class="empty-state" style="grid-column:1/-1;padding:20px;">
                 No categories found.
                 <br/><button onclick="window.location.href='items.html'" style="margin-top:8px;background:#8b5cf6;color:#fff;border:none;padding:4px 16px;border-radius:30px;cursor:pointer;">📋 Add Categories</button>
@@ -769,12 +532,12 @@ function renderCategories(categories) {
         `;
     });
     
-    itemsGrid.innerHTML = html;
+    document.getElementById('itemsGrid').innerHTML = html;
 }
 
 function selectCategory(category) {
     selectedCategory = category;
-    backToCategoriesBtn.style.display = 'block';
+    document.getElementById('backToCategoriesBtn').style.display = 'block';
     renderCategoryItems(category);
 }
 
@@ -788,7 +551,7 @@ function renderCategoryItems(category) {
     const catName = categoryNames[category] || category.charAt(0).toUpperCase() + category.slice(1);
     
     if (catItems.length === 0) {
-        itemsGrid.innerHTML = `
+        document.getElementById('itemsGrid').innerHTML = `
             <div style="grid-column:1/-1;text-align:center;padding:30px 0;color:#94a3b8;">
                 No items in ${catName}
             </div>
@@ -815,15 +578,15 @@ function renderCategoryItems(category) {
         `;
     });
     
-    itemsGrid.innerHTML = html;
+    document.getElementById('itemsGrid').innerHTML = html;
 }
 
-backToCategoriesBtn.addEventListener('click', function() {
+document.getElementById('backToCategoriesBtn').addEventListener('click', function() {
     selectedCategory = null;
     renderItems();
 });
 
-refreshItemsBtn.addEventListener('click', function() {
+document.getElementById('refreshItemsBtn').addEventListener('click', function() {
     loadData();
     renderItems();
     showToast('🔄 Items refreshed!');
@@ -859,9 +622,9 @@ function addToCart(itemId) {
 
 function updateBilling() {
     if (cart.length === 0) {
-        billingList.innerHTML = `<div class="empty-cart">🛒 No items in cart</div>`;
+        document.getElementById('billingList').innerHTML = `<div class="empty-cart">🛒 No items in cart</div>`;
     } else {
-        billingList.innerHTML = cart.map(item => {
+        document.getElementById('billingList').innerHTML = cart.map(item => {
             const total = item.price * item.quantity;
             const discount = (total * (item.discount || 0)) / 100;
             const finalTotal = total - discount;
@@ -894,7 +657,7 @@ function changeQty(id, delta) {
     const stockQty = getStockForItem(id);
     const newQty = item.quantity + delta;
     
-    if (newQty > stockQty) {
+    if (delta > 0 && newQty > stockQty) {
         showToast(`❌ Not enough stock! Available: ${stockQty}`);
         return;
     }
@@ -936,14 +699,14 @@ function calculateTotals() {
     const discount = (subtotal * discountPercent) / 100 + itemDiscounts;
     const total = subtotal - discount;
 
-    subtotalEl.textContent = `Rs. ${subtotal.toFixed(2)}`;
-    discountAmountEl.textContent = `-Rs. ${discount.toFixed(2)}`;
-    totalEl.textContent = `Rs. ${total.toFixed(2)}`;
+    document.getElementById('subtotal').textContent = `Rs. ${subtotal.toFixed(2)}`;
+    document.getElementById('discountAmount').textContent = `-Rs. ${discount.toFixed(2)}`;
+    document.getElementById('total').textContent = `Rs. ${total.toFixed(2)}`;
     
-    payBtn.disabled = cart.length === 0;
+    document.getElementById('payBtn').disabled = cart.length === 0;
 }
 
-discountInput.addEventListener('input', function() {
+document.getElementById('discountInput').addEventListener('input', function() {
     let val = parseFloat(this.value) || 0;
     if (val < 0) val = 0;
     if (val > 100) val = 100;
@@ -951,35 +714,49 @@ discountInput.addEventListener('input', function() {
     calculateTotals();
 });
 
-clearCartBtn.addEventListener('click', function() {
+document.getElementById('clearCartBtn').addEventListener('click', function() {
     if (cart.length === 0) return;
     if (!confirm('Clear all items from cart?')) return;
+    
+    // Restore stock when clearing cart
+    const stockData = JSON.parse(localStorage.getItem('hotel_stock') || '[]');
+    cart.forEach(item => {
+        const stockItem = stockData.find(s => s.id === item.id);
+        if (stockItem) {
+            stockItem.stock += item.quantity;
+        }
+    });
+    localStorage.setItem('hotel_stock', JSON.stringify(stockData));
+    
     cart = [];
     saveCart();
     updateBilling();
+    renderItems();
+    showToast('🔄 Cart cleared! Stock restored.');
 });
 
 // ============================================================
-//  HOLD - Customer or Table
+//  HOLD FUNCTIONS - WITH STOCK UPDATE
 // ============================================================
-holdBtn.addEventListener('click', function() {
+document.getElementById('holdBtn').addEventListener('click', function() {
     if (cart.length === 0) {
         showToast('Cart is empty!');
         return;
     }
-    holdModal.classList.add('open');
+    document.getElementById('holdModal').classList.add('open');
 });
 
-closeHoldModalBtn.addEventListener('click', function() {
-    holdModal.classList.remove('open');
+document.getElementById('closeHoldModalBtn').addEventListener('click', function() {
+    document.getElementById('holdModal').classList.remove('open');
 });
 
-cancelHoldBtn.addEventListener('click', function() {
-    holdModal.classList.remove('open');
+document.getElementById('cancelHoldBtn').addEventListener('click', function() {
+    document.getElementById('holdModal').classList.remove('open');
 });
 
-holdToTableBtn.addEventListener('click', function() {
-    holdModal.classList.remove('open');
+// ===== HOLD TO TABLE =====
+document.getElementById('holdToTableBtn').addEventListener('click', function() {
+    document.getElementById('holdModal').classList.remove('open');
     const tableNum = prompt('Enter table number (1-12):', '1');
     if (tableNum === null) return;
     const num = parseInt(tableNum);
@@ -988,6 +765,30 @@ holdToTableBtn.addEventListener('click', function() {
         return;
     }
     
+    // Check stock before holding
+    const stockData = JSON.parse(localStorage.getItem('hotel_stock') || '[]');
+    let stockError = false;
+    let stockUpdateMsg = '';
+    
+    cart.forEach(item => {
+        const stockItem = stockData.find(s => s.id === item.id);
+        if (stockItem) {
+            const currentStock = stockItem.stock;
+            if (currentStock < item.quantity) {
+                showToast(`❌ Not enough stock for ${item.name}! Available: ${currentStock}`);
+                stockError = true;
+                return;
+            }
+            // Reduce stock immediately
+            stockItem.stock -= item.quantity;
+            stockUpdateMsg += `\n${item.name}: ${currentStock} → ${stockItem.stock}`;
+        }
+    });
+    
+    if (stockError) return;
+    localStorage.setItem('hotel_stock', JSON.stringify(stockData));
+    
+    // Add to table
     cart.forEach(item => {
         const existing = tableOrders[num].find(c => c.id === item.id);
         if (existing) {
@@ -1001,17 +802,42 @@ holdToTableBtn.addEventListener('click', function() {
     saveCart();
     saveTables();
     updateBilling();
-    showToast(`✅ Order held to Table ${num}`);
+    renderItems();
+    showToast(`✅ Order held to Table ${num}! Stock updated:${stockUpdateMsg}`);
 });
 
-holdToCustomerBtn.addEventListener('click', function() {
-    holdModal.classList.remove('open');
+// ===== HOLD TO CUSTOMER =====
+document.getElementById('holdToCustomerBtn').addEventListener('click', function() {
+    document.getElementById('holdModal').classList.remove('open');
     const customerName = prompt('Enter customer name:', '');
     if (!customerName || customerName.trim() === '') {
         showToast('Customer name is required!');
         return;
     }
     const name = customerName.trim();
+    
+    // Check stock before holding
+    const stockData = JSON.parse(localStorage.getItem('hotel_stock') || '[]');
+    let stockError = false;
+    let stockUpdateMsg = '';
+    
+    cart.forEach(item => {
+        const stockItem = stockData.find(s => s.id === item.id);
+        if (stockItem) {
+            const currentStock = stockItem.stock;
+            if (currentStock < item.quantity) {
+                showToast(`❌ Not enough stock for ${item.name}! Available: ${currentStock}`);
+                stockError = true;
+                return;
+            }
+            // Reduce stock immediately
+            stockItem.stock -= item.quantity;
+            stockUpdateMsg += `\n${item.name}: ${currentStock} → ${stockItem.stock}`;
+        }
+    });
+    
+    if (stockError) return;
+    localStorage.setItem('hotel_stock', JSON.stringify(stockData));
     
     if (!customerOrders[name]) customerOrders[name] = [];
     
@@ -1028,13 +854,230 @@ holdToCustomerBtn.addEventListener('click', function() {
     saveCart();
     saveCustomers();
     updateBilling();
-    showToast(`✅ Order held to Customer "${name}"`);
+    renderItems();
+    showToast(`✅ Order held to Customer "${name}"! Stock updated:${stockUpdateMsg}`);
 });
 
 // ============================================================
-//  PAYMENT
+//  CUSTOMER ORDERS
 // ============================================================
-payBtn.addEventListener('click', function() {
+function openCustomerOrders() {
+    renderCustomerOrders();
+    document.getElementById('customerOrdersModal').classList.add('open');
+}
+
+document.getElementById('closeCustomerOrdersBtn').addEventListener('click', function() {
+    document.getElementById('customerOrdersModal').classList.remove('open');
+});
+
+function renderCustomerOrders(search = '') {
+    const container = document.getElementById('customerOrdersList');
+    let customers = Object.keys(customerOrders);
+    
+    if (search) {
+        customers = customers.filter(name => 
+            name.toLowerCase().includes(search.toLowerCase())
+        );
+    }
+    
+    if (customers.length === 0) {
+        container.innerHTML = '<div class="empty-state">No customer orders found</div>';
+        return;
+    }
+    
+    let html = '';
+    customers.forEach(name => {
+        const items = customerOrders[name] || [];
+        const total = items.reduce((sum, i) => sum + i.price * i.quantity, 0);
+        const count = items.reduce((sum, i) => sum + i.quantity, 0);
+        
+        html += `
+            <div class="customer-order-card" onclick="loadCustomerOrder('${name}')">
+                <div class="customer-info">
+                    <span class="customer-name">👤 ${name}</span>
+                    <span class="customer-items">${count} items</span>
+                    <span class="customer-total">Rs. ${total.toFixed(2)}</span>
+                </div>
+                <button class="load-btn">📤 Load</button>
+            </div>
+        `;
+    });
+    
+    container.innerHTML = html;
+}
+
+function loadCustomerOrder(name) {
+    const items = customerOrders[name] || [];
+    if (items.length === 0) {
+        showToast('No items found!');
+        return;
+    }
+    
+    // Check stock before loading
+    const stockData = JSON.parse(localStorage.getItem('hotel_stock') || '[]');
+    let stockError = false;
+    let stockUpdateMsg = '';
+    
+    items.forEach(item => {
+        const stockItem = stockData.find(s => s.id === item.id);
+        if (stockItem) {
+            const currentStock = stockItem.stock;
+            if (currentStock < item.quantity) {
+                showToast(`❌ Not enough stock for ${item.name}! Available: ${currentStock}`);
+                stockError = true;
+                return;
+            }
+            stockItem.stock -= item.quantity;
+            stockUpdateMsg += `\n${item.name}: ${currentStock} → ${stockItem.stock}`;
+        }
+    });
+    
+    if (stockError) return;
+    localStorage.setItem('hotel_stock', JSON.stringify(stockData));
+    
+    items.forEach(item => {
+        const existing = cart.find(c => c.id === item.id);
+        if (existing) {
+            existing.quantity += item.quantity;
+        } else {
+            cart.push({ ...item });
+        }
+    });
+    
+    delete customerOrders[name];
+    saveCustomers();
+    saveCart();
+    updateBilling();
+    renderItems();
+    document.getElementById('customerOrdersModal').classList.remove('open');
+    showToast(`✅ Order from "${name}" loaded! Stock updated:${stockUpdateMsg}`);
+}
+
+// ============================================================
+//  PAYMENT FUNCTIONS
+// ============================================================
+function selectPaymentMethod(method) {
+    selectedMethod = method;
+    document.querySelectorAll('.payment-method-btn').forEach(btn => {
+        btn.classList.toggle('active', btn.dataset.method === method);
+    });
+    
+    const refGroup = document.getElementById('paymentReferenceGroup');
+    const refInput = document.getElementById('paymentReference');
+    if (['card', 'mobile', 'bank'].includes(method)) {
+        refGroup.style.display = 'block';
+        refInput.placeholder = method === 'card' ? 'Card (last 4)' : 
+                              method === 'mobile' ? 'Mobile no' : 'Bank ref';
+    } else {
+        refGroup.style.display = 'none';
+        refInput.value = '';
+    }
+    
+    document.getElementById('paymentAmount').focus();
+}
+
+function addPayment() {
+    const amount = parseFloat(document.getElementById('paymentAmount').value);
+    const reference = document.getElementById('paymentReference').value.trim();
+    
+    if (!amount || amount <= 0) {
+        showToast('⚠️ Please enter amount!');
+        return;
+    }
+    
+    const billTotal = currentBill ? currentBill.total : 0;
+    
+    const methodIcons = {
+        'cash': '💵',
+        'card': '💳',
+        'mobile': '📱',
+        'bank': '🏦',
+        'credit': '💰'
+    };
+    
+    const methodNames = {
+        'cash': 'Cash',
+        'card': 'Card',
+        'mobile': 'Mobile',
+        'bank': 'Bank',
+        'credit': 'Credit'
+    };
+    
+    payments.push({
+        method: selectedMethod,
+        methodLabel: `${methodIcons[selectedMethod] || '💵'} ${methodNames[selectedMethod] || selectedMethod}`,
+        amount: amount,
+        reference: reference || '-'
+    });
+    
+    paymentTotal += amount;
+    
+    document.getElementById('paymentAmount').value = '';
+    document.getElementById('paymentReference').value = '';
+    
+    updatePaymentSummarySimple();
+    document.getElementById('paymentAmount').focus();
+    
+    let changeText = '';
+    if (paymentTotal > billTotal) {
+        changeText = ` (Change: +Rs. ${(paymentTotal - billTotal).toFixed(2)})`;
+    }
+    showToast(`✅ Added ${methodNames[selectedMethod]}: Rs. ${amount.toFixed(2)}${changeText}`);
+}
+
+function removePayment(index) {
+    paymentTotal -= payments[index].amount;
+    payments.splice(index, 1);
+    updatePaymentSummarySimple();
+}
+
+function updatePaymentSummarySimple() {
+    const list = document.getElementById('paymentList');
+    const billTotal = currentBill ? currentBill.total : 0;
+    const balance = billTotal - paymentTotal;
+    
+    if (payments.length === 0) {
+        list.innerHTML = '<div class="empty-payment">No payments added</div>';
+    } else {
+        list.innerHTML = payments.map((p, i) => `
+            <div class="payment-item-simple">
+                <span class="method">
+                    <span>${p.methodLabel}</span>
+                    ${p.reference !== '-' ? `<span style="font-size:0.7rem;color:#94a3b8;">(${p.reference})</span>` : ''}
+                </span>
+                <span class="amount">Rs. ${p.amount.toFixed(2)}</span>
+                <button class="remove-payment" onclick="removePayment(${i})">✕</button>
+            </div>
+        `).join('');
+    }
+    
+    document.getElementById('paymentTotalDisplay').textContent = `Rs. ${paymentTotal.toFixed(2)}`;
+    
+    const balanceEl = document.getElementById('paymentBalance');
+    const changeRow = document.getElementById('changeRow');
+    const changeDisplay = document.getElementById('paymentChangeDisplay');
+    
+    if (paymentTotal < billTotal) {
+        balanceEl.textContent = `Rs. ${balance.toFixed(2)}`;
+        balanceEl.style.color = '#ef4444';
+        changeRow.style.display = 'none';
+    } else if (paymentTotal > billTotal) {
+        balanceEl.textContent = `✅ Paid`;
+        balanceEl.style.color = '#16a34a';
+        changeRow.style.display = 'flex';
+        changeDisplay.textContent = `+Rs. ${(paymentTotal - billTotal).toFixed(2)}`;
+        changeDisplay.style.color = '#16a34a';
+    } else {
+        balanceEl.textContent = `✅ Paid in full`;
+        balanceEl.style.color = '#16a34a';
+        changeRow.style.display = 'none';
+    }
+    
+    document.getElementById('confirmPaymentBtn').disabled = paymentTotal < billTotal || paymentTotal === 0;
+}
+
+// ===== PAYMENT MODAL OPEN =====
+document.getElementById('payBtn').addEventListener('click', function() {
     if (cart.length === 0) return;
     
     const subtotal = cart.reduce((sum, item) => sum + item.price * item.quantity, 0);
@@ -1058,84 +1101,52 @@ payBtn.addEventListener('click', function() {
         total: total
     };
     
-    paymentDetails.innerHTML = `
-        ${currentBill.items.map(item => `
-            <div class="pay-line">
-                <span>${item.name} x${item.qty}</span>
-                <span>Rs. ${(item.price * item.qty).toFixed(2)}</span>
-            </div>
-        `).join('')}
+    payments = [];
+    paymentTotal = 0;
+    selectedMethod = 'cash';
+    
+    document.querySelectorAll('.payment-method-btn').forEach(btn => {
+        btn.classList.toggle('active', btn.dataset.method === 'cash');
+    });
+    document.getElementById('paymentReferenceGroup').style.display = 'none';
+    document.getElementById('paymentAmount').value = '';
+    document.getElementById('paymentReference').value = '';
+    
+    document.getElementById('paymentDetails').innerHTML = `
         <div class="pay-line"><span>Subtotal</span><span>Rs. ${currentBill.subtotal.toFixed(2)}</span></div>
-        <div class="pay-line" style="color:#ef4444;"><span>Discount</span><span>Rs. ${currentBill.discount.toFixed(2)}</span></div>
+        ${currentBill.discount > 0 ? `<div class="pay-line" style="color:#ef4444;"><span>Discount</span><span>-Rs. ${currentBill.discount.toFixed(2)}</span></div>` : ''}
         <div class="pay-line total"><span>TOTAL</span><span>Rs. ${currentBill.total.toFixed(2)}</span></div>
     `;
     
-    amountReceived.value = '';
-    changeAmount.textContent = 'Rs. 0.00';
-    const changeEl = document.getElementById('paymentChange');
-    changeEl.style.borderColor = '#86efac';
-    changeEl.style.background = '#f0fdf4';
-    changeEl.querySelector('span:first-child').textContent = 'Change Due:';
-    confirmPaymentBtn.disabled = true;
-    
-    paymentModal.classList.add('open');
-    setTimeout(() => amountReceived.focus(), 100);
+    updatePaymentSummarySimple();
+    document.getElementById('paymentModal').classList.add('open');
+    setTimeout(() => document.getElementById('paymentAmount').focus(), 100);
 });
 
-// Calculate change on input
-amountReceived.addEventListener('input', function() {
-    const received = parseFloat(this.value) || 0;
-    const total = currentBill ? currentBill.total : 0;
-    const change = received - total;
-    
-    const changeEl = document.getElementById('paymentChange');
-    const changeSpan = document.getElementById('changeAmount');
-    
-    if (received > 0 && received < total) {
-        changeSpan.textContent = `-Rs. ${(total - received).toFixed(2)}`;
-        changeSpan.style.color = '#ef4444';
-        changeEl.style.borderColor = '#fca5a5';
-        changeEl.style.background = '#fef2f2';
-        changeEl.querySelector('span:first-child').textContent = 'Remaining:';
-        confirmPaymentBtn.disabled = true;
-    } else if (received >= total) {
-        changeSpan.textContent = `Rs. ${change.toFixed(2)}`;
-        changeSpan.style.color = '#16a34a';
-        changeEl.style.borderColor = '#86efac';
-        changeEl.style.background = '#f0fdf4';
-        changeEl.querySelector('span:first-child').textContent = 'Change Due:';
-        confirmPaymentBtn.disabled = false;
-    } else {
-        changeSpan.textContent = 'Rs. 0.00';
-        changeSpan.style.color = '#16a34a';
-        changeEl.style.borderColor = '#86efac';
-        changeEl.style.background = '#f0fdf4';
-        changeEl.querySelector('span:first-child').textContent = 'Change Due:';
-        confirmPaymentBtn.disabled = true;
+document.getElementById('paymentAmount').addEventListener('keydown', function(e) {
+    if (e.key === 'Enter') {
+        addPayment();
     }
 });
 
-// Enter key to confirm payment
-amountReceived.addEventListener('keydown', function(e) {
-    if (e.key === 'Enter' && !confirmPaymentBtn.disabled) {
-        confirmPaymentBtn.click();
+document.getElementById('paymentReference').addEventListener('keydown', function(e) {
+    if (e.key === 'Enter') {
+        addPayment();
     }
 });
 
-// Confirm Payment
-confirmPaymentBtn.addEventListener('click', function() {
+// ===== CONFIRM PAYMENT =====
+document.getElementById('confirmPaymentBtn').addEventListener('click', function() {
     if (!currentBill) return;
     
-    const received = parseFloat(amountReceived.value) || 0;
-    if (received < currentBill.total) {
-        showToast(`❌ Insufficient amount!\nTotal: Rs. ${currentBill.total.toFixed(2)}\nReceived: Rs. ${received.toFixed(2)}\nRemaining: Rs. ${(currentBill.total - received).toFixed(2)}`);
+    const billTotal = currentBill.total;
+    
+    if (paymentTotal < billTotal) {
+        showToast(`❌ Insufficient amount!\nTotal: Rs. ${billTotal.toFixed(2)}\nPaid: Rs. ${paymentTotal.toFixed(2)}\nRemaining: Rs. ${(billTotal - paymentTotal).toFixed(2)}`);
         return;
     }
     
-    // Update stock
-    currentBill.items.forEach(item => {
-        updateStock(item.id, item.qty);
-    });
+    const changeAmount = paymentTotal - billTotal;
     
     const bill = {
         id: Date.now(),
@@ -1144,53 +1155,66 @@ confirmPaymentBtn.addEventListener('click', function() {
         subtotal: currentBill.subtotal,
         discount: currentBill.discount,
         total: currentBill.total,
-        received: received,
-        change: received - currentBill.total,
+        payments: payments.map(p => ({
+            method: p.method,
+            methodLabel: p.methodLabel,
+            amount: p.amount,
+            reference: p.reference
+        })),
+        received: paymentTotal,
+        change: changeAmount,
         edited: false
     };
     history.push(bill);
     saveHistory();
     
-    const shouldPrint = printBillCheckbox ? printBillCheckbox.checked : true;
+    const shouldPrint = document.getElementById('printBillCheckbox') ? document.getElementById('printBillCheckbox').checked : true;
     
-    paymentModal.classList.remove('open');
+    document.getElementById('paymentModal').classList.remove('open');
     
     if (shouldPrint) {
         printBill(bill);
     }
     
-    showToast(`✅ Payment Successful!\nTotal: Rs. ${bill.total.toFixed(2)}\nReceived: Rs. ${bill.received.toFixed(2)}\nChange: Rs. ${bill.change.toFixed(2)}\nThank you! 🍽️`);
+    let paymentSummary = payments.map(p => `${p.methodLabel}: Rs. ${p.amount.toFixed(2)}`).join('\n');
+    let changeText = changeAmount > 0 ? `\nChange: Rs. ${changeAmount.toFixed(2)}` : '';
+    showToast(`✅ Payment Successful!\nTotal: Rs. ${bill.total.toFixed(2)}\n${paymentSummary}${changeText}\nThank you! 🍽️`);
     
     cart = [];
     saveCart();
     updateBilling();
     renderItems();
     currentBill = null;
+    payments = [];
+    paymentTotal = 0;
 });
 
-// Cancel Payment
-cancelPaymentBtn.addEventListener('click', function() {
-    paymentModal.classList.remove('open');
+document.getElementById('cancelPaymentBtn').addEventListener('click', function() {
+    document.getElementById('paymentModal').classList.remove('open');
     currentBill = null;
+    payments = [];
+    paymentTotal = 0;
 });
 
-closePaymentModalBtn.addEventListener('click', function() {
-    paymentModal.classList.remove('open');
+document.getElementById('closePaymentModalBtn').addEventListener('click', function() {
+    document.getElementById('paymentModal').classList.remove('open');
     currentBill = null;
+    payments = [];
+    paymentTotal = 0;
 });
 
-paymentModal.addEventListener('click', function(e) {
-    if (e.target === paymentModal) {
-        paymentModal.classList.remove('open');
+document.getElementById('paymentModal').addEventListener('click', function(e) {
+    if (e.target === this) {
+        this.classList.remove('open');
         currentBill = null;
+        payments = [];
+        paymentTotal = 0;
     }
 });
 
 // ============================================================
 //  PRINT FUNCTIONS
 // ============================================================
-
-// Print Single Bill
 function printBill(bill) {
     const printWindow = window.open('', '_blank', 'width=400,height=600');
     if (!printWindow) {
@@ -1200,10 +1224,6 @@ function printBill(bill) {
     
     const isEdited = bill.edited || false;
     const editedText = isEdited ? ' (Edited)' : '';
-    const editedInfo = isEdited ? `
-        <p style="color:#d97706;font-size:0.7rem;">✏️ Edited on: ${bill.editedDate || ''}</p>
-        <p style="color:#d97706;font-size:0.7rem;text-decoration:line-through;">Original Total: Rs. ${(bill.originalTotal || bill.total).toFixed(2)}</p>
-    ` : '';
     
     const itemsHtml = bill.items.map(item => `
         <tr>
@@ -1213,6 +1233,16 @@ function printBill(bill) {
             <td style="text-align:right;">Rs. ${(item.price * item.qty).toFixed(2)}</td>
         </tr>
     `).join('');
+    
+    let paymentsHtml = '';
+    if (bill.payments && bill.payments.length > 0) {
+        paymentsHtml = bill.payments.map(p => `
+            <div style="display:flex;justify-content:space-between;font-size:0.8rem;padding:2px 0;">
+                <span>${p.methodLabel}${p.reference && p.reference !== '-' ? ` (${p.reference})` : ''}</span>
+                <span>Rs. ${p.amount.toFixed(2)}</span>
+            </div>
+        `).join('');
+    }
     
     printWindow.document.write(`
         <!DOCTYPE html>
@@ -1270,8 +1300,18 @@ function printBill(bill) {
                     padding-top: 6px; 
                     margin-top: 4px; 
                 }
-                .totals .received { color: #16a34a; }
-                .totals .change { color: #16a34a; }
+                .payment-breakdown {
+                    margin: 6px 0;
+                    padding: 6px 0;
+                    border-top: 1px dashed #ddd;
+                    border-bottom: 1px dashed #ddd;
+                }
+                .payment-breakdown .title {
+                    font-weight: 600;
+                    font-size: 0.75rem;
+                    color: #666;
+                    margin-bottom: 2px;
+                }
                 .footer { 
                     text-align: center; 
                     margin-top: 20px; 
@@ -1326,9 +1366,31 @@ function printBill(bill) {
                 ${bill.discount > 0 ? `<div><span>Discount</span><span>-Rs. ${bill.discount.toFixed(2)}</span></div>` : ''}
                 <div class="grand"><span>TOTAL</span><span>Rs. ${bill.total.toFixed(2)}</span></div>
                 ${isEdited ? `<div style="color:#d97706;text-decoration:line-through;"><span>Original Total</span><span>Rs. ${(bill.originalTotal || bill.total).toFixed(2)}</span></div>` : ''}
-                ${bill.received ? `<div class="received"><span>Received</span><span>Rs. ${bill.received.toFixed(2)}</span></div>` : ''}
-                ${bill.change ? `<div class="change"><span>Change</span><span>Rs. ${bill.change.toFixed(2)}</span></div>` : ''}
             </div>
+            
+            ${bill.payments && bill.payments.length > 0 ? `
+                <div class="payment-breakdown">
+                    <div class="title">💳 Payment Breakdown</div>
+                    ${paymentsHtml}
+                    <div style="display:flex;justify-content:space-between;font-size:0.85rem;padding-top:4px;border-top:1px solid #ddd;margin-top:4px;">
+                        <span><strong>Total Paid</strong></span>
+                        <span><strong>Rs. ${bill.received.toFixed(2)}</strong></span>
+                    </div>
+                    <div style="display:flex;justify-content:space-between;font-size:0.85rem;">
+                        <span>Change</span>
+                        <span>Rs. ${bill.change.toFixed(2)}</span>
+                    </div>
+                </div>
+            ` : `
+                <div style="display:flex;justify-content:space-between;font-size:0.85rem;padding:4px 0;">
+                    <span>Received</span>
+                    <span>Rs. ${bill.received.toFixed(2)}</span>
+                </div>
+                <div style="display:flex;justify-content:space-between;font-size:0.85rem;padding:2px 0;">
+                    <span>Change</span>
+                    <span>Rs. ${bill.change.toFixed(2)}</span>
+                </div>
+            `}
             
             <div class="footer">
                 <p style="font-weight:600;">Thank you! Come again! 🍽️</p>
@@ -1350,7 +1412,6 @@ function printBill(bill) {
     printWindow.document.close();
 }
 
-// Print Single Bill from History
 function printBillFromHistory(billId) {
     const bill = history.find(b => b.id === billId);
     if (!bill) {
@@ -1360,7 +1421,6 @@ function printBillFromHistory(billId) {
     printBill(bill);
 }
 
-// Print All Bills from History
 function printAllHistory() {
     if (history.length === 0) {
         showToast('❌ No bills to print!');
@@ -1554,8 +1614,6 @@ function printAllHistory() {
 // ============================================================
 //  EDIT BILL FUNCTIONS
 // ============================================================
-
-// Open Edit Bill Modal
 function openEditBill(billId) {
     const bill = history.find(b => b.id === billId);
     if (!bill) {
@@ -1570,10 +1628,9 @@ function openEditBill(billId) {
     renderEditBillItems(editedBillData);
     updateEditTotals(editedBillData);
     
-    editBillModal.classList.add('open');
+    document.getElementById('editBillModal').classList.add('open');
 }
 
-// Render Edit Bill Items
 function renderEditBillItems(bill) {
     const container = document.getElementById('editBillItems');
     
@@ -1608,7 +1665,6 @@ function renderEditBillItems(bill) {
     container.innerHTML = html;
 }
 
-// Change Quantity in Edit
 function changeEditQty(index, delta) {
     if (!editedBillData || !editedBillData.items[index]) return;
     editedBillData.items[index].qty += delta;
@@ -1619,7 +1675,6 @@ function changeEditQty(index, delta) {
     updateEditTotals(editedBillData);
 }
 
-// Remove Item from Edit
 function removeEditItem(index) {
     if (!editedBillData || !editedBillData.items[index]) return;
     editedBillData.items.splice(index, 1);
@@ -1627,7 +1682,6 @@ function removeEditItem(index) {
     updateEditTotals(editedBillData);
 }
 
-// Update Edit Totals
 function updateEditTotals(bill) {
     const subtotal = bill.items.reduce((sum, item) => sum + (item.price * item.qty), 0);
     const discountPercent = bill.discountPercent || 0;
@@ -1643,7 +1697,6 @@ function updateEditTotals(bill) {
     bill.total = total;
 }
 
-// Update Edit Discount
 function updateEditDiscount(value) {
     if (!editedBillData) return;
     const val = parseFloat(value) || 0;
@@ -1651,7 +1704,6 @@ function updateEditDiscount(value) {
     updateEditTotals(editedBillData);
 }
 
-// Save Edited Bill
 function saveEditBill() {
     if (!editingBillId || !editedBillData) return;
     
@@ -1661,7 +1713,6 @@ function saveEditBill() {
         return;
     }
     
-    // Mark as edited
     editedBillData.edited = true;
     editedBillData.editedDate = new Date().toLocaleString('en-US', { 
         month: '2-digit', day: '2-digit', year: 'numeric', 
@@ -1669,11 +1720,10 @@ function saveEditBill() {
     });
     editedBillData.originalTotal = history[index].total;
     
-    // Update history
     history[index] = editedBillData;
     saveHistory();
     
-    editBillModal.classList.remove('open');
+    document.getElementById('editBillModal').classList.remove('open');
     renderHistory();
     showToast('✅ Bill updated successfully!');
     
@@ -1681,9 +1731,8 @@ function saveEditBill() {
     editedBillData = null;
 }
 
-// Cancel Edit
 function cancelEditBill() {
-    editBillModal.classList.remove('open');
+    document.getElementById('editBillModal').classList.remove('open');
     editingBillId = null;
     editedBillData = null;
 }
@@ -1693,11 +1742,11 @@ function cancelEditBill() {
 // ============================================================
 function renderHistory() {
     if (history.length === 0) {
-        historyList.innerHTML = `<div class="empty-state">No bills yet</div>`;
+        document.getElementById('historyList').innerHTML = `<div class="empty-state">No bills yet</div>`;
         return;
     }
     
-    historyList.innerHTML = history.slice().reverse().map(bill => {
+    document.getElementById('historyList').innerHTML = history.slice().reverse().map(bill => {
         const isEdited = bill.edited || false;
         const editBadge = isEdited ? '<span class="edit-badge">✏️ Edited</span>' : '';
         
@@ -1725,8 +1774,7 @@ function renderHistory() {
     }).join('');
 }
 
-// Clear History
-clearHistoryBtn.addEventListener('click', function() {
+document.getElementById('clearHistoryBtn').addEventListener('click', function() {
     if (!confirm('⚠️ Clear all bill history? This cannot be undone!')) return;
     history = [];
     saveHistory();
@@ -1734,8 +1782,7 @@ clearHistoryBtn.addEventListener('click', function() {
     showToast('✅ History cleared!');
 });
 
-// Print All History
-printHistoryBtn.addEventListener('click', function() {
+document.getElementById('printHistoryBtn').addEventListener('click', function() {
     if (history.length === 0) {
         showToast('❌ No bills to print!');
         return;
@@ -1746,12 +1793,12 @@ printHistoryBtn.addEventListener('click', function() {
 // ============================================================
 //  EDIT MODAL EVENT LISTENERS
 // ============================================================
-saveEditBillBtn.addEventListener('click', saveEditBill);
-cancelEditBillBtn.addEventListener('click', cancelEditBill);
-closeEditBillModalBtn.addEventListener('click', cancelEditBill);
+document.getElementById('saveEditBillBtn').addEventListener('click', saveEditBill);
+document.getElementById('cancelEditBillBtn').addEventListener('click', cancelEditBill);
+document.getElementById('closeEditBillModalBtn').addEventListener('click', cancelEditBill);
 
-editBillModal.addEventListener('click', function(e) {
-    if (e.target === editBillModal) cancelEditBill();
+document.getElementById('editBillModal').addEventListener('click', function(e) {
+    if (e.target === this) cancelEditBill();
 });
 
 // ============================================================
@@ -1851,6 +1898,12 @@ window.removeEditItem = removeEditItem;
 window.updateEditDiscount = updateEditDiscount;
 window.saveEditBill = saveEditBill;
 window.cancelEditBill = cancelEditBill;
+window.selectPaymentMethod = selectPaymentMethod;
+window.addPayment = addPayment;
+window.removePayment = removePayment;
+window.openCustomerOrders = openCustomerOrders;
+window.loadCustomerOrder = loadCustomerOrder;
+window.renderCustomerOrders = renderCustomerOrders;
 
 // ============================================================
 //  INIT

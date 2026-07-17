@@ -13,6 +13,123 @@ body {
     color: #1e293b;
     min-height: 100vh;
     overflow-x: hidden;
+    transition: background 0.3s, color 0.3s;
+}
+
+/* ============================================================
+   THEMES
+   ============================================================ */
+body.theme-dark {
+    background: #0f172a;
+    color: #f1f5f9;
+}
+
+body.theme-dark .actions-bar {
+    background: #1e293b;
+    border-bottom-color: #334155;
+}
+
+body.theme-dark .actions-bar button {
+    background: #1e293b;
+    border-color: #334155;
+    color: #94a3b8;
+}
+
+body.theme-dark .actions-bar button.active {
+    background: #8b5cf6;
+    color: white;
+    border-color: #8b5cf6;
+}
+
+body.theme-dark .category-card {
+    background: #1e293b;
+    border-color: #334155;
+}
+
+body.theme-dark .category-card:hover {
+    border-color: #8b5cf6;
+}
+
+body.theme-dark .cat-name {
+    color: #f1f5f9;
+}
+
+body.theme-dark .item-card {
+    background: #1e293b;
+    border-color: #334155;
+}
+
+body.theme-dark .item-name {
+    color: #f1f5f9;
+}
+
+body.theme-dark .modal {
+    background: #1e293b;
+}
+
+body.theme-dark .modal-header {
+    border-bottom-color: #334155;
+}
+
+body.theme-dark .modal-header h2 {
+    color: #f1f5f9;
+}
+
+body.theme-dark .modal-body label {
+    color: #94a3b8;
+}
+
+body.theme-dark .modal-body input,
+body.theme-dark .modal-body select {
+    background: #0f172a;
+    border-color: #334155;
+    color: #f1f5f9;
+}
+
+body.theme-dark .dropdown-menu {
+    background: #1e293b;
+}
+
+body.theme-dark .dropdown-item {
+    color: #f1f5f9;
+}
+
+body.theme-dark .dropdown-item:hover {
+    background: #334155;
+}
+
+body.theme-dark .count-badge {
+    background: #334155;
+    color: #94a3b8;
+}
+
+body.theme-dark .view-header h2 {
+    color: #f1f5f9;
+}
+
+body.theme-dark .empty-state {
+    color: #94a3b8;
+}
+
+body.theme-dark .empty-state p {
+    color: #94a3b8;
+}
+
+/* Font Sizes */
+body.font-small {
+    font-size: 14px;
+}
+
+body.font-medium {
+    font-size: 16px;
+}
+
+body.font-large {
+    font-size: 18px;
+}
+
+body.font-xlarge {
+    font-size: 20px;
 }
 
 /* ============================================================
@@ -711,6 +828,11 @@ body {
     max-width: 90%;
     text-align: center;
     pointer-events: none;
+}
+
+#toast.show {
+    opacity: 1;
+    transform: translateX(-50%) translateY(0);
 }
 
 /* ============================================================

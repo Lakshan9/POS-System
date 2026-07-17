@@ -13,6 +13,185 @@ body {
     color: #1e293b;
     min-height: 100vh;
     overflow-x: hidden;
+    transition: background 0.3s, color 0.3s;
+}
+
+/* ============================================================
+   THEMES
+   ============================================================ */
+body.theme-dark {
+    background: #0f172a;
+    color: #f1f5f9;
+}
+
+body.theme-dark .actions-bar {
+    background: #1e293b;
+    border-bottom-color: #334155;
+}
+
+body.theme-dark .actions-bar button {
+    background: #1e293b;
+    border-color: #334155;
+    color: #94a3b8;
+}
+
+body.theme-dark .actions-bar button.active {
+    background: #8b5cf6;
+    color: white;
+    border-color: #8b5cf6;
+}
+
+body.theme-dark .table-btn {
+    background: #1e293b;
+    border-color: #334155;
+}
+
+body.theme-dark .table-btn .num {
+    color: #f1f5f9;
+}
+
+body.theme-dark .table-btn .status {
+    color: #94a3b8;
+}
+
+body.theme-dark .table-btn.empty {
+    border-color: #065f46;
+    background: #0d2b1e;
+}
+
+body.theme-dark .table-btn.occupied {
+    border-color: #78350f;
+    background: #2d1a0e;
+}
+
+body.theme-dark .summary-card {
+    background: #1e293b;
+}
+
+body.theme-dark .summary-card .table-total {
+    color: #16a34a;
+}
+
+body.theme-dark .summary-grand {
+    background: linear-gradient(135deg, #0f172a, #1e293b);
+}
+
+body.theme-dark .modal {
+    background: #1e293b;
+}
+
+body.theme-dark .modal-header {
+    border-bottom-color: #334155;
+}
+
+body.theme-dark .modal-header h2 {
+    color: #f1f5f9;
+}
+
+body.theme-dark .order-item {
+    background: #0f172a;
+}
+
+body.theme-dark .order-item .item-name {
+    color: #f1f5f9;
+}
+
+body.theme-dark .order-item .qty-control button {
+    background: #1e293b;
+    border-color: #334155;
+    color: #f1f5f9;
+}
+
+body.theme-dark .order-item .qty-control button:hover {
+    background: #8b5cf6;
+    color: white;
+}
+
+body.theme-dark .order-summary .line {
+    color: #f1f5f9;
+}
+
+body.theme-dark .order-summary .line.total {
+    border-top-color: #334155;
+}
+
+body.theme-dark .payment-details {
+    background: #0f172a;
+}
+
+body.theme-dark .pay-line {
+    color: #f1f5f9;
+}
+
+body.theme-dark .pay-line.total {
+    border-top-color: #334155;
+}
+
+body.theme-dark .payment-input input {
+    background: #0f172a;
+    border-color: #334155;
+    color: #f1f5f9;
+}
+
+body.theme-dark .payment-change {
+    background: #0d2b1e;
+    border-color: #065f46;
+}
+
+body.theme-dark .payment-change span {
+    color: #f1f5f9;
+}
+
+body.theme-dark .dropdown-menu {
+    background: #1e293b;
+}
+
+body.theme-dark .dropdown-item {
+    color: #f1f5f9;
+}
+
+body.theme-dark .dropdown-item:hover {
+    background: #334155;
+}
+
+body.theme-dark .summary-bar {
+    background: #1e293b;
+    color: #f1f5f9;
+}
+
+body.theme-dark #tablePaymentModal .payment-method-btn {
+    background: #0f172a;
+    border-color: #334155;
+    color: #94a3b8;
+}
+
+body.theme-dark #tablePaymentModal .payment-method-btn.active {
+    border-color: #8b5cf6;
+    background: #1e293b;
+    color: #8b5cf6;
+}
+
+body.theme-dark #tablePaymentModal .payment-input-group input {
+    background: #0f172a;
+    border-color: #334155;
+    color: #f1f5f9;
+}
+
+/* Font Sizes */
+body.font-small {
+    font-size: 14px;
+}
+
+body.font-medium {
+    font-size: 16px;
+}
+
+body.font-large {
+    font-size: 18px;
+}
+
+body.font-xlarge {
+    font-size: 20px;
 }
 
 /* ============================================================
@@ -653,6 +832,7 @@ body {
     display: flex;
     gap: 10px;
     margin-top: 12px;
+    flex-wrap: wrap;
 }
 
 .modal-actions button {
@@ -663,6 +843,25 @@ body {
     cursor: pointer;
     transition: all 0.3s;
     flex: 1;
+    min-width: 80px;
+}
+
+.add-items-btn {
+    background: #8b5cf6;
+    color: white;
+}
+
+.add-items-btn:hover {
+    background: #7c3aed;
+}
+
+.load-pos-btn {
+    background: #3b82f6;
+    color: white;
+}
+
+.load-pos-btn:hover {
+    background: #2563eb;
 }
 
 .pay-btn {
@@ -712,6 +911,79 @@ body {
     border-top: 2px solid #e2e8f0;
     padding-top: 8px;
     margin-top: 4px;
+}
+
+/* ============================================================
+   PAYMENT METHOD BUTTONS (Tables)
+   ============================================================ */
+#tablePaymentModal .payment-methods-simple {
+    margin: 12px 0;
+}
+
+#tablePaymentModal .payment-methods-simple label {
+    display: block;
+    font-weight: 600;
+    font-size: 0.85rem;
+    color: #475569;
+    margin-bottom: 8px;
+}
+
+#tablePaymentModal .payment-methods-grid {
+    display: grid;
+    grid-template-columns: repeat(5, 1fr);
+    gap: 6px;
+}
+
+#tablePaymentModal .payment-method-btn {
+    padding: 6px 4px;
+    border: 2px solid #e2e8f0;
+    border-radius: 8px;
+    background: white;
+    cursor: pointer;
+    transition: all 0.3s;
+    font-size: 0.7rem;
+    font-weight: 500;
+    color: #64748b;
+    font-family: inherit;
+    text-align: center;
+}
+
+#tablePaymentModal .payment-method-btn:hover {
+    border-color: #94a3b8;
+    background: #f8fafc;
+}
+
+#tablePaymentModal .payment-method-btn.active {
+    border-color: #8b5cf6;
+    background: #f5f3ff;
+    color: #8b5cf6;
+}
+
+#tablePaymentModal .payment-input-group {
+    margin: 8px 0;
+}
+
+#tablePaymentModal .payment-input-group label {
+    display: block;
+    font-size: 0.7rem;
+    font-weight: 500;
+    color: #64748b;
+    margin-bottom: 2px;
+}
+
+#tablePaymentModal .payment-input-group input {
+    width: 100%;
+    padding: 8px 12px;
+    border: 2px solid #e2e8f0;
+    border-radius: 8px;
+    font-size: 0.9rem;
+    transition: border-color 0.3s;
+    font-family: inherit;
+}
+
+#tablePaymentModal .payment-input-group input:focus {
+    outline: none;
+    border-color: #8b5cf6;
 }
 
 .payment-input {
@@ -916,6 +1188,11 @@ body {
         flex-direction: column;
     }
     
+    .modal-actions button {
+        flex: none;
+        width: 100%;
+    }
+    
     .payment-actions {
         grid-template-columns: 1fr;
     }
@@ -935,6 +1212,10 @@ body {
         flex-direction: column;
         align-items: center;
         gap: 12px;
+    }
+    
+    #tablePaymentModal .payment-methods-grid {
+        grid-template-columns: repeat(3, 1fr);
     }
 }
 
@@ -1000,6 +1281,10 @@ body {
     .order-item .price {
         min-width: 60px;
         font-size: 0.85rem;
+    }
+    
+    #tablePaymentModal .payment-methods-grid {
+        grid-template-columns: repeat(2, 1fr);
     }
 }
 

@@ -5,231 +5,6 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
     <title>Stock Management - Hotel POS</title>
     <link rel="stylesheet" href="style-stock.css" />
-    <style>
-        /* ===== PASSWORD PROTECTION STYLES ===== */
-        .password-overlay {
-            position: fixed;
-            top: 0;
-            left: 0;
-            width: 100vw;
-            height: 100vh;
-            background: linear-gradient(135deg, #0f172a, #1e293b);
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            z-index: 9999;
-            padding: 20px;
-        }
-
-        .password-box {
-            background: white;
-            border-radius: 24px;
-            padding: 40px 36px;
-            max-width: 400px;
-            width: 100%;
-            box-shadow: 0 20px 60px rgba(0,0,0,0.5);
-            animation: modalSlideIn 0.4s ease;
-        }
-
-        @keyframes modalSlideIn {
-            from { opacity: 0; transform: scale(0.9) translateY(20px); }
-            to { opacity: 1; transform: scale(1) translateY(0); }
-        }
-
-        @keyframes shake {
-            0%, 100% { transform: translateX(0); }
-            10%, 30%, 50%, 70%, 90% { transform: translateX(-10px); }
-            20%, 40%, 60%, 80% { transform: translateX(10px); }
-        }
-
-        .password-header {
-            text-align: center;
-            margin-bottom: 28px;
-        }
-
-        .lock-icon {
-            font-size: 3.5rem;
-            display: block;
-            margin-bottom: 8px;
-        }
-
-        .password-header h2 {
-            font-size: 1.5rem;
-            font-weight: 700;
-            color: #0f172a;
-        }
-
-        .password-header p {
-            color: #94a3b8;
-            font-size: 0.9rem;
-            margin-top: 4px;
-        }
-
-        .password-input-group {
-            position: relative;
-            margin-bottom: 16px;
-        }
-
-        .password-input-group input {
-            width: 100%;
-            padding: 12px 48px 12px 16px;
-            border: 2px solid #e2e8f0;
-            border-radius: 12px;
-            font-size: 1rem;
-            transition: border-color 0.3s;
-            background: #f8fafc;
-        }
-
-        .password-input-group input:focus {
-            outline: none;
-            border-color: #8b5cf6;
-        }
-
-        .toggle-password-btn {
-            position: absolute;
-            right: 12px;
-            top: 50%;
-            transform: translateY(-50%);
-            background: transparent;
-            border: none;
-            cursor: pointer;
-            font-size: 1.1rem;
-            padding: 4px 8px;
-            border-radius: 6px;
-            transition: all 0.2s;
-            color: #94a3b8;
-        }
-
-        .toggle-password-btn:hover {
-            background: #f1f5f9;
-            color: #475569;
-        }
-
-        .password-error {
-            display: none;
-            padding: 10px 14px;
-            background: #fef2f2;
-            border: 2px solid #fca5a5;
-            border-radius: 10px;
-            color: #dc2626;
-            font-size: 0.85rem;
-            font-weight: 500;
-            margin-bottom: 16px;
-            text-align: center;
-        }
-
-        .password-submit-btn {
-            width: 100%;
-            padding: 12px;
-            background: linear-gradient(135deg, #8b5cf6, #7c3aed);
-            color: white;
-            border: none;
-            border-radius: 12px;
-            font-size: 1rem;
-            font-weight: 700;
-            cursor: pointer;
-            transition: all 0.3s;
-            margin-bottom: 10px;
-        }
-
-        .password-submit-btn:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 8px 25px rgba(139, 92, 246, 0.4);
-        }
-
-        .password-cancel-btn {
-            width: 100%;
-            padding: 12px;
-            background: #e2e8f0;
-            color: #475569;
-            border: none;
-            border-radius: 12px;
-            font-size: 1rem;
-            font-weight: 600;
-            cursor: pointer;
-            transition: all 0.3s;
-            margin-bottom: 16px;
-        }
-
-        .password-cancel-btn:hover {
-            background: #cbd5e1;
-        }
-
-        .password-footer {
-            text-align: center;
-            font-size: 0.8rem;
-            color: #94a3b8;
-            padding-top: 12px;
-            border-top: 1px solid #e2e8f0;
-        }
-
-        .password-footer strong {
-            color: #8b5cf6;
-        }
-
-        /* ===== MAIN CONTENT WRAPPER ===== */
-        .main-content-wrapper {
-            display: none;
-            min-height: 100vh;
-        }
-
-        /* ===== LOCK BUTTON ===== */
-        .lock-btn {
-            padding: 6px 16px;
-            border: none;
-            border-radius: 8px;
-            background: #ef4444;
-            color: white;
-            cursor: pointer;
-            font-size: 0.8rem;
-            transition: all 0.3s;
-            font-weight: 500;
-        }
-
-        .lock-btn:hover {
-            background: #dc2626;
-            transform: scale(1.02);
-        }
-
-        /* ===== TOAST ===== */
-        #toast {
-            position: fixed;
-            bottom: 30px;
-            left: 50%;
-            transform: translateX(-50%) translateY(100px);
-            background: #1e293b;
-            color: white;
-            padding: 14px 28px;
-            border-radius: 12px;
-            font-size: 0.95rem;
-            z-index: 9999;
-            opacity: 0;
-            transition: all 0.5s ease;
-            box-shadow: 0 10px 40px rgba(0,0,0,0.3);
-            max-width: 90%;
-            text-align: center;
-            pointer-events: none;
-            white-space: pre-line;
-        }
-
-        #toast.show {
-            opacity: 1;
-            transform: translateX(-50%) translateY(0);
-        }
-
-        /* ===== RESPONSIVE ===== */
-        @media (max-width: 480px) {
-            .password-box {
-                padding: 28px 20px;
-            }
-            .password-header h2 {
-                font-size: 1.2rem;
-            }
-            .lock-icon {
-                font-size: 2.8rem;
-            }
-        }
-    </style>
 </head>
 <body>
 
@@ -255,125 +30,126 @@
 </div>
 
 <!-- ===== MAIN CONTENT ===== -->
-<div class="main-content-wrapper" id="mainContentWrapper">
+<div class="main-content-wrapper" id="mainContentWrapper" style="display:none;">
 
     <!-- ===== HEADER ===== -->
-    <div class="main-header" style="background:linear-gradient(135deg,#1e293b,#0f172a);color:white;padding:12px 20px;display:flex;justify-content:space-between;align-items:center;position:sticky;top:0;z-index:100;box-shadow:0 4px 12px rgba(0,0,0,0.3);">
-        <div class="header-left" style="display:flex;align-items:center;gap:16px;flex:1;">
-            <button class="hamburger-btn" id="hamburgerBtn" onclick="toggleDropdown()" style="display:flex;flex-direction:column;gap:5px;background:transparent;border:none;cursor:pointer;padding:4px;width:32px;height:32px;align-items:center;justify-content:center;border-radius:8px;transition:background 0.3s;">
-                <span style="display:block;width:24px;height:2.5px;background:white;border-radius:4px;transition:all 0.3s ease;transform-origin:center;"></span>
-                <span style="display:block;width:24px;height:2.5px;background:white;border-radius:4px;transition:all 0.3s ease;transform-origin:center;"></span>
-                <span style="display:block;width:24px;height:2.5px;background:white;border-radius:4px;transition:all 0.3s ease;transform-origin:center;"></span>
+    <div class="main-header">
+        <div class="header-left">
+            <button class="hamburger-btn" id="hamburgerBtn" onclick="toggleDropdown()">
+                <span></span>
+                <span></span>
+                <span></span>
             </button>
-            <h1 style="font-size:1.2rem;font-weight:700;letter-spacing:0.5px;">📦 STOCK MANAGEMENT</h1>
-            <span class="datetime" id="datetime" style="font-size:0.75rem;opacity:0.8;background:rgba(255,255,255,0.1);padding:4px 12px;border-radius:20px;font-family:'Courier New',monospace;">--</span>
+            <h1>📦 STOCK MANAGEMENT</h1>
+            <span class="datetime" id="datetime">--</span>
         </div>
-        <div class="header-right" style="display:flex;align-items:center;gap:8px;">
-            <button onclick="window.location.href='index.html'" class="back-btn" style="padding:6px 16px;border:none;border-radius:8px;background:#8b5cf6;color:white;cursor:pointer;font-size:0.8rem;transition:all 0.3s;font-weight:500;">🏠 Back to POS</button>
-            <button id="refreshBtn" class="refresh-btn" style="padding:6px 16px;border:none;border-radius:8px;background:rgba(255,255,255,0.1);color:white;cursor:pointer;font-size:0.8rem;transition:all 0.3s;font-weight:500;">⟳ Refresh</button>
+        <div class="header-right">
+            <button onclick="window.location.href='index.html'" class="back-btn">🏠 Back to POS</button>
+            <button id="refreshBtn" class="refresh-btn">⟳ Refresh</button>
             <button onclick="lockStock()" class="lock-btn">🔒 Lock</button>
         </div>
     </div>
 
     <!-- ===== DROPDOWN MENU ===== -->
-    <div class="dropdown-menu" id="dropdownMenu" style="display:none;position:fixed;top:0;left:0;width:300px;height:100vh;background:white;z-index:999;box-shadow:4px 0 20px rgba(0,0,0,0.2);transform:translateX(-100%);transition:transform 0.3s ease;overflow-y:auto;">
-        <div class="dropdown-content" style="padding:20px 0;">
-            <a href="index.html" class="dropdown-item" style="display:flex;align-items:center;gap:14px;padding:12px 24px;color:#1e293b;text-decoration:none;transition:background 0.2s;cursor:pointer;border:none;background:transparent;width:100%;text-align:left;font-size:0.95rem;">
-                <span class="drop-icon" style="font-size:1.2rem;width:28px;text-align:center;">🧾</span>
-                <span class="drop-text" style="flex:1;">POS</span>
+    <div class="dropdown-menu" id="dropdownMenu">
+        <div class="dropdown-content">
+            <a href="index.html" class="dropdown-item">
+                <span class="drop-icon">🧾</span>
+                <span class="drop-text">POS</span>
             </a>
-            <a href="index.html#history" class="dropdown-item" style="display:flex;align-items:center;gap:14px;padding:12px 24px;color:#1e293b;text-decoration:none;transition:background 0.2s;cursor:pointer;border:none;background:transparent;width:100%;text-align:left;font-size:0.95rem;">
-                <span class="drop-icon" style="font-size:1.2rem;width:28px;text-align:center;">📜</span>
-                <span class="drop-text" style="flex:1;">History</span>
+            <a href="index.html#history" class="dropdown-item" onclick="switchTab('history')">
+                <span class="drop-icon">📜</span>
+                <span class="drop-text">History</span>
             </a>
-            <a href="report.html" class="dropdown-item" style="display:flex;align-items:center;gap:14px;padding:12px 24px;color:#1e293b;text-decoration:none;transition:background 0.2s;cursor:pointer;border:none;background:transparent;width:100%;text-align:left;font-size:0.95rem;">
-                <span class="drop-icon" style="font-size:1.2rem;width:28px;text-align:center;">📊</span>
-                <span class="drop-text" style="flex:1;">Report</span>
+            <a href="report.html" class="dropdown-item">
+                <span class="drop-icon">📊</span>
+                <span class="drop-text">Report</span>
             </a>
-            <a href="items.html" class="dropdown-item" style="display:flex;align-items:center;gap:14px;padding:12px 24px;color:#1e293b;text-decoration:none;transition:background 0.2s;cursor:pointer;border:none;background:transparent;width:100%;text-align:left;font-size:0.95rem;">
-                <span class="drop-icon" style="font-size:1.2rem;width:28px;text-align:center;">📋</span>
-                <span class="drop-text" style="flex:1;">Menu</span>
+            <a href="items.html" class="dropdown-item">
+                <span class="drop-icon">📋</span>
+                <span class="drop-text">Menu</span>
             </a>
-            <a href="tables.html" class="dropdown-item" style="display:flex;align-items:center;gap:14px;padding:12px 24px;color:#1e293b;text-decoration:none;transition:background 0.2s;cursor:pointer;border:none;background:transparent;width:100%;text-align:left;font-size:0.95rem;">
-                <span class="drop-icon" style="font-size:1.2rem;width:28px;text-align:center;">🪑</span>
-                <span class="drop-text" style="flex:1;">Tables</span>
+            <a href="tables.html" class="dropdown-item">
+                <span class="drop-icon">🪑</span>
+                <span class="drop-text">Tables</span>
             </a>
-            <a href="stock.html" class="dropdown-item active-link" style="display:flex;align-items:center;gap:14px;padding:12px 24px;color:#8b5cf6;text-decoration:none;transition:background 0.2s;cursor:pointer;border:none;background:#f5f3ff;width:100%;text-align:left;font-size:0.95rem;font-weight:600;">
-                <span class="drop-icon" style="font-size:1.2rem;width:28px;text-align:center;">📦</span>
-                <span class="drop-text" style="flex:1;">Stock</span>
+            <a href="stock.html" class="dropdown-item active-link">
+                <span class="drop-icon">📦</span>
+                <span class="drop-text">Stock</span>
             </a>
-            <a href="settings.html" class="dropdown-item" style="display:flex;align-items:center;gap:14px;padding:12px 24px;color:#1e293b;text-decoration:none;transition:background 0.2s;cursor:pointer;border:none;background:transparent;width:100%;text-align:left;font-size:0.95rem;">
-                <span class="drop-icon" style="font-size:1.2rem;width:28px;text-align:center;">⚙️</span>
-                <span class="drop-text" style="flex:1;">Settings</span>
+            <a href="settings.html" class="dropdown-item">
+                <span class="drop-icon">⚙️</span>
+                <span class="drop-text">Settings</span>
             </a>
-            <div class="dropdown-divider" style="height:1px;background:#e2e8f0;margin:8px 16px;"></div>
-            <a href="#" class="dropdown-item" onclick="toggleFullScreen();" style="display:flex;align-items:center;gap:14px;padding:12px 24px;color:#1e293b;text-decoration:none;transition:background 0.2s;cursor:pointer;border:none;background:transparent;width:100%;text-align:left;font-size:0.95rem;">
-                <span class="drop-icon" style="font-size:1.2rem;width:28px;text-align:center;">⛶</span>
-                <span class="drop-text" style="flex:1;">Full Screen</span>
+            <div class="dropdown-divider"></div>
+            <a href="#" class="dropdown-item" onclick="toggleFullScreen();">
+                <span class="drop-icon">⛶</span>
+                <span class="drop-text">Full Screen</span>
             </a>
-            <a href="#" class="dropdown-item" onclick="logout();" style="display:flex;align-items:center;gap:14px;padding:12px 24px;color:#1e293b;text-decoration:none;transition:background 0.2s;cursor:pointer;border:none;background:transparent;width:100%;text-align:left;font-size:0.95rem;">
-                <span class="drop-icon" style="font-size:1.2rem;width:28px;text-align:center;">🚪</span>
-                <span class="drop-text" style="flex:1;">Logout</span>
+            <a href="#" class="dropdown-item" onclick="logout();">
+                <span class="drop-icon">🚪</span>
+                <span class="drop-text">Logout</span>
             </a>
         </div>
     </div>
 
     <!-- ===== DROPDOWN OVERLAY ===== -->
-    <div class="dropdown-overlay" id="dropdownOverlay" onclick="closeDropdown()" style="display:none;position:fixed;top:0;left:0;width:100vw;height:100vh;background:rgba(0,0,0,0.5);z-index:998;backdrop-filter:blur(4px);"></div>
+    <div class="dropdown-overlay" id="dropdownOverlay" onclick="closeDropdown()"></div>
 
     <!-- ===== SUMMARY CARDS ===== -->
-    <div class="stock-summary" id="stockSummary" style="display:grid;grid-template-columns:repeat(auto-fit,minmax(180px,1fr));gap:16px;padding:20px;max-width:1200px;margin:0 auto;">
-        <div class="summary-card" style="background:white;border-radius:16px;padding:20px;display:flex;align-items:center;gap:16px;box-shadow:0 2px 8px rgba(0,0,0,0.06);transition:all 0.3s;border:2px solid transparent;">
-            <div class="card-icon" style="font-size:2rem;width:48px;height:48px;display:flex;align-items:center;justify-content:center;border-radius:12px;background:#f8fafc;">📋</div>
-            <div class="card-info" style="flex:1;">
-                <div class="num" id="totalItems" style="font-size:1.5rem;font-weight:700;color:#0f172a;line-height:1.2;">0</div>
-                <div class="label" style="font-size:0.75rem;color:#94a3b8;font-weight:500;text-transform:uppercase;letter-spacing:0.5px;">Total Items</div>
+    <div class="stock-summary" id="stockSummary">
+        <div class="summary-card">
+            <div class="card-icon">📋</div>
+            <div class="card-info">
+                <div class="num" id="totalItems">0</div>
+                <div class="label">Total Items</div>
             </div>
         </div>
-        <div class="summary-card" style="background:white;border-radius:16px;padding:20px;display:flex;align-items:center;gap:16px;box-shadow:0 2px 8px rgba(0,0,0,0.06);transition:all 0.3s;border:2px solid transparent;">
-            <div class="card-icon" style="font-size:2rem;width:48px;height:48px;display:flex;align-items:center;justify-content:center;border-radius:12px;background:#f8fafc;">📦</div>
-            <div class="card-info" style="flex:1;">
-                <div class="num" id="totalStock" style="font-size:1.5rem;font-weight:700;color:#0f172a;line-height:1.2;">0</div>
-                <div class="label" style="font-size:0.75rem;color:#94a3b8;font-weight:500;text-transform:uppercase;letter-spacing:0.5px;">Total Stock</div>
+        <div class="summary-card">
+            <div class="card-icon">📦</div>
+            <div class="card-info">
+                <div class="num" id="totalStock">0</div>
+                <div class="label">Total Stock</div>
             </div>
         </div>
-        <div class="summary-card warning" style="background:white;border-radius:16px;padding:20px;display:flex;align-items:center;gap:16px;box-shadow:0 2px 8px rgba(0,0,0,0.06);transition:all 0.3s;border:2px solid transparent;">
-            <div class="card-icon" style="font-size:2rem;width:48px;height:48px;display:flex;align-items:center;justify-content:center;border-radius:12px;background:#fef3c7;">⚠️</div>
-            <div class="card-info" style="flex:1;">
-                <div class="num" id="lowStockCount" style="font-size:1.5rem;font-weight:700;color:#d97706;line-height:1.2;">0</div>
-                <div class="label" style="font-size:0.75rem;color:#94a3b8;font-weight:500;text-transform:uppercase;letter-spacing:0.5px;">Low Stock Items</div>
+        <div class="summary-card warning">
+            <div class="card-icon">⚠️</div>
+            <div class="card-info">
+                <div class="num" id="lowStockCount">0</div>
+                <div class="label">Low Stock Items</div>
             </div>
         </div>
-        <div class="summary-card success" style="background:white;border-radius:16px;padding:20px;display:flex;align-items:center;gap:16px;box-shadow:0 2px 8px rgba(0,0,0,0.06);transition:all 0.3s;border:2px solid transparent;">
-            <div class="card-icon" style="font-size:2rem;width:48px;height:48px;display:flex;align-items:center;justify-content:center;border-radius:12px;background:#d1fae5;">💰</div>
-            <div class="card-info" style="flex:1;">
-                <div class="num" id="totalValue" style="font-size:1.5rem;font-weight:700;color:#16a34a;line-height:1.2;">Rs. 0.00</div>
-                <div class="label" style="font-size:0.75rem;color:#94a3b8;font-weight:500;text-transform:uppercase;letter-spacing:0.5px;">Total Stock Value</div>
+        <div class="summary-card success">
+            <div class="card-icon">💰</div>
+            <div class="card-info">
+                <div class="num" id="totalValue">Rs. 0.00</div>
+                <div class="label">Total Stock Value</div>
             </div>
         </div>
     </div>
 
     <!-- ===== ACTIONS BAR ===== -->
-    <div class="actions-bar" style="background:white;padding:12px 20px;display:flex;gap:10px;border-bottom:1px solid #e2e8f0;flex-wrap:wrap;align-items:center;max-width:1200px;margin:0 auto 16px;border-radius:12px;box-shadow:0 2px 8px rgba(0,0,0,0.04);">
-        <button class="active" id="showAllBtn" style="padding:8px 18px;border:2px solid #e2e8f0;background:white;border-radius:10px;cursor:pointer;font-size:0.85rem;font-weight:500;transition:all 0.3s;color:#475569;">📋 All Items</button>
-        <button id="showLowStockBtn" style="padding:8px 18px;border:2px solid #e2e8f0;background:white;border-radius:10px;cursor:pointer;font-size:0.85rem;font-weight:500;transition:all 0.3s;color:#475569;">⚠️ Low Stock</button>
-        <button id="addItemBtn" class="add-btn" style="padding:8px 18px;border:none;border-radius:10px;background:#22c55e;color:white;cursor:pointer;font-size:0.85rem;font-weight:500;transition:all 0.3s;margin-left:auto;">➕ Add Item</button>
-        <button id="exportStockBtn" class="export-btn" style="padding:8px 18px;border:none;border-radius:10px;background:#3b82f6;color:white;cursor:pointer;font-size:0.85rem;font-weight:500;transition:all 0.3s;">⬇ Export CSV</button>
+    <div class="actions-bar">
+        <button class="active" id="showAllBtn">📋 All Items</button>
+        <button id="showLowStockBtn">⚠️ Low Stock</button>
+        <button id="addItemBtn" class="add-btn">➕ Add Item</button>
+        <button id="exportStockBtn" class="export-btn">⬇ Export CSV</button>
+        <button id="cleanupBtn" class="cleanup-btn-header">🗑️ End of Day Cleanup</button>
     </div>
 
     <!-- ===== STOCK TABLE ===== -->
-    <div class="stock-table-container" style="max-width:1200px;margin:0 auto;padding:0 20px 20px;overflow-x:auto;">
-        <table class="stock-table" id="stockTable" style="width:100%;border-collapse:collapse;background:white;border-radius:16px;overflow:hidden;box-shadow:0 2px 8px rgba(0,0,0,0.06);">
-            <thead style="background:#f8fafc;border-bottom:2px solid #e2e8f0;">
+    <div class="stock-table-container">
+        <table class="stock-table" id="stockTable">
+            <thead>
                 <tr>
-                    <th style="padding:14px 16px;text-align:left;font-size:0.75rem;font-weight:600;color:#64748b;text-transform:uppercase;letter-spacing:0.5px;white-space:nowrap;">#</th>
-                    <th style="padding:14px 16px;text-align:left;font-size:0.75rem;font-weight:600;color:#64748b;text-transform:uppercase;letter-spacing:0.5px;white-space:nowrap;">Item Name</th>
-                    <th style="padding:14px 16px;text-align:left;font-size:0.75rem;font-weight:600;color:#64748b;text-transform:uppercase;letter-spacing:0.5px;white-space:nowrap;">Category</th>
-                    <th style="padding:14px 16px;text-align:left;font-size:0.75rem;font-weight:600;color:#64748b;text-transform:uppercase;letter-spacing:0.5px;white-space:nowrap;">Price (Rs.)</th>
-                    <th style="padding:14px 16px;text-align:left;font-size:0.75rem;font-weight:600;color:#64748b;text-transform:uppercase;letter-spacing:0.5px;white-space:nowrap;">Stock</th>
-                    <th style="padding:14px 16px;text-align:left;font-size:0.75rem;font-weight:600;color:#64748b;text-transform:uppercase;letter-spacing:0.5px;white-space:nowrap;">Total Value</th>
-                    <th style="padding:14px 16px;text-align:left;font-size:0.75rem;font-weight:600;color:#64748b;text-transform:uppercase;letter-spacing:0.5px;white-space:nowrap;">Status</th>
-                    <th style="padding:14px 16px;text-align:left;font-size:0.75rem;font-weight:600;color:#64748b;text-transform:uppercase;letter-spacing:0.5px;white-space:nowrap;">Actions</th>
+                    <th>#</th>
+                    <th>Item Name</th>
+                    <th>Category</th>
+                    <th>Price (Rs.)</th>
+                    <th>Stock</th>
+                    <th>Total Value</th>
+                    <th>Status</th>
+                    <th>Actions</th>
                 </tr>
             </thead>
             <tbody id="stockTableBody">
@@ -382,53 +158,84 @@
         </table>
     </div>
 
-    <!-- ===== ADD/EDIT ITEM MODAL ===== -->
-    <div class="modal-overlay" id="itemModal" style="display:none;position:fixed;top:0;left:0;width:100vw;height:100vh;background:rgba(0,0,0,0.5);z-index:2000;justify-content:center;align-items:center;backdrop-filter:blur(4px);">
-        <div class="modal modal-small" style="background:white;border-radius:20px;max-width:420px;width:90%;max-height:90vh;overflow-y:auto;box-shadow:0 20px 60px rgba(0,0,0,0.3);animation:modalSlideIn 0.3s ease;">
-            <div class="modal-header" style="padding:18px 24px;border-bottom:1px solid #e2e8f0;display:flex;justify-content:space-between;align-items:center;">
-                <h2 id="modalTitle" style="font-size:1.1rem;">➕ Add New Item</h2>
-                <button class="close-btn" id="closeModalBtn" style="background:transparent;border:none;font-size:1.2rem;cursor:pointer;color:#94a3b8;padding:4px 8px;border-radius:6px;transition:all 0.2s;">✕</button>
+    <!-- ===== STOCK CLEANUP SECTION ===== -->
+    <div class="stock-cleanup-section" id="stockCleanupSection" style="display:none;">
+        <div class="cleanup-header">
+            <div>
+                <h3>🗑️ End of Day Stock Cleanup</h3>
+                <p>Remove unsold stock items from today <span class="admin-badge">Admin Only</span></p>
             </div>
-            <div class="modal-body" style="padding:24px;">
-                <label style="display:block;font-weight:600;font-size:0.85rem;margin-bottom:4px;color:#475569;">Item Name</label>
-                <input type="text" id="itemName" placeholder="e.g. Burger" style="width:100%;padding:10px 14px;border:2px solid #e2e8f0;border-radius:10px;font-size:0.95rem;transition:border-color 0.3s;margin-bottom:16px;font-family:inherit;" />
+            <button onclick="toggleCleanupMode()" class="cleanup-toggle-btn" id="cleanupToggleBtn">🔓 Enable Cleanup</button>
+        </div>
+
+        <div class="cleanup-content" id="cleanupContent" style="display:none;">
+            <div class="cleanup-list-header">
+                <span></span>
+                <span>Item Name</span>
+                <span>Sold Today</span>
+                <span>Current Stock</span>
+                <span>Action</span>
+            </div>
+            <div id="unsoldStockList">
+                <!-- Rendered by JS -->
+            </div>
+            
+            <div class="cleanup-actions">
+                <button onclick="removeAllUnsold()" class="cleanup-btn remove-all">🗑️ Remove All Unsold</button>
+                <button onclick="removeSelectedUnsold()" class="cleanup-btn remove-selected">☑️ Remove Selected</button>
+                <button onclick="keepAllStock()" class="cleanup-btn keep-all">✅ Keep All Stock</button>
+                <button onclick="toggleCleanupMode()" class="cleanup-btn close-cleanup">✕ Close</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- ===== ADD/EDIT ITEM MODAL ===== -->
+    <div class="modal-overlay" id="itemModal">
+        <div class="modal modal-small">
+            <div class="modal-header">
+                <h2 id="modalTitle">➕ Add New Item</h2>
+                <button class="close-btn" id="closeModalBtn">✕</button>
+            </div>
+            <div class="modal-body">
+                <label>Item Name</label>
+                <input type="text" id="itemName" placeholder="e.g. Burger" />
                 
-                <label style="display:block;font-weight:600;font-size:0.85rem;margin-bottom:4px;color:#475569;">Price (Rs.)</label>
-                <input type="number" id="itemPrice" placeholder="0.00" step="0.01" min="0" style="width:100%;padding:10px 14px;border:2px solid #e2e8f0;border-radius:10px;font-size:0.95rem;transition:border-color 0.3s;margin-bottom:16px;font-family:inherit;" />
+                <label>Price (Rs.)</label>
+                <input type="number" id="itemPrice" placeholder="0.00" step="0.01" min="0" />
                 
-                <label style="display:block;font-weight:600;font-size:0.85rem;margin-bottom:4px;color:#475569;">Stock Quantity</label>
-                <input type="number" id="itemStock" placeholder="0" step="1" min="0" style="width:100%;padding:10px 14px;border:2px solid #e2e8f0;border-radius:10px;font-size:0.95rem;transition:border-color 0.3s;margin-bottom:16px;font-family:inherit;" />
+                <label>Stock Quantity</label>
+                <input type="number" id="itemStock" placeholder="0" step="1" min="0" />
                 
-                <label style="display:block;font-weight:600;font-size:0.85rem;margin-bottom:4px;color:#475569;">Category</label>
-                <select id="itemCategory" style="width:100%;padding:10px 14px;border:2px solid #e2e8f0;border-radius:10px;font-size:0.95rem;transition:border-color 0.3s;margin-bottom:16px;font-family:inherit;appearance:auto;background:white;">
+                <label>Category</label>
+                <select id="itemCategory">
                     <option value="main">🍽️ Main Dishes</option>
                     <option value="drinks">🥤 Beverages</option>
                     <option value="desserts">🍰 Desserts</option>
                     <option value="other">📦 Other</option>
                 </select>
                 
-                <label style="display:block;font-weight:600;font-size:0.85rem;margin-bottom:4px;color:#475569;">Low Stock Alert (Min Quantity)</label>
-                <input type="number" id="itemMinStock" placeholder="5" step="1" min="0" value="5" style="width:100%;padding:10px 14px;border:2px solid #e2e8f0;border-radius:10px;font-size:0.95rem;transition:border-color 0.3s;margin-bottom:16px;font-family:inherit;" />
+                <label>Low Stock Alert (Min Quantity)</label>
+                <input type="number" id="itemMinStock" placeholder="5" step="1" min="0" value="5" />
                 
                 <input type="hidden" id="editItemId" value="" />
                 
-                <div class="modal-actions" style="display:flex;gap:10px;margin-top:8px;flex-wrap:wrap;">
-                    <button class="save-btn" id="saveItemBtn" style="padding:10px 20px;border:none;border-radius:10px;font-weight:600;cursor:pointer;transition:all 0.3s;font-size:0.9rem;flex:1;min-width:80px;background:#22c55e;color:white;">💾 Save</button>
-                    <button class="delete-btn" id="deleteItemBtn" style="display:none;padding:10px 20px;border:none;border-radius:10px;font-weight:600;cursor:pointer;transition:all 0.3s;font-size:0.9rem;flex:1;min-width:80px;background:#ef4444;color:white;">🗑 Delete</button>
-                    <button class="cancel-btn" id="cancelModalBtn" style="padding:10px 20px;border:none;border-radius:10px;font-weight:600;cursor:pointer;transition:all 0.3s;font-size:0.9rem;flex:1;min-width:80px;background:#e2e8f0;color:#475569;">✕ Cancel</button>
+                <div class="modal-actions">
+                    <button class="save-btn" id="saveItemBtn">💾 Save</button>
+                    <button class="delete-btn" id="deleteItemBtn" style="display:none;">🗑 Delete</button>
+                    <button class="cancel-btn" id="cancelModalBtn">✕ Cancel</button>
                 </div>
             </div>
         </div>
     </div>
 
     <!-- ===== LOW STOCK ALERT MODAL ===== -->
-    <div class="modal-overlay" id="alertModal" style="display:none;position:fixed;top:0;left:0;width:100vw;height:100vh;background:rgba(0,0,0,0.5);z-index:2000;justify-content:center;align-items:center;backdrop-filter:blur(4px);">
-        <div class="modal modal-small alert-modal" style="background:white;border-radius:20px;max-width:420px;width:90%;max-height:90vh;overflow-y:auto;box-shadow:0 20px 60px rgba(0,0,0,0.3);animation:modalSlideIn 0.3s ease;">
-            <div class="modal-header alert-header" style="padding:18px 24px;border-bottom:2px solid #ef4444;display:flex;justify-content:space-between;align-items:center;">
-                <h2 style="color:#ef4444;font-size:1.1rem;">⚠️ Low Stock Alert</h2>
-                <button class="close-btn" id="closeAlertBtn" style="background:transparent;border:none;font-size:1.2rem;cursor:pointer;color:#94a3b8;padding:4px 8px;border-radius:6px;transition:all 0.2s;">✕</button>
+    <div class="modal-overlay" id="alertModal">
+        <div class="modal modal-small alert-modal">
+            <div class="modal-header alert-header">
+                <h2>⚠️ Low Stock Alert</h2>
+                <button class="close-btn" id="closeAlertBtn">✕</button>
             </div>
-            <div class="alert-body" id="alertBody" style="padding:24px;text-align:center;">
+            <div class="alert-body" id="alertBody">
                 <!-- Rendered by JS -->
             </div>
         </div>
@@ -441,10 +248,8 @@
 
 <script>
 // ============================================================
-//  STOCK PASSWORD FUNCTIONS
+//  PASSWORD FUNCTIONS
 // ============================================================
-
-// Get stored stock password (default: stock123)
 function getStockPassword() {
     try {
         const stored = localStorage.getItem('hotel_stock_password');
@@ -458,7 +263,6 @@ function getStockPassword() {
     }
 }
 
-// Check if stock is locked
 function isStockLocked() {
     try {
         const locked = localStorage.getItem('stock_locked');
@@ -472,7 +276,6 @@ function isStockLocked() {
     }
 }
 
-// Verify stock password
 function verifyStockPassword() {
     const input = document.getElementById('stockPasswordInput');
     const error = document.getElementById('passwordError');
@@ -492,27 +295,23 @@ function verifyStockPassword() {
         document.getElementById('mainContentWrapper').style.display = 'block';
         error.style.display = 'none';
         input.value = '';
-        
         loadData();
         renderStock('all');
+        checkAdminAccess();
         showToast('🔓 Stock unlocked!');
     } else {
         error.textContent = '❌ Invalid password! Please try again.';
         error.style.display = 'block';
         input.value = '';
         input.focus();
-        
         const box = document.querySelector('.password-box');
         if (box) {
             box.style.animation = 'shake 0.5s ease';
-            setTimeout(() => {
-                box.style.animation = '';
-            }, 500);
+            setTimeout(() => { box.style.animation = ''; }, 500);
         }
     }
 }
 
-// Toggle password visibility
 function toggleStockPassword() {
     const input = document.getElementById('stockPasswordInput');
     const btn = document.querySelector('.toggle-password-btn');
@@ -525,37 +324,29 @@ function toggleStockPassword() {
     }
 }
 
-// Lock stock
 function lockStock() {
     if (confirm('🔒 Lock Stock Management? You will need to enter password again.')) {
         localStorage.setItem('stock_locked', 'true');
         document.getElementById('mainContentWrapper').style.display = 'none';
         document.getElementById('passwordOverlay').style.display = 'flex';
         document.getElementById('stockPasswordInput').value = '';
-        setTimeout(() => {
-            document.getElementById('stockPasswordInput').focus();
-        }, 100);
+        setTimeout(() => { document.getElementById('stockPasswordInput').focus(); }, 100);
         showToast('🔒 Stock locked!');
     }
 }
 
-// Check stock lock status
 function checkStockLock() {
     const locked = isStockLocked();
     if (locked) {
         document.getElementById('passwordOverlay').style.display = 'flex';
         document.getElementById('mainContentWrapper').style.display = 'none';
-        setTimeout(() => {
-            const input = document.getElementById('stockPasswordInput');
-            if (input) input.focus();
-        }, 200);
+        setTimeout(() => { document.getElementById('stockPasswordInput').focus(); }, 200);
     } else {
         document.getElementById('passwordOverlay').style.display = 'none';
         document.getElementById('mainContentWrapper').style.display = 'block';
     }
 }
 
-// Enter key support for password
 document.addEventListener('DOMContentLoaded', function() {
     const input = document.getElementById('stockPasswordInput');
     if (input) {
@@ -572,9 +363,11 @@ document.addEventListener('DOMContentLoaded', function() {
 // ============================================================
 const STOCK_KEY = 'hotel_stock';
 const ITEMS_KEY = 'hotel_items';
+const HISTORY_KEY = 'hotel_history';
 
 let stockItems = [];
 let allItems = [];
+let history = [];
 let currentFilter = 'all';
 
 // ============================================================
@@ -587,6 +380,9 @@ function loadData() {
         
         const storedItems = localStorage.getItem(ITEMS_KEY);
         allItems = storedItems ? JSON.parse(storedItems) : [];
+        
+        const storedHistory = localStorage.getItem(HISTORY_KEY);
+        history = storedHistory ? JSON.parse(storedHistory) : [];
         
         allItems.forEach(item => {
             const stockItem = stockItems.find(s => s.id === item.id);
@@ -619,26 +415,18 @@ function saveStock() {
 }
 
 // ============================================================
-//  STOCK HELPER FUNCTIONS
+//  HELPER FUNCTIONS
 // ============================================================
 function getStockColor(stock) {
-    if (stock < 5) {
-        return 'stock-danger';
-    } else if (stock < 10) {
-        return 'stock-warning';
-    } else {
-        return 'stock-success';
-    }
+    if (stock < 5) return 'stock-danger';
+    else if (stock < 10) return 'stock-warning';
+    else return 'stock-success';
 }
 
 function getStockStatus(stock) {
-    if (stock < 5) {
-        return '🔴 Very Low';
-    } else if (stock < 10) {
-        return '🟡 Low';
-    } else {
-        return '🟢 Sufficient';
-    }
+    if (stock < 5) return '🔴 Very Low';
+    else if (stock < 10) return '🟡 Low';
+    else return '🟢 Sufficient';
 }
 
 function getCategoryDisplay(category) {
@@ -649,6 +437,28 @@ function getCategoryDisplay(category) {
         'other': '📦 Other'
     };
     return names[category] || category;
+}
+
+function isAdmin() {
+    const username = localStorage.getItem('hotel_username');
+    return username === 'admin';
+}
+
+// ============================================================
+//  APPLY SAVED THEME
+// ============================================================
+function applySavedTheme() {
+    try {
+        const settings = JSON.parse(localStorage.getItem('hotel_settings') || '{}');
+        if (settings.theme) {
+            document.body.classList.add(`theme-${settings.theme}`);
+        }
+        if (settings.fontSize) {
+            document.body.classList.add(`font-${settings.fontSize}`);
+        }
+    } catch (e) {
+        // No settings found
+    }
 }
 
 // ============================================================
@@ -665,6 +475,7 @@ const showAllBtn = document.getElementById('showAllBtn');
 const showLowStockBtn = document.getElementById('showLowStockBtn');
 const refreshBtn = document.getElementById('refreshBtn');
 const exportBtn = document.getElementById('exportStockBtn');
+const cleanupBtn = document.getElementById('cleanupBtn');
 const modal = document.getElementById('itemModal');
 const modalTitle = document.getElementById('modalTitle');
 const itemName = document.getElementById('itemName');
@@ -701,32 +512,20 @@ function toggleDropdown() {
     const menu = document.getElementById('dropdownMenu');
     const overlay = document.getElementById('dropdownOverlay');
     
-    if (btn) {
-        btn.classList.toggle('open');
-        if (btn.classList.contains('open')) {
-            btn.querySelectorAll('span').forEach((span, i) => {
-                if (i === 0) span.style.transform = 'translateY(7px) rotate(45deg)';
-                else if (i === 1) span.style.transform = 'scaleX(0)';
-                else if (i === 2) span.style.transform = 'translateY(-7px) rotate(-45deg)';
-            });
-        } else {
-            btn.querySelectorAll('span').forEach(span => {
-                span.style.transform = '';
-            });
-        }
-    }
-    
-    if (menu) {
+    btn.classList.toggle('open');
+    if (btn.classList.contains('open')) {
         menu.style.display = 'block';
-        menu.style.transform = btn && btn.classList.contains('open') ? 'translateX(0)' : 'translateX(-100%)';
-    }
-    
-    if (overlay) {
+        menu.style.transform = 'translateX(0)';
         overlay.style.display = 'block';
-        overlay.classList.toggle('active');
+        overlay.classList.add('active');
+        document.body.style.overflow = 'hidden';
+    } else {
+        menu.style.transform = 'translateX(-100%)';
+        setTimeout(() => { menu.style.display = 'none'; }, 300);
+        overlay.style.display = 'none';
+        overlay.classList.remove('active');
+        document.body.style.overflow = '';
     }
-    
-    document.body.style.overflow = btn && btn.classList.contains('open') ? 'hidden' : '';
 }
 
 function closeDropdown() {
@@ -734,25 +533,11 @@ function closeDropdown() {
     const menu = document.getElementById('dropdownMenu');
     const overlay = document.getElementById('dropdownOverlay');
     
-    if (btn) {
-        btn.classList.remove('open');
-        btn.querySelectorAll('span').forEach(span => {
-            span.style.transform = '';
-        });
-    }
-    
-    if (menu) {
-        menu.style.transform = 'translateX(-100%)';
-        setTimeout(() => {
-            menu.style.display = 'none';
-        }, 300);
-    }
-    
-    if (overlay) {
-        overlay.style.display = 'none';
-        overlay.classList.remove('active');
-    }
-    
+    btn.classList.remove('open');
+    menu.style.transform = 'translateX(-100%)';
+    setTimeout(() => { menu.style.display = 'none'; }, 300);
+    overlay.style.display = 'none';
+    overlay.classList.remove('active');
     document.body.style.overflow = '';
 }
 
@@ -772,7 +557,7 @@ function renderStock(filter = 'all') {
     if (filteredItems.length === 0) {
         stockTableBody.innerHTML = `
             <tr>
-                <td colspan="8" class="empty-state" style="text-align:center;padding:40px 20px;color:#94a3b8;">
+                <td colspan="8" class="empty-state">
                     <span style="font-size:2rem;">📦</span>
                     <p>No items found</p>
                     ${filter === 'low' ? '<p style="font-size:0.85rem;color:#94a3b8;">All items have sufficient stock!</p>' : ''}
@@ -790,18 +575,18 @@ function renderStock(filter = 'all') {
         const statusText = getStockStatus(item.stock);
         
         html += `
-            <tr class="${colorClass}" style="${colorClass === 'stock-danger' ? 'border-left:4px solid #dc2626;' : colorClass === 'stock-warning' ? 'border-left:4px solid #d97706;' : 'border-left:4px solid #16a34a;'}">
-                <td style="padding:12px 16px;font-size:0.85rem;border-bottom:1px solid #f1f5f9;vertical-align:middle;">${index + 1}</td>
-                <td style="padding:12px 16px;font-size:0.85rem;border-bottom:1px solid #f1f5f9;vertical-align:middle;font-weight:500;">${item.name}</td>
-                <td style="padding:12px 16px;font-size:0.85rem;border-bottom:1px solid #f1f5f9;vertical-align:middle;">${getCategoryDisplay(item.category)}</td>
-                <td style="padding:12px 16px;font-size:0.85rem;border-bottom:1px solid #f1f5f9;vertical-align:middle;">Rs. ${item.price.toFixed(2)}</td>
-                <td class="stock-qty ${colorClass}" style="padding:12px 16px;font-size:0.85rem;border-bottom:1px solid #f1f5f9;vertical-align:middle;font-weight:600;${colorClass === 'stock-danger' ? 'color:#dc2626;' : colorClass === 'stock-warning' ? 'color:#d97706;' : 'color:#16a34a;'}">${item.stock}</td>
-                <td style="padding:12px 16px;font-size:0.85rem;border-bottom:1px solid #f1f5f9;vertical-align:middle;">Rs. ${total.toFixed(2)}</td>
-                <td style="padding:12px 16px;font-size:0.85rem;border-bottom:1px solid #f1f5f9;vertical-align:middle;"><span class="status-badge ${colorClass}" style="padding:4px 12px;border-radius:20px;font-size:0.75rem;font-weight:600;display:inline-block;${colorClass === 'stock-success' ? 'background:#d1fae5;color:#16a34a;' : colorClass === 'stock-warning' ? 'background:#fef3c7;color:#d97706;' : 'background:#fecaca;color:#dc2626;'}">${statusText}</span></td>
-                <td class="actions-cell" style="padding:12px 16px;font-size:0.85rem;border-bottom:1px solid #f1f5f9;vertical-align:middle;display:flex;gap:6px;white-space:nowrap;">
-                    <button class="action-btn edit-btn" onclick="editItem(${item.id})" title="Edit" style="width:32px;height:32px;border:none;border-radius:6px;cursor:pointer;font-size:0.85rem;transition:all 0.2s;display:inline-flex;align-items:center;justify-content:center;background:#e2e8f0;color:#475569;">✎</button>
-                    <button class="action-btn add-stock-btn" onclick="addStock(${item.id})" title="Add Stock" style="width:32px;height:32px;border:none;border-radius:6px;cursor:pointer;font-size:0.85rem;transition:all 0.2s;display:inline-flex;align-items:center;justify-content:center;background:#dbeafe;color:#3b82f6;">➕</button>
-                    <button class="action-btn delete-btn" onclick="confirmDelete(${item.id})" title="Delete" style="width:32px;height:32px;border:none;border-radius:6px;cursor:pointer;font-size:0.85rem;transition:all 0.2s;display:inline-flex;align-items:center;justify-content:center;background:#fee2e2;color:#ef4444;">✕</button>
+            <tr class="${colorClass}">
+                <td>${index + 1}</td>
+                <td class="item-name">${item.name}</td>
+                <td>${getCategoryDisplay(item.category)}</td>
+                <td>Rs. ${item.price.toFixed(2)}</td>
+                <td class="stock-qty ${colorClass}">${item.stock}</td>
+                <td>Rs. ${total.toFixed(2)}</td>
+                <td><span class="status-badge ${colorClass}">${statusText}</span></td>
+                <td class="actions-cell">
+                    <button class="action-btn edit-btn" onclick="editItem(${item.id})" title="Edit">✎</button>
+                    <button class="action-btn add-stock-btn" onclick="addStock(${item.id})" title="Add Stock">➕</button>
+                    <button class="action-btn delete-btn" onclick="confirmDelete(${item.id})" title="Delete">✕</button>
                 </td>
             </tr>
         `;
@@ -839,36 +624,36 @@ function showLowStockAlert() {
     if (lowItems.length === 0) return;
     
     let html = `
-        <div class="alert-icon" style="font-size:3rem;margin-bottom:12px;">🔴</div>
-        <div class="alert-title" style="font-size:1.1rem;font-weight:700;color:#1e293b;margin-bottom:8px;">${lowItems.length} item(s) are critically low in stock!</div>
-        <div class="alert-message" style="font-size:0.9rem;color:#64748b;margin-bottom:16px;">These items have less than 5 units remaining. Please restock immediately.</div>
-        <div class="alert-list" style="display:flex;flex-direction:column;gap:8px;margin:12px 0 20px;text-align:left;">
+        <div class="alert-icon">🔴</div>
+        <div class="alert-title">${lowItems.length} item(s) are critically low in stock!</div>
+        <div class="alert-message">These items have less than 5 units remaining. Please restock immediately.</div>
+        <div class="alert-list">
     `;
     
     lowItems.forEach(item => {
         html += `
-            <div class="alert-item danger" style="display:flex;justify-content:space-between;align-items:center;padding:10px 14px;border-left:4px solid #ef4444;border-radius:10px;background:#fef2f2;">
-                <div class="alert-item-info" style="display:flex;gap:16px;align-items:center;flex-wrap:wrap;">
-                    <span class="alert-item-name" style="font-weight:500;"><strong>${item.name}</strong></span>
-                    <span class="alert-item-stock" style="font-size:0.85rem;">Stock: <strong style="color:#dc2626;">${item.stock}</strong></span>
-                    <span class="alert-item-min" style="font-size:0.8rem;color:#94a3b8;">Min: ${item.minStock}</span>
+            <div class="alert-item danger">
+                <div class="alert-item-info">
+                    <span class="alert-item-name"><strong>${item.name}</strong></span>
+                    <span class="alert-item-stock">Stock: <strong style="color:#dc2626;">${item.stock}</strong></span>
+                    <span class="alert-item-min">Min: ${item.minStock}</span>
                 </div>
-                <button onclick="addStock(${item.id});closeAlert();" class="add-stock-small" style="padding:4px 12px;border:none;border-radius:6px;background:#3b82f6;color:white;cursor:pointer;font-size:0.75rem;transition:all 0.2s;">➕ Add Stock</button>
+                <button onclick="addStock(${item.id});closeAlert();" class="add-stock-small">➕ Add Stock</button>
             </div>
         `;
     });
     
     html += `
         </div>
-        <button onclick="closeAlert()" class="alert-close-btn" style="padding:8px 32px;border:none;border-radius:10px;background:#8b5cf6;color:white;cursor:pointer;font-size:0.9rem;font-weight:600;transition:all 0.3s;">Got it!</button>
+        <button onclick="closeAlert()" class="alert-close-btn">Got it!</button>
     `;
     
     alertBody.innerHTML = html;
-    alertModal.style.display = 'flex';
+    alertModal.classList.add('open');
 }
 
 function closeAlert() {
-    alertModal.style.display = 'none';
+    alertModal.classList.remove('open');
 }
 
 closeAlertBtn.addEventListener('click', closeAlert);
@@ -888,7 +673,7 @@ function openAddModal() {
     itemMinStock.value = 5;
     editItemId.value = '';
     deleteItemBtn.style.display = 'none';
-    modal.style.display = 'flex';
+    modal.classList.add('open');
     setTimeout(() => itemName.focus(), 100);
 }
 
@@ -904,7 +689,7 @@ function editItem(id) {
     itemMinStock.value = item.minStock || 5;
     editItemId.value = id;
     deleteItemBtn.style.display = 'block';
-    modal.style.display = 'flex';
+    modal.classList.add('open');
     setTimeout(() => itemName.focus(), 100);
 }
 
@@ -937,7 +722,7 @@ function confirmDelete(id) {
 }
 
 // ============================================================
-//  SAVE ITEM
+//  SAVE ITEM - SYNC WITH MENU
 // ============================================================
 saveItemBtn.addEventListener('click', function() {
     const name = itemName.value.trim();
@@ -977,28 +762,72 @@ saveItemBtn.addEventListener('click', function() {
             stockItems[idx].category = category;
             stockItems[idx].minStock = minStock;
             saveStock();
+            
+            // Update menu item
+            const menuItem = allItems.find(i => i.id === parseInt(editId));
+            if (menuItem) {
+                menuItem.name = name;
+                menuItem.price = price;
+                menuItem.category = category;
+                localStorage.setItem(ITEMS_KEY, JSON.stringify(allItems));
+            }
+            
             renderStock(currentFilter);
-            modal.style.display = 'none';
+            modal.classList.remove('open');
             showToast(`✅ "${name}" updated!`);
         }
     } else {
-        if (stockItems.some(s => s.name.toLowerCase() === name.toLowerCase())) {
-            showToast('⚠️ Item already exists!');
-            return;
+        // Check if item exists in menu
+        const menuItem = allItems.find(i => i.name.toLowerCase() === name.toLowerCase());
+        
+        if (menuItem) {
+            // Update existing menu item's stock
+            const stockItem = stockItems.find(s => s.id === menuItem.id);
+            if (stockItem) {
+                stockItem.stock += stock;
+                stockItem.price = price;
+                saveStock();
+                showToast(`✅ Stock added to "${name}"`);
+            } else {
+                // Create stock item for existing menu item
+                stockItems.push({
+                    id: menuItem.id,
+                    name: name,
+                    price: price,
+                    category: menuItem.category || 'other',
+                    stock: stock,
+                    minStock: minStock
+                });
+                saveStock();
+                showToast(`✅ Stock created for "${name}"`);
+            }
+        } else {
+            // Create both menu and stock item
+            const newId = stockItems.length > 0 ? Math.max(...stockItems.map(s => s.id)) + 1 : 1;
+            
+            // Add to menu
+            allItems.push({
+                id: newId,
+                name: name,
+                price: price,
+                category: category
+            });
+            localStorage.setItem(ITEMS_KEY, JSON.stringify(allItems));
+            
+            // Add to stock
+            stockItems.push({
+                id: newId,
+                name: name,
+                price: price,
+                category: category,
+                stock: stock,
+                minStock: minStock
+            });
+            saveStock();
+            showToast(`✅ "${name}" added to menu and stock!`);
         }
-        const newId = stockItems.length > 0 ? Math.max(...stockItems.map(s => s.id)) + 1 : 1;
-        stockItems.push({
-            id: newId,
-            name: name,
-            price: price,
-            category: category,
-            stock: stock,
-            minStock: minStock
-        });
-        saveStock();
         renderStock(currentFilter);
-        modal.style.display = 'none';
-        showToast(`✅ "${name}" added with ${stock} stock!`);
+        modal.classList.remove('open');
     }
 });
 
@@ -1011,7 +840,7 @@ deleteItemBtn.addEventListener('click', function() {
     stockItems = stockItems.filter(s => s.id !== id);
     saveStock();
     renderStock(currentFilter);
-    modal.style.display = 'none';
+    modal.classList.remove('open');
     showToast(`✅ "${item.name}" deleted!`);
 });
 
@@ -1019,7 +848,12 @@ deleteItemBtn.addEventListener('click', function() {
 //  FILTER BUTTONS
 // ============================================================
 showAllBtn.addEventListener('click', function() {
-    document.querySelectorAll('.actions-bar button').forEach(b => b.classList.remove('active'));
+    document.querySelectorAll('.actions-bar button').forEach(b => {
+        b.classList.remove('active');
+        b.style.background = 'white';
+        b.style.color = '#475569';
+        b.style.borderColor = '#e2e8f0';
+    });
     this.classList.add('active');
     this.style.background = '#8b5cf6';
     this.style.color = 'white';
@@ -1042,13 +876,6 @@ showLowStockBtn.addEventListener('click', function() {
 });
 
 addItemBtn.addEventListener('click', openAddModal);
-
-// ============================================================
-//  MODAL CONTROLS
-// ============================================================
-cancelModalBtn.addEventListener('click', () => modal.style.display = 'none');
-closeModalBtn.addEventListener('click', () => modal.style.display = 'none');
-modal.addEventListener('click', (e) => { if (e.target === modal) modal.style.display = 'none'; });
 
 // ============================================================
 //  EXPORT STOCK CSV
@@ -1080,6 +907,13 @@ exportBtn.addEventListener('click', function() {
 });
 
 // ============================================================
+//  MODAL CONTROLS
+// ============================================================
+cancelModalBtn.addEventListener('click', () => modal.classList.remove('open'));
+closeModalBtn.addEventListener('click', () => modal.classList.remove('open'));
+modal.addEventListener('click', (e) => { if (e.target === modal) modal.classList.remove('open'); });
+
+// ============================================================
 //  REFRESH
 // ============================================================
 refreshBtn.addEventListener('click', function() {
@@ -1089,7 +923,203 @@ refreshBtn.addEventListener('click', function() {
 });
 
 // ============================================================
-//  TOAST NOTIFICATION
+//  ADMIN CHECK
+// ============================================================
+function checkAdminAccess() {
+    const cleanupSection = document.getElementById('stockCleanupSection');
+    if (isAdmin()) {
+        cleanupSection.style.display = 'block';
+    } else {
+        cleanupSection.style.display = 'none';
+    }
+}
+
+// ============================================================
+//  STOCK CLEANUP FUNCTIONS
+// ============================================================
+let cleanupMode = false;
+
+function toggleCleanupMode() {
+    if (!isAdmin()) {
+        showToast('⚠️ Only admin can access stock cleanup!');
+        return;
+    }
+    
+    cleanupMode = !cleanupMode;
+    const content = document.getElementById('cleanupContent');
+    const btn = document.getElementById('cleanupToggleBtn');
+    
+    if (cleanupMode) {
+        content.style.display = 'block';
+        btn.textContent = '🔒 Close Cleanup';
+        btn.classList.add('close');
+        loadUnsoldStock();
+    } else {
+        content.style.display = 'none';
+        btn.textContent = '🔓 Enable Cleanup';
+        btn.classList.remove('close');
+    }
+}
+
+function loadUnsoldStock() {
+    const today = new Date().toDateString();
+    const todayBills = history.filter(bill => {
+        return new Date(bill.date).toDateString() === today;
+    });
+    
+    const soldItems = {};
+    todayBills.forEach(bill => {
+        bill.items.forEach(item => {
+            const name = item.name;
+            const qty = item.qty || item.quantity || 1;
+            if (!soldItems[name]) soldItems[name] = 0;
+            soldItems[name] += qty;
+        });
+    });
+    
+    const unsoldItems = stockItems.filter(stock => stock.stock > 0);
+    renderUnsoldList(unsoldItems, soldItems);
+}
+
+function renderUnsoldList(unsoldItems, soldItems) {
+    const container = document.getElementById('unsoldStockList');
+    
+    if (unsoldItems.length === 0) {
+        container.innerHTML = `
+            <div style="text-align:center;padding:20px;color:#94a3b8;">
+                🎉 No stock items available!
+            </div>
+        `;
+        return;
+    }
+    
+    let html = `
+        <div class="cleanup-list-header">
+            <span></span>
+            <span>Item Name</span>
+            <span>Sold Today</span>
+            <span>Current Stock</span>
+            <span>Action</span>
+        </div>
+    `;
+    
+    unsoldItems.forEach((item, index) => {
+        const sold = soldItems ? (soldItems[item.name] || 0) : 0;
+        
+        html += `
+            <div class="unsold-item">
+                <input type="checkbox" id="unsold_${index}" class="unsold-checkbox" />
+                <span style="font-weight:500;">${item.name}</span>
+                <span style="color:#3b82f6;">${sold}</span>
+                <span style="color:#16a34a;font-weight:600;">${item.stock}</span>
+                <button onclick="removeSingleItem(${item.id})" 
+                        style="background:transparent;border:none;color:#ef4444;cursor:pointer;font-size:0.8rem;"
+                        title="Remove this item from stock">
+                    ✕
+                </button>
+            </div>
+        `;
+    });
+    
+    container.innerHTML = html;
+}
+
+function removeSingleItem(itemId) {
+    if (!confirm('Remove this item from stock?')) return;
+    
+    const item = stockItems.find(s => s.id === itemId);
+    if (!item) return;
+    
+    addToRemovedStock(item.name, item.stock);
+    item.stock = 0;
+    saveStock();
+    
+    showToast(`✅ "${item.name}" removed from stock`);
+    loadUnsoldStock();
+    renderStock(currentFilter);
+}
+
+function removeAllUnsold() {
+    const unsoldItems = stockItems.filter(stock => stock.stock > 0);
+    if (unsoldItems.length === 0) {
+        showToast('No items to remove!');
+        return;
+    }
+    
+    if (!confirm(`⚠️ Remove ALL ${unsoldItems.length} items from stock?`)) return;
+    if (!confirm('🔴 This action cannot be undone! Continue?')) return;
+    
+    unsoldItems.forEach(item => {
+        addToRemovedStock(item.name, item.stock);
+        const stockItem = stockItems.find(s => s.id === item.id);
+        if (stockItem) stockItem.stock = 0;
+    });
+    
+    saveStock();
+    showToast(`✅ ${unsoldItems.length} items removed from stock`);
+    loadUnsoldStock();
+    renderStock(currentFilter);
+}
+
+function removeSelectedUnsold() {
+    const checkboxes = document.querySelectorAll('.unsold-checkbox:checked');
+    if (checkboxes.length === 0) {
+        showToast('Please select items to remove!');
+        return;
+    }
+    
+    if (!confirm(`Remove ${checkboxes.length} selected items from stock?`)) return;
+    
+    checkboxes.forEach((cb) => {
+        const index = parseInt(cb.id.split('_')[1]);
+        const item = stockItems[index];
+        if (item) {
+            addToRemovedStock(item.name, item.stock);
+            item.stock = 0;
+        }
+    });
+    
+    saveStock();
+    showToast(`✅ ${checkboxes.length} items removed from stock`);
+    loadUnsoldStock();
+    renderStock(currentFilter);
+}
+
+function keepAllStock() {
+    showToast('✅ All stock kept! No changes made.');
+    toggleCleanupMode();
+}
+
+function addToRemovedStock(itemName, quantity) {
+    const today = new Date().toDateString();
+    let removedStock = JSON.parse(localStorage.getItem('removed_stock') || '{}');
+    
+    if (!removedStock[today]) {
+        removedStock[today] = [];
+    }
+    
+    removedStock[today].push({
+        name: itemName,
+        quantity: quantity,
+        removedAt: new Date().toLocaleString()
+    });
+    
+    localStorage.setItem('removed_stock', JSON.stringify(removedStock));
+}
+
+// ============================================================
+//  CLEANUP BUTTON EVENT
+// ============================================================
+cleanupBtn.addEventListener('click', function() {
+    if (!isAdmin()) {
+        showToast('⚠️ Only admin can access stock cleanup!');
+        return;
+    }
+    toggleCleanupMode();
+});
+
+// ============================================================
+//  TOAST
 // ============================================================
 function showToast(message) {
     const toast = document.getElementById('toast');
@@ -1107,17 +1137,11 @@ function showToast(message) {
 function toggleFullScreen() {
     if (!document.fullscreenElement && !document.webkitFullscreenElement) {
         const el = document.documentElement;
-        if (el.requestFullscreen) {
-            el.requestFullscreen();
-        } else if (el.webkitRequestFullscreen) {
-            el.webkitRequestFullscreen();
-        }
+        if (el.requestFullscreen) el.requestFullscreen();
+        else if (el.webkitRequestFullscreen) el.webkitRequestFullscreen();
     } else {
-        if (document.exitFullscreen) {
-            document.exitFullscreen();
-        } else if (document.webkitExitFullscreen) {
-            document.webkitExitFullscreen();
-        }
+        if (document.exitFullscreen) document.exitFullscreen();
+        else if (document.webkitExitFullscreen) document.webkitExitFullscreen();
     }
 }
 
@@ -1147,8 +1171,8 @@ function checkLoginStatus() {
 // ============================================================
 document.addEventListener('keydown', (e) => {
     if (e.key === 'Escape') {
-        modal.style.display = 'none';
-        alertModal.style.display = 'none';
+        modal.classList.remove('open');
+        alertModal.classList.remove('open');
         closeDropdown();
     }
     if ((e.ctrlKey || e.metaKey) && e.key === 'r') {
@@ -1175,17 +1199,23 @@ window.showToast = showToast;
 window.lockStock = lockStock;
 window.verifyStockPassword = verifyStockPassword;
 window.toggleStockPassword = toggleStockPassword;
+window.toggleCleanupMode = toggleCleanupMode;
+window.removeAllUnsold = removeAllUnsold;
+window.removeSelectedUnsold = removeSelectedUnsold;
+window.keepAllStock = keepAllStock;
 
 // ============================================================
 //  INIT
 // ============================================================
 document.addEventListener('DOMContentLoaded', function() {
     checkLoginStatus();
+    applySavedTheme();
     checkStockLock();
     
     if (!isStockLocked()) {
         loadData();
         renderStock('all');
+        checkAdminAccess();
     }
 });
 </script>

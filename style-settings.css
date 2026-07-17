@@ -444,15 +444,27 @@ body {
     padding: 8px 20px;
     border: none;
     border-radius: 8px;
-    background: #22c55e;
     color: white;
     cursor: pointer;
     font-weight: 600;
     transition: all 0.3s;
 }
 
-.update-password-btn:hover {
-    background: #16a34a;
+.update-password-btn.login-btn {
+    background: #8b5cf6;
+}
+
+.update-password-btn.login-btn:hover {
+    background: #7c3aed;
+    transform: scale(1.02);
+}
+
+.update-password-btn.stock-btn {
+    background: #f59e0b;
+}
+
+.update-password-btn.stock-btn:hover {
+    background: #d97706;
     transform: scale(1.02);
 }
 
@@ -519,6 +531,39 @@ body {
 
 .password-match.no-match {
     color: #ef4444;
+}
+
+/* ============================================================
+   PASSWORD INFO BOX
+   ============================================================ */
+.password-info-box {
+    display: flex;
+    align-items: flex-start;
+    gap: 12px;
+    background: #f8fafc;
+    padding: 14px 18px;
+    border-radius: 12px;
+    border-left: 4px solid #8b5cf6;
+    margin-top: 12px;
+}
+
+.password-info-box span:first-child {
+    font-size: 1.4rem;
+}
+
+.password-info-box code {
+    background: #e2e8f0;
+    padding: 2px 10px;
+    border-radius: 4px;
+    font-family: 'Courier New', monospace;
+    font-size: 0.85rem;
+    color: #475569;
+}
+
+.password-info-box div {
+    font-size: 0.85rem;
+    color: #475569;
+    line-height: 1.6;
 }
 
 /* ============================================================
@@ -671,6 +716,19 @@ body.theme-dark .footer {
     color: #64748b;
 }
 
+body.theme-dark .password-info-box {
+    background: #0f172a;
+}
+
+body.theme-dark .password-info-box div {
+    color: #94a3b8;
+}
+
+body.theme-dark .password-info-box code {
+    background: #334155;
+    color: #f1f5f9;
+}
+
 /* Blue Theme */
 body.theme-blue .main-header {
     background: linear-gradient(135deg, #1e3a5f, #1a365d);
@@ -711,27 +769,6 @@ body.theme-green .import-btn:hover {
 
 body.theme-green .switch input:checked + .slider {
     background: #22c55e;
-}
-
-/* Purple Theme */
-body.theme-purple .main-header {
-    background: linear-gradient(135deg, #4c1d95, #5b21b6);
-}
-
-body.theme-purple .back-btn,
-body.theme-purple .save-setting-btn,
-body.theme-purple .import-btn {
-    background: #8b5cf6;
-}
-
-body.theme-purple .back-btn:hover,
-body.theme-purple .save-setting-btn:hover,
-body.theme-purple .import-btn:hover {
-    background: #7c3aed;
-}
-
-body.theme-purple .switch input:checked + .slider {
-    background: #8b5cf6;
 }
 
 /* ============================================================
@@ -863,229 +900,4 @@ body.font-xlarge {
 
 ::-webkit-scrollbar-thumb:hover {
     background: #94a3b8;
-}
-
-/* ============================================================
-   PASSWORD SETTINGS - UPDATED
-   ============================================================ */
-
-/* Divider between password sections */
-.divider {
-    height: 2px;
-    background: linear-gradient(to right, transparent, #e2e8f0, transparent);
-    margin: 8px 0;
-}
-
-/* Password section labels */
-.password-setting .setting-label {
-    font-weight: 700;
-    font-size: 1rem;
-}
-
-/* Info box for default passwords */
-.password-info-box {
-    display: flex;
-    align-items: flex-start;
-    gap: 12px;
-    background: #f8fafc;
-    padding: 14px 18px;
-    border-radius: 12px;
-    border-left: 4px solid #8b5cf6;
-    margin-top: 12px;
-}
-
-.password-info-box span:first-child {
-    font-size: 1.4rem;
-}
-
-.password-info-box code {
-    background: #e2e8f0;
-    padding: 2px 10px;
-    border-radius: 4px;
-    font-family: 'Courier New', monospace;
-    font-size: 0.85rem;
-    color: #475569;
-}
-
-.password-info-box div {
-    font-size: 0.85rem;
-    color: #475569;
-    line-height: 1.6;
-}
-
-/* Password input group improvements */
-.password-input-group {
-    width: 100%;
-}
-
-.password-row {
-    display: flex;
-    gap: 10px;
-    margin-bottom: 8px;
-    flex-wrap: wrap;
-}
-
-.password-toggle {
-    position: relative;
-    display: flex;
-    align-items: center;
-    flex: 1;
-    min-width: 120px;
-}
-
-.password-toggle input {
-    width: 100%;
-    padding: 8px 40px 8px 12px;
-    border: 2px solid #e2e8f0;
-    border-radius: 8px;
-    font-size: 0.85rem;
-    background: #f8fafc;
-    transition: border-color 0.3s;
-}
-
-.password-toggle input:focus {
-    outline: none;
-    border-color: #8b5cf6;
-}
-
-.toggle-btn {
-    position: absolute;
-    right: 8px;
-    background: transparent;
-    border: none;
-    cursor: pointer;
-    font-size: 1rem;
-    padding: 4px;
-    border-radius: 4px;
-    transition: background 0.2s;
-}
-
-.toggle-btn:hover {
-    background: #f1f5f9;
-}
-
-.update-password-btn {
-    padding: 8px 20px;
-    border: none;
-    border-radius: 8px;
-    color: white;
-    cursor: pointer;
-    font-weight: 600;
-    transition: all 0.3s;
-    min-width: 120px;
-}
-
-.update-password-btn.login-btn {
-    background: #8b5cf6;
-}
-
-.update-password-btn.login-btn:hover {
-    background: #7c3aed;
-    transform: scale(1.02);
-}
-
-.update-password-btn.stock-btn {
-    background: #f59e0b;
-}
-
-.update-password-btn.stock-btn:hover {
-    background: #d97706;
-    transform: scale(1.02);
-}
-
-/* Password strength */
-.password-strength {
-    margin: 8px 0;
-}
-
-.strength-bar {
-    height: 4px;
-    background: #e2e8f0;
-    border-radius: 4px;
-    overflow: hidden;
-    margin-bottom: 4px;
-}
-
-.strength-fill {
-    height: 100%;
-    width: 0%;
-    transition: width 0.3s, background 0.3s;
-    border-radius: 4px;
-}
-
-.strength-text {
-    font-size: 0.75rem;
-    color: #94a3b8;
-}
-
-.strength-weak .strength-text { color: #ef4444; }
-.strength-medium .strength-text { color: #f59e0b; }
-.strength-strong .strength-text { color: #3b82f6; }
-.strength-very-strong .strength-text { color: #16a34a; }
-
-/* Password requirements */
-.password-requirements {
-    display: flex;
-    flex-wrap: wrap;
-    gap: 8px 16px;
-    margin: 6px 0;
-}
-
-.req-item {
-    font-size: 0.75rem;
-    transition: all 0.3s;
-}
-
-.req-item.valid {
-    color: #16a34a;
-}
-
-.req-item.invalid {
-    color: #94a3b8;
-}
-
-/* Password match */
-.password-match {
-    font-size: 0.8rem;
-    margin-top: 4px;
-}
-
-.password-match.match {
-    color: #16a34a;
-}
-
-.password-match.no-match {
-    color: #ef4444;
-}
-
-/* ============================================================
-   RESPONSIVE - PASSWORD SETTINGS
-   ============================================================ */
-@media (max-width: 768px) {
-    .password-row {
-        flex-direction: column;
-    }
-    
-    .password-toggle {
-        width: 100%;
-        min-width: auto;
-    }
-    
-    .update-password-btn {
-        width: 100%;
-        min-width: auto;
-    }
-    
-    .password-info-box {
-        flex-direction: column;
-        align-items: center;
-        text-align: center;
-    }
-}
-
-@media (max-width: 480px) {
-    .password-info-box code {
-        display: block;
-        margin: 4px 0;
-    }
 }

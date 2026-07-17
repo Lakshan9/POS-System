@@ -208,6 +208,23 @@ function saveItems() { localStorage.setItem(STORAGE_KEY, JSON.stringify(items));
 function saveCategories() { localStorage.setItem(CATEGORY_KEY, JSON.stringify(categories)); }
 
 // ============================================================
+//  APPLY SAVED THEME
+// ============================================================
+function applySavedTheme() {
+    try {
+        const settings = JSON.parse(localStorage.getItem('hotel_settings') || '{}');
+        if (settings.theme) {
+            document.body.classList.add(`theme-${settings.theme}`);
+        }
+        if (settings.fontSize) {
+            document.body.classList.add(`font-${settings.fontSize}`);
+        }
+    } catch (e) {
+        // No settings found
+    }
+}
+
+// ============================================================
 //  DOM REFS
 // ============================================================
 const mainContent = document.getElementById('mainContent');
@@ -543,7 +560,7 @@ function openAddItemModal(category = null) {
     editItemId.value = '';
     deleteItemBtn.style.display = 'none';
     
-    // Populate category dropdown
+    // Populate category dropdown with ALL categories
     newItemCategory.innerHTML = categories.map(cat => 
         `<option value="${cat}" ${cat === category ? 'selected' : ''}>${getCategoryDisplayName(cat)}</option>`
     ).join('');
@@ -562,6 +579,7 @@ function editItem(id) {
     editItemId.value = id;
     deleteItemBtn.style.display = 'block';
     
+    // Populate with ALL categories
     newItemCategory.innerHTML = categories.map(cat => 
         `<option value="${cat}" ${cat === item.category ? 'selected' : ''}>${getCategoryDisplayName(cat)}</option>`
     ).join('');
@@ -835,6 +853,7 @@ document.addEventListener('keydown', (e) => {
 // ============================================================
 document.addEventListener('DOMContentLoaded', function() {
     checkLoginStatus();
+    applySavedTheme();
     loadData();
     renderCategories();
 });

@@ -13,6 +13,218 @@ body {
     color: #1e293b;
     min-height: 100vh;
     overflow-x: hidden;
+    transition: background 0.3s, color 0.3s;
+}
+
+/* ============================================================
+   THEMES
+   ============================================================ */
+body.theme-dark {
+    background: #0f172a;
+    color: #f1f5f9;
+}
+
+body.theme-dark .quick-filters {
+    background: #1e293b;
+    border-bottom-color: #334155;
+}
+
+body.theme-dark .filter-btn {
+    background: #1e293b;
+    border-color: #334155;
+    color: #94a3b8;
+}
+
+body.theme-dark .filter-btn.active {
+    background: #8b5cf6;
+    color: white;
+    border-color: #8b5cf6;
+}
+
+body.theme-dark .filter-bar {
+    background: #1e293b;
+    border-bottom-color: #334155;
+}
+
+body.theme-dark .filter-bar label {
+    color: #94a3b8;
+}
+
+body.theme-dark .filter-bar input {
+    background: #0f172a;
+    border-color: #334155;
+    color: #f1f5f9;
+}
+
+body.theme-dark .report-card {
+    background: #1e293b;
+}
+
+body.theme-dark .report-card .num {
+    color: #f1f5f9;
+}
+
+body.theme-dark .report-card-modern {
+    background: #1e293b;
+}
+
+body.theme-dark .report-card-modern .card-title {
+    color: #94a3b8;
+    border-bottom-color: #334155;
+}
+
+body.theme-dark .top-item-row {
+    background: #0f172a;
+}
+
+body.theme-dark .top-item-row .name {
+    color: #f1f5f9;
+}
+
+body.theme-dark .top-item-row:hover {
+    background: #0f172a;
+}
+
+body.theme-dark .payment-bar-row .label {
+    color: #94a3b8;
+}
+
+body.theme-dark .payment-bar-row .bar-track {
+    background: #0f172a;
+}
+
+body.theme-dark .payment-bar-row .bar-value {
+    color: #f1f5f9;
+}
+
+body.theme-dark .stock-movement-item {
+    background: #0f172a;
+}
+
+body.theme-dark .stock-movement-item .label {
+    color: #94a3b8;
+}
+
+body.theme-dark .peak-hour-item {
+    background: #0f172a;
+}
+
+body.theme-dark .peak-hour-item .hour {
+    color: #94a3b8;
+}
+
+body.theme-dark .peak-hour-item .count {
+    color: #8b5cf6;
+}
+
+body.theme-dark .bill-item {
+    background: #0f172a;
+}
+
+body.theme-dark .bill-item.edited-bill {
+    background: #2d1a0e;
+}
+
+body.theme-dark .bill-number {
+    color: #94a3b8;
+}
+
+body.theme-dark .bill-table {
+    background: #1e293b;
+    color: #94a3b8;
+}
+
+body.theme-dark .bill-total {
+    color: #16a34a;
+}
+
+body.theme-dark .bill-item-name {
+    background: #1e293b;
+    color: #f1f5f9;
+}
+
+body.theme-dark .bill-payment-methods {
+    color: #94a3b8;
+}
+
+body.theme-dark .bill-payment {
+    color: #94a3b8;
+}
+
+body.theme-dark .modal {
+    background: #1e293b;
+}
+
+body.theme-dark .modal-header {
+    border-bottom-color: #334155;
+}
+
+body.theme-dark .modal-header h2 {
+    color: #f1f5f9;
+}
+
+body.theme-dark .items-sold-stat {
+    background: #0f172a;
+}
+
+body.theme-dark .items-sold-stat .stat-number {
+    color: #f1f5f9;
+}
+
+body.theme-dark .items-sold-table thead {
+    background: #0f172a;
+}
+
+body.theme-dark .items-sold-table th {
+    color: #94a3b8;
+}
+
+body.theme-dark .items-sold-table td {
+    color: #f1f5f9;
+    border-bottom-color: #334155;
+}
+
+body.theme-dark .category-badge {
+    background: #1e293b;
+    color: #94a3b8;
+}
+
+body.theme-dark .progress-bar-mini {
+    background: #0f172a;
+}
+
+body.theme-dark .items-sold-footer {
+    border-top-color: #334155;
+    color: #94a3b8;
+}
+
+body.theme-dark .dropdown-menu {
+    background: #1e293b;
+}
+
+body.theme-dark .dropdown-item {
+    color: #f1f5f9;
+}
+
+body.theme-dark .dropdown-item:hover {
+    background: #334155;
+}
+
+/* Font Sizes */
+body.font-small {
+    font-size: 14px;
+}
+
+body.font-medium {
+    font-size: 16px;
+}
+
+body.font-large {
+    font-size: 18px;
+}
+
+body.font-xlarge {
+    font-size: 20px;
 }
 
 /* ============================================================
@@ -319,7 +531,7 @@ body {
 }
 
 /* ============================================================
-   REPORT SUMMARY
+   REPORT SUMMARY CARDS
    ============================================================ */
 .report-summary {
     display: grid;
@@ -389,69 +601,256 @@ body {
 .report-card.average .num { color: #7c3aed; }
 .report-card.average .card-icon { background: #ede9fe; }
 
+.report-card.items.clickable {
+    cursor: pointer;
+    transition: all 0.3s;
+}
+
+.report-card.items.clickable:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 8px 28px rgba(139, 92, 246, 0.2);
+    border-color: #8b5cf6;
+}
+
+.click-hint {
+    font-size: 0.55rem;
+    color: #8b5cf6;
+    font-weight: 600;
+    display: block;
+    margin-top: 2px;
+}
+
 /* ============================================================
-   REPORT CONTENT
+   REPORT GRID
    ============================================================ */
-.report-content {
+.report-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 20px;
     max-width: 1200px;
     margin: 0 auto;
     padding: 0 20px 20px;
 }
 
+.report-grid .full-width {
+    grid-column: 1 / -1;
+}
+
 /* ============================================================
-   REPORT SECTION
+   REPORT CARD MODERN
    ============================================================ */
-.report-section {
+.report-card-modern {
     background: white;
     border-radius: 16px;
     padding: 20px;
-    margin-bottom: 20px;
     box-shadow: 0 2px 8px rgba(0,0,0,0.06);
+    transition: all 0.3s;
 }
 
-.section-header {
+.report-card-modern:hover {
+    box-shadow: 0 8px 24px rgba(0,0,0,0.1);
+}
+
+.report-card-modern .card-title {
+    font-size: 0.85rem;
+    font-weight: 600;
+    color: #64748b;
+    margin-bottom: 12px;
     display: flex;
-    justify-content: space-between;
     align-items: center;
-    margin-bottom: 16px;
-    padding-bottom: 12px;
+    gap: 8px;
+    padding-bottom: 8px;
     border-bottom: 2px solid #f1f5f9;
-    flex-wrap: wrap;
+}
+
+.report-card-modern .card-title .icon {
+    font-size: 1.2rem;
+}
+
+/* ============================================================
+   TOP SELLING ITEMS
+   ============================================================ */
+.top-items-list {
+    display: flex;
+    flex-direction: column;
     gap: 8px;
 }
 
-.section-header h2 {
-    font-size: 1.1rem;
-    font-weight: 600;
+.top-item-row {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 8px 12px;
+    background: #f8fafc;
+    border-radius: 8px;
+    transition: all 0.2s;
 }
 
-.section-badge {
+.top-item-row:hover {
     background: #f1f5f9;
-    padding: 4px 14px;
-    border-radius: 20px;
-    font-size: 0.75rem;
-    color: #64748b;
+}
+
+.top-item-row .rank {
+    font-weight: 700;
+    color: #8b5cf6;
+    min-width: 30px;
+}
+
+.top-item-row .name {
+    flex: 1;
     font-weight: 500;
+    margin: 0 8px;
+}
+
+.top-item-row .qty {
+    font-weight: 600;
+    color: #3b82f6;
+}
+
+.top-item-row .revenue {
+    font-weight: 600;
+    color: #16a34a;
+    min-width: 80px;
+    text-align: right;
+}
+
+/* ============================================================
+   PAYMENT BREAKDOWN
+   ============================================================ */
+.payment-breakdown {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+}
+
+.payment-bar-row {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+}
+
+.payment-bar-row .label {
+    min-width: 70px;
+    font-size: 0.8rem;
+    font-weight: 500;
+    color: #475569;
+}
+
+.payment-bar-row .bar-track {
+    flex: 1;
+    height: 20px;
+    background: #f1f5f9;
+    border-radius: 10px;
+    overflow: hidden;
+    position: relative;
+}
+
+.payment-bar-row .bar-fill {
+    height: 100%;
+    border-radius: 10px;
+    transition: width 0.8s ease;
+}
+
+.payment-bar-row .bar-value {
+    min-width: 80px;
+    text-align: right;
+    font-size: 0.85rem;
+    font-weight: 600;
+    color: #0f172a;
+}
+
+/* ============================================================
+   STOCK MOVEMENT
+   ============================================================ */
+.stock-movement {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 12px;
+}
+
+.stock-movement-item {
+    text-align: center;
+    padding: 12px;
+    background: #f8fafc;
+    border-radius: 10px;
+}
+
+.stock-movement-item .number {
+    font-size: 1.8rem;
+    font-weight: 700;
+}
+
+.stock-movement-item .number.added {
+    color: #3b82f6;
+}
+
+.stock-movement-item .number.sold {
+    color: #ef4444;
+}
+
+.stock-movement-item .number.remaining {
+    color: #16a34a;
+}
+
+.stock-movement-item .label {
+    font-size: 0.7rem;
+    color: #94a3b8;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+}
+
+/* ============================================================
+   PEAK HOURS
+   ============================================================ */
+.peak-hours {
+    display: flex;
+    gap: 8px;
+    flex-wrap: wrap;
+}
+
+.peak-hour-item {
+    flex: 1;
+    min-width: 40px;
+    text-align: center;
+    padding: 8px 4px;
+    background: #f8fafc;
+    border-radius: 8px;
+    font-size: 0.7rem;
+}
+
+.peak-hour-item .hour {
+    font-weight: 600;
+    color: #475569;
+}
+
+.peak-hour-item .count {
+    font-weight: 700;
+    color: #8b5cf6;
+}
+
+.peak-hour-item.high {
+    background: #ede9fe;
+}
+
+.peak-hour-item.high .count {
+    color: #7c3aed;
 }
 
 /* ============================================================
    BILL LIST
    ============================================================ */
-.bill-list-header {
+.bill-list {
     display: flex;
-    justify-content: space-between;
-    padding: 8px 0 12px;
-    font-size: 0.85rem;
-    color: #64748b;
-    border-bottom: 2px solid #e2e8f0;
-    margin-bottom: 12px;
+    flex-direction: column;
+    gap: 8px;
+    max-height: 400px;
+    overflow-y: auto;
 }
 
 .bill-item {
     background: #f8fafc;
     border-radius: 12px;
-    padding: 14px 18px;
-    margin-bottom: 10px;
+    padding: 12px 16px;
     border-left: 4px solid #8b5cf6;
     transition: all 0.2s;
 }
@@ -462,6 +861,11 @@ body {
 
 .bill-item.even {
     border-left-color: #3b82f6;
+}
+
+.bill-item.edited-bill {
+    border-left-color: #f59e0b;
+    background: #fffbeb;
 }
 
 .bill-header {
@@ -531,6 +935,16 @@ body {
     font-size: 0.7rem;
 }
 
+.bill-payment-methods {
+    margin-top: 6px;
+    font-size: 0.8rem;
+    color: #475569;
+    display: flex;
+    flex-wrap: wrap;
+    gap: 4px;
+    align-items: center;
+}
+
 .bill-payment {
     margin-top: 6px;
     display: flex;
@@ -539,275 +953,13 @@ body {
     color: #64748b;
 }
 
-/* ============================================================
-   ITEM-WISE SALES
-   ============================================================ */
-.item-summary-cards {
-    display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
-    gap: 12px;
-    margin-bottom: 20px;
-}
-
-.item-summary-card {
-    background: #f8fafc;
-    border-radius: 12px;
-    padding: 16px;
-    border-left: 4px solid #8b5cf6;
-    display: flex;
-    align-items: center;
-    gap: 12px;
-    transition: all 0.3s;
-}
-
-.item-summary-card:hover {
-    transform: translateY(-2px);
-    box-shadow: 0 4px 12px rgba(0,0,0,0.08);
-}
-
-.item-rank {
-    font-size: 1.8rem;
-}
-
-.item-summary-info {
-    flex: 1;
-    display: flex;
-    flex-direction: column;
-    gap: 2px;
-}
-
-.item-summary-name {
-    font-weight: 600;
-    font-size: 0.95rem;
-}
-
-.item-summary-qty {
-    font-size: 0.8rem;
-    color: #64748b;
-}
-
-.item-summary-revenue {
-    font-weight: 700;
-    color: #16a34a;
-    font-size: 0.9rem;
-}
-
-.item-summary-bar {
-    width: 100%;
-    height: 6px;
-    background: #e2e8f0;
-    border-radius: 6px;
-    position: relative;
-    margin-top: 4px;
-}
-
-.item-summary-fill {
-    height: 100%;
-    border-radius: 6px;
-    transition: width 0.5s ease;
-}
-
-.item-summary-percent {
-    position: absolute;
-    right: 0;
-    top: -16px;
-    font-size: 0.7rem;
-    font-weight: 600;
-    color: #475569;
-}
-
-/* ============================================================
-   ITEM SALES TABLE
-   ============================================================ */
-.item-sales-table-container {
-    overflow-x: auto;
-}
-
-.item-sales-table {
-    width: 100%;
-    border-collapse: collapse;
-    font-size: 0.85rem;
-}
-
-.item-sales-table thead {
-    background: #f8fafc;
-    border-bottom: 2px solid #e2e8f0;
-}
-
-.item-sales-table th {
-    padding: 10px 14px;
-    text-align: left;
-    font-weight: 600;
-    color: #64748b;
-    font-size: 0.75rem;
-    text-transform: uppercase;
-    letter-spacing: 0.5px;
-}
-
-.item-sales-table td {
-    padding: 10px 14px;
-    border-bottom: 1px solid #f1f5f9;
-}
-
-.item-sales-table .item-name {
-    font-weight: 500;
-}
-
-.item-sales-table .qty-cell {
-    font-weight: 600;
-    color: #8b5cf6;
-}
-
-.item-sales-table .revenue-cell {
-    font-weight: 600;
-    color: #16a34a;
-}
-
-.item-sales-table .total-row {
-    background: #f8fafc;
-    font-weight: 700;
-}
-
-.item-sales-table .total-row td {
-    border-top: 2px solid #e2e8f0;
-}
-
-.category-badge {
-    background: #f1f5f9;
+.edit-badge-report {
+    background: #fef3c7;
+    color: #d97706;
     padding: 2px 10px;
     border-radius: 12px;
-    font-size: 0.7rem;
-    color: #64748b;
-}
-
-.progress-bar {
-    position: relative;
-    height: 20px;
-    background: #f1f5f9;
-    border-radius: 10px;
-    overflow: hidden;
-    min-width: 80px;
-}
-
-.progress-fill {
-    height: 100%;
-    border-radius: 10px;
-    transition: width 0.5s ease;
-}
-
-.progress-label {
-    position: absolute;
-    right: 6px;
-    top: 50%;
-    transform: translateY(-50%);
     font-size: 0.65rem;
     font-weight: 600;
-    color: #475569;
-}
-
-/* ============================================================
-   TOP ITEMS GRID
-   ============================================================ */
-.top-items-grid {
-    display: grid;
-    grid-template-columns: repeat(auto-fill, minmax(140px, 1fr));
-    gap: 12px;
-}
-
-.top-item-card {
-    background: #f8fafc;
-    border-radius: 12px;
-    padding: 14px;
-    text-align: center;
-    transition: all 0.3s;
-}
-
-.top-item-card:hover {
-    transform: translateY(-3px);
-    box-shadow: 0 4px 12px rgba(0,0,0,0.08);
-}
-
-.top-item-rank {
-    font-size: 1.8rem;
-    margin-bottom: 4px;
-}
-
-.top-item-info {
-    display: flex;
-    flex-direction: column;
-    gap: 2px;
-}
-
-.top-item-name {
-    font-weight: 600;
-    font-size: 0.85rem;
-}
-
-.top-item-qty {
-    font-size: 0.75rem;
-    color: #94a3b8;
-}
-
-.top-item-revenue {
-    font-weight: 700;
-    color: #16a34a;
-    font-size: 0.85rem;
-}
-
-/* ============================================================
-   SALES CHART
-   ============================================================ */
-.sales-chart {
-    display: flex;
-    align-items: flex-end;
-    gap: 12px;
-    height: 200px;
-    padding: 12px 0;
-    justify-content: center;
-}
-
-.chart-bar-container {
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    flex: 1;
-    min-width: 30px;
-    max-width: 60px;
-}
-
-.chart-bar {
-    width: 100%;
-    min-height: 4px;
-    border-radius: 4px 4px 0 0;
-    position: relative;
-    transition: height 0.5s ease;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-}
-
-.chart-bar-value {
-    font-size: 0.65rem;
-    font-weight: 700;
-    color: white;
-    text-shadow: 0 1px 2px rgba(0,0,0,0.3);
-    opacity: 0;
-    transition: opacity 0.3s;
-}
-
-.chart-bar:hover .chart-bar-value {
-    opacity: 1;
-}
-
-.chart-bar-label {
-    font-size: 0.65rem;
-    color: #64748b;
-    margin-top: 6px;
-    text-align: center;
-    max-width: 60px;
-    overflow: hidden;
-    text-overflow: ellipsis;
-    white-space: nowrap;
 }
 
 /* ============================================================
@@ -829,15 +981,198 @@ body {
 }
 
 /* ============================================================
-   FOOTER
+   ITEMS SOLD MODAL
    ============================================================ */
-.footer {
-    text-align: center;
-    padding: 20px;
+.modal-overlay {
+    display: none;
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100vw;
+    height: 100vh;
+    background: rgba(0,0,0,0.5);
+    z-index: 2000;
+    justify-content: center;
+    align-items: center;
+    backdrop-filter: blur(4px);
+}
+
+.modal-overlay.open {
+    display: flex;
+}
+
+.modal {
+    background: white;
+    border-radius: 20px;
+    max-width: 500px;
+    width: 90%;
+    max-height: 90vh;
+    overflow-y: auto;
+    box-shadow: 0 20px 60px rgba(0,0,0,0.3);
+    animation: modalSlideIn 0.3s ease;
+}
+
+.modal-wide {
+    max-width: 700px;
+}
+
+@keyframes modalSlideIn {
+    from {
+        opacity: 0;
+        transform: scale(0.9) translateY(20px);
+    }
+    to {
+        opacity: 1;
+        transform: scale(1) translateY(0);
+    }
+}
+
+.modal-header {
+    padding: 18px 24px;
+    border-bottom: 1px solid #e2e8f0;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.modal-header h2 {
+    font-size: 1.1rem;
+}
+
+.close-btn {
+    background: transparent;
+    border: none;
+    font-size: 1.2rem;
+    cursor: pointer;
     color: #94a3b8;
-    font-size: 0.75rem;
-    border-top: 1px solid #e2e8f0;
-    margin-top: 20px;
+    padding: 4px 8px;
+    border-radius: 6px;
+    transition: all 0.2s;
+}
+
+.close-btn:hover {
+    background: #f1f5f9;
+    color: #1e293b;
+}
+
+.modal-body {
+    padding: 24px;
+}
+
+.items-sold-summary {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+    gap: 12px;
+    margin-bottom: 16px;
+}
+
+.items-sold-stat {
+    background: #f8fafc;
+    border-radius: 10px;
+    padding: 12px;
+    text-align: center;
+}
+
+.items-sold-stat .stat-number {
+    font-size: 1.4rem;
+    font-weight: 700;
+    color: #0f172a;
+}
+
+.items-sold-stat .stat-label {
+    font-size: 0.7rem;
+    color: #94a3b8;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+}
+
+.items-sold-table-container {
+    overflow-x: auto;
+}
+
+.items-sold-table {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 0.85rem;
+}
+
+.items-sold-table thead {
+    background: #f8fafc;
+    border-bottom: 2px solid #e2e8f0;
+}
+
+.items-sold-table th {
+    padding: 10px 14px;
+    text-align: left;
+    font-weight: 600;
+    color: #64748b;
+    font-size: 0.7rem;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+}
+
+.items-sold-table td {
+    padding: 8px 14px;
+    border-bottom: 1px solid #f1f5f9;
+}
+
+.items-sold-table .item-name {
+    font-weight: 500;
+}
+
+.items-sold-table .qty-cell {
+    font-weight: 600;
+    color: #8b5cf6;
+    text-align: center;
+}
+
+.items-sold-table .revenue-cell {
+    font-weight: 600;
+    color: #16a34a;
+}
+
+.category-badge {
+    background: #f1f5f9;
+    padding: 2px 10px;
+    border-radius: 12px;
+    font-size: 0.7rem;
+    color: #64748b;
+}
+
+.progress-bar-mini {
+    position: relative;
+    height: 16px;
+    background: #f1f5f9;
+    border-radius: 8px;
+    overflow: hidden;
+    min-width: 60px;
+}
+
+.progress-fill-mini {
+    height: 100%;
+    border-radius: 8px;
+    transition: width 0.5s ease;
+}
+
+.progress-label-mini {
+    position: absolute;
+    right: 4px;
+    top: 50%;
+    transform: translateY(-50%);
+    font-size: 0.6rem;
+    font-weight: 600;
+    color: #475569;
+}
+
+.items-sold-footer {
+    display: flex;
+    justify-content: space-between;
+    padding: 12px 0 0;
+    border-top: 2px solid #e2e8f0;
+    margin-top: 12px;
+    font-size: 0.9rem;
+    flex-wrap: wrap;
+    gap: 8px;
 }
 
 /* ============================================================
@@ -870,6 +1205,14 @@ body {
 /* ============================================================
    RESPONSIVE
    ============================================================ */
+@media (max-width: 1024px) {
+    .report-grid {
+        grid-template-columns: 1fr 1fr;
+        padding: 0 12px 12px;
+        gap: 12px;
+    }
+}
+
 @media (max-width: 768px) {
     .header-left h1 {
         font-size: 0.9rem;
@@ -910,43 +1253,44 @@ body {
         font-size: 1.2rem;
     }
     
-    .report-content {
-        padding: 0 12px 12px;
+    .report-grid {
+        grid-template-columns: 1fr;
+        padding: 0 8px 12px;
+        gap: 12px;
     }
     
-    .report-section {
-        padding: 16px;
-    }
-    
-    .item-summary-cards {
+    .stock-movement {
         grid-template-columns: 1fr 1fr;
     }
     
-    .top-items-grid {
-        grid-template-columns: repeat(auto-fill, minmax(100px, 1fr));
+    .payment-bar-row {
+        flex-wrap: wrap;
     }
     
-    .sales-chart {
-        height: 150px;
-        gap: 8px;
+    .payment-bar-row .bar-track {
+        flex-basis: 100%;
+        order: 3;
     }
     
-    .chart-bar-container {
-        min-width: 20px;
+    .payment-bar-row .bar-value {
+        min-width: 60px;
     }
     
-    .dropdown-menu {
-        width: 280px;
+    .modal-wide {
+        max-width: 95%;
     }
     
-    .filter-bar {
-        padding: 8px 12px;
-        gap: 8px;
+    .items-sold-summary {
+        grid-template-columns: 1fr 1fr;
     }
     
-    .filter-bar input[type="date"] {
+    .items-sold-table {
         font-size: 0.75rem;
-        padding: 4px 8px;
+    }
+    
+    .items-sold-table th,
+    .items-sold-table td {
+        padding: 6px 8px;
     }
 }
 
@@ -989,39 +1333,61 @@ body {
         font-size: 0.65rem;
     }
     
+    .stock-movement {
+        grid-template-columns: 1fr;
+    }
+    
+    .peak-hours {
+        justify-content: center;
+    }
+    
+    .peak-hour-item {
+        min-width: 30px;
+        padding: 4px 2px;
+        font-size: 0.6rem;
+    }
+    
     .filter-btn {
         font-size: 0.65rem;
         padding: 4px 10px;
     }
     
-    .report-section {
+    .modal-body {
         padding: 12px;
     }
     
-    .item-summary-cards {
+    .items-sold-summary {
         grid-template-columns: 1fr;
     }
     
-    .top-items-grid {
-        grid-template-columns: repeat(auto-fill, minmax(80px, 1fr));
+    .items-sold-footer {
+        flex-direction: column;
+        align-items: center;
+        text-align: center;
+    }
+}
+
+/* ============================================================
+   PRINT STYLES
+   ============================================================ */
+@media print {
+    .main-header, .quick-filters, .filter-bar, .dropdown-menu, .dropdown-overlay {
+        display: none !important;
     }
     
-    .item-sales-table {
-        font-size: 0.75rem;
+    .report-summary {
+        break-inside: avoid;
     }
     
-    .item-sales-table th,
-    .item-sales-table td {
-        padding: 6px 8px;
+    .report-card-modern {
+        break-inside: avoid;
+        border: 1px solid #ddd !important;
+        box-shadow: none !important;
     }
     
     .bill-item {
-        padding: 10px 12px;
-    }
-    
-    .bill-header {
-        flex-direction: column;
-        align-items: flex-start;
+        break-inside: avoid;
+        border: 1px solid #ddd !important;
     }
 }
 
@@ -1045,23 +1411,4 @@ body {
 
 ::-webkit-scrollbar-thumb:hover {
     background: #94a3b8;
-}
-
-/* ============================================================
-   PRINT STYLES
-   ============================================================ */
-@media print {
-    .main-header, .quick-filters, .filter-bar, .footer, .dropdown-menu, .dropdown-overlay {
-        display: none !important;
-    }
-    
-    .report-content {
-        padding: 0 !important;
-    }
-    
-    .report-section {
-        break-inside: avoid;
-        border: 1px solid #ddd !important;
-        box-shadow: none !important;
-    }
 }
