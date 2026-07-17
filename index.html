@@ -166,7 +166,7 @@
     </div>
 </div>
 
-<!-- ===== PAYMENT MODAL ===== -->
+<!-- ===== PAYMENT MODAL (Same as Table Payment - No Add Payment Button) ===== -->
 <div class="modal-overlay" id="paymentModal">
     <div class="modal modal-small">
         <div class="modal-header">
@@ -174,10 +174,12 @@
             <button class="close-btn" id="closePaymentModalBtn">✕</button>
         </div>
         <div class="payment-body">
+            <!-- Bill Summary -->
             <div class="payment-details" id="paymentDetails">
                 <!-- Rendered by JS -->
             </div>
             
+            <!-- Payment Method Selection -->
             <div class="payment-methods-simple">
                 <label>Payment Method</label>
                 <div class="payment-methods-grid">
@@ -189,48 +191,36 @@
                 </div>
             </div>
             
-            <div class="payment-input-simple">
-                <div class="payment-input-group">
-                    <label>Amount Received (Rs.)</label>
-                    <input type="number" id="paymentAmount" placeholder="0.00" step="0.01" min="0" />
-                </div>
-                <div class="payment-input-group" id="paymentReferenceGroup" style="display:none;">
-                    <label>Reference</label>
-                    <input type="text" id="paymentReference" placeholder="Card/Mobile/Bank ref" />
-                </div>
+            <!-- Reference Input -->
+            <div class="payment-input-group" id="paymentReferenceGroup" style="display:none;">
+                <label>Reference</label>
+                <input type="text" id="paymentReference" placeholder="Card/Mobile/Bank ref" />
             </div>
             
-            <button class="add-payment-btn-simple" onclick="addPayment()">➕ Add Payment</button>
-            
-            <div class="payment-summary-simple" id="paymentSummary">
-                <div class="payment-list" id="paymentList">
-                    <div class="empty-payment">No payments added</div>
-                </div>
-                <div class="payment-total-simple">
-                    <div class="total-row">
-                        <span>Total:</span>
-                        <span id="paymentTotalDisplay">Rs. 0.00</span>
-                    </div>
-                    <div class="total-row">
-                        <span>Balance:</span>
-                        <span id="paymentBalance">Rs. 0.00</span>
-                    </div>
-                    <div class="total-row change-row" id="changeRow" style="display:none;">
-                        <span>Change:</span>
-                        <span id="paymentChangeDisplay">Rs. 0.00</span>
-                    </div>
-                </div>
+            <!-- Amount Input -->
+            <div class="payment-input">
+                <label>Amount Received (Rs.)</label>
+                <input type="number" id="paymentAmount" placeholder="0.00" step="0.01" min="0" />
             </div>
             
-            <div class="payment-actions-simple">
-                <label class="print-checkbox">
+            <!-- Change Due -->
+            <div class="payment-change" id="paymentChange">
+                <span>Change Due:</span>
+                <span id="paymentChangeAmount">Rs. 0.00</span>
+            </div>
+            
+            <!-- Print Option -->
+            <div class="print-option">
+                <label>
                     <input type="checkbox" id="printBillCheckbox" checked />
                     🖨️ Print Bill
                 </label>
-                <div class="action-buttons">
-                    <button class="confirm-btn" id="confirmPaymentBtn" disabled>✅ Confirm</button>
-                    <button class="cancel-btn" id="cancelPaymentBtn">✕ Cancel</button>
-                </div>
+            </div>
+            
+            <!-- Payment Actions -->
+            <div class="payment-actions">
+                <button class="confirm-btn" id="confirmPaymentBtn" disabled>✅ Confirm Payment</button>
+                <button class="cancel-btn" id="cancelPaymentBtn">✕ Cancel</button>
             </div>
         </div>
     </div>
@@ -312,8 +302,6 @@ let editedBillData = null;
 
 // ===== PAYMENT VARIABLES =====
 let selectedMethod = 'cash';
-let payments = [];
-let paymentTotal = 0;
 
 // ============================================================
 //  LOAD / SAVE FUNCTIONS
@@ -718,7 +706,6 @@ document.getElementById('clearCartBtn').addEventListener('click', function() {
     if (cart.length === 0) return;
     if (!confirm('Clear all items from cart?')) return;
     
-    // Restore stock when clearing cart
     const stockData = JSON.parse(localStorage.getItem('hotel_stock') || '[]');
     cart.forEach(item => {
         const stockItem = stockData.find(s => s.id === item.id);
@@ -736,7 +723,7 @@ document.getElementById('clearCartBtn').addEventListener('click', function() {
 });
 
 // ============================================================
-//  HOLD FUNCTIONS - WITH STOCK UPDATE
+//  HOLD FUNCTIONS
 // ============================================================
 document.getElementById('holdBtn').addEventListener('click', function() {
     if (cart.length === 0) {
@@ -754,7 +741,6 @@ document.getElementById('cancelHoldBtn').addEventListener('click', function() {
     document.getElementById('holdModal').classList.remove('open');
 });
 
-// ===== HOLD TO TABLE =====
 document.getElementById('holdToTableBtn').addEventListener('click', function() {
     document.getElementById('holdModal').classList.remove('open');
     const tableNum = prompt('Enter table number (1-12):', '1');
@@ -765,7 +751,6 @@ document.getElementById('holdToTableBtn').addEventListener('click', function() {
         return;
     }
     
-    // Check stock before holding
     const stockData = JSON.parse(localStorage.getItem('hotel_stock') || '[]');
     let stockError = false;
     let stockUpdateMsg = '';
@@ -779,7 +764,6 @@ document.getElementById('holdToTableBtn').addEventListener('click', function() {
                 stockError = true;
                 return;
             }
-            // Reduce stock immediately
             stockItem.stock -= item.quantity;
             stockUpdateMsg += `\n${item.name}: ${currentStock} → ${stockItem.stock}`;
         }
@@ -788,7 +772,6 @@ document.getElementById('holdToTableBtn').addEventListener('click', function() {
     if (stockError) return;
     localStorage.setItem('hotel_stock', JSON.stringify(stockData));
     
-    // Add to table
     cart.forEach(item => {
         const existing = tableOrders[num].find(c => c.id === item.id);
         if (existing) {
@@ -806,7 +789,6 @@ document.getElementById('holdToTableBtn').addEventListener('click', function() {
     showToast(`✅ Order held to Table ${num}! Stock updated:${stockUpdateMsg}`);
 });
 
-// ===== HOLD TO CUSTOMER =====
 document.getElementById('holdToCustomerBtn').addEventListener('click', function() {
     document.getElementById('holdModal').classList.remove('open');
     const customerName = prompt('Enter customer name:', '');
@@ -816,7 +798,6 @@ document.getElementById('holdToCustomerBtn').addEventListener('click', function(
     }
     const name = customerName.trim();
     
-    // Check stock before holding
     const stockData = JSON.parse(localStorage.getItem('hotel_stock') || '[]');
     let stockError = false;
     let stockUpdateMsg = '';
@@ -830,7 +811,6 @@ document.getElementById('holdToCustomerBtn').addEventListener('click', function(
                 stockError = true;
                 return;
             }
-            // Reduce stock immediately
             stockItem.stock -= item.quantity;
             stockUpdateMsg += `\n${item.name}: ${currentStock} → ${stockItem.stock}`;
         }
@@ -913,7 +893,6 @@ function loadCustomerOrder(name) {
         return;
     }
     
-    // Check stock before loading
     const stockData = JSON.parse(localStorage.getItem('hotel_stock') || '[]');
     let stockError = false;
     let stockUpdateMsg = '';
@@ -954,11 +933,13 @@ function loadCustomerOrder(name) {
 }
 
 // ============================================================
-//  PAYMENT FUNCTIONS
+//  PAYMENT FUNCTIONS (Same as Table Payment)
 // ============================================================
+
+// Select Payment Method
 function selectPaymentMethod(method) {
     selectedMethod = method;
-    document.querySelectorAll('.payment-method-btn').forEach(btn => {
+    document.querySelectorAll('#paymentModal .payment-method-btn').forEach(btn => {
         btn.classList.toggle('active', btn.dataset.method === method);
     });
     
@@ -968,6 +949,7 @@ function selectPaymentMethod(method) {
         refGroup.style.display = 'block';
         refInput.placeholder = method === 'card' ? 'Card (last 4)' : 
                               method === 'mobile' ? 'Mobile no' : 'Bank ref';
+        refInput.focus();
     } else {
         refGroup.style.display = 'none';
         refInput.value = '';
@@ -976,105 +958,51 @@ function selectPaymentMethod(method) {
     document.getElementById('paymentAmount').focus();
 }
 
-function addPayment() {
-    const amount = parseFloat(document.getElementById('paymentAmount').value);
-    const reference = document.getElementById('paymentReference').value.trim();
+// Calculate Change
+document.getElementById('paymentAmount').addEventListener('input', function() {
+    const received = parseFloat(this.value) || 0;
+    const total = currentBill ? currentBill.total : 0;
+    const change = received - total;
     
-    if (!amount || amount <= 0) {
-        showToast('⚠️ Please enter amount!');
-        return;
-    }
+    const changeEl = document.getElementById('paymentChange');
+    const changeSpan = document.getElementById('paymentChangeAmount');
     
-    const billTotal = currentBill ? currentBill.total : 0;
-    
-    const methodIcons = {
-        'cash': '💵',
-        'card': '💳',
-        'mobile': '📱',
-        'bank': '🏦',
-        'credit': '💰'
-    };
-    
-    const methodNames = {
-        'cash': 'Cash',
-        'card': 'Card',
-        'mobile': 'Mobile',
-        'bank': 'Bank',
-        'credit': 'Credit'
-    };
-    
-    payments.push({
-        method: selectedMethod,
-        methodLabel: `${methodIcons[selectedMethod] || '💵'} ${methodNames[selectedMethod] || selectedMethod}`,
-        amount: amount,
-        reference: reference || '-'
-    });
-    
-    paymentTotal += amount;
-    
-    document.getElementById('paymentAmount').value = '';
-    document.getElementById('paymentReference').value = '';
-    
-    updatePaymentSummarySimple();
-    document.getElementById('paymentAmount').focus();
-    
-    let changeText = '';
-    if (paymentTotal > billTotal) {
-        changeText = ` (Change: +Rs. ${(paymentTotal - billTotal).toFixed(2)})`;
-    }
-    showToast(`✅ Added ${methodNames[selectedMethod]}: Rs. ${amount.toFixed(2)}${changeText}`);
-}
-
-function removePayment(index) {
-    paymentTotal -= payments[index].amount;
-    payments.splice(index, 1);
-    updatePaymentSummarySimple();
-}
-
-function updatePaymentSummarySimple() {
-    const list = document.getElementById('paymentList');
-    const billTotal = currentBill ? currentBill.total : 0;
-    const balance = billTotal - paymentTotal;
-    
-    if (payments.length === 0) {
-        list.innerHTML = '<div class="empty-payment">No payments added</div>';
+    if (received > 0 && received < total) {
+        changeSpan.textContent = `-Rs. ${(total - received).toFixed(2)}`;
+        changeSpan.style.color = '#ef4444';
+        changeEl.style.borderColor = '#fca5a5';
+        changeEl.style.background = '#fef2f2';
+        changeEl.querySelector('span:first-child').textContent = 'Remaining:';
+        document.getElementById('confirmPaymentBtn').disabled = true;
+    } else if (received >= total) {
+        changeSpan.textContent = `Rs. ${change.toFixed(2)}`;
+        changeSpan.style.color = '#16a34a';
+        changeEl.style.borderColor = '#86efac';
+        changeEl.style.background = '#f0fdf4';
+        changeEl.querySelector('span:first-child').textContent = 'Change Due:';
+        document.getElementById('confirmPaymentBtn').disabled = false;
     } else {
-        list.innerHTML = payments.map((p, i) => `
-            <div class="payment-item-simple">
-                <span class="method">
-                    <span>${p.methodLabel}</span>
-                    ${p.reference !== '-' ? `<span style="font-size:0.7rem;color:#94a3b8;">(${p.reference})</span>` : ''}
-                </span>
-                <span class="amount">Rs. ${p.amount.toFixed(2)}</span>
-                <button class="remove-payment" onclick="removePayment(${i})">✕</button>
-            </div>
-        `).join('');
+        changeSpan.textContent = 'Rs. 0.00';
+        changeSpan.style.color = '#16a34a';
+        changeEl.style.borderColor = '#86efac';
+        changeEl.style.background = '#f0fdf4';
+        changeEl.querySelector('span:first-child').textContent = 'Change Due:';
+        document.getElementById('confirmPaymentBtn').disabled = true;
     }
-    
-    document.getElementById('paymentTotalDisplay').textContent = `Rs. ${paymentTotal.toFixed(2)}`;
-    
-    const balanceEl = document.getElementById('paymentBalance');
-    const changeRow = document.getElementById('changeRow');
-    const changeDisplay = document.getElementById('paymentChangeDisplay');
-    
-    if (paymentTotal < billTotal) {
-        balanceEl.textContent = `Rs. ${balance.toFixed(2)}`;
-        balanceEl.style.color = '#ef4444';
-        changeRow.style.display = 'none';
-    } else if (paymentTotal > billTotal) {
-        balanceEl.textContent = `✅ Paid`;
-        balanceEl.style.color = '#16a34a';
-        changeRow.style.display = 'flex';
-        changeDisplay.textContent = `+Rs. ${(paymentTotal - billTotal).toFixed(2)}`;
-        changeDisplay.style.color = '#16a34a';
-    } else {
-        balanceEl.textContent = `✅ Paid in full`;
-        balanceEl.style.color = '#16a34a';
-        changeRow.style.display = 'none';
+});
+
+// Enter key support
+document.getElementById('paymentAmount').addEventListener('keydown', function(e) {
+    if (e.key === 'Enter' && !document.getElementById('confirmPaymentBtn').disabled) {
+        document.getElementById('confirmPaymentBtn').click();
     }
-    
-    document.getElementById('confirmPaymentBtn').disabled = paymentTotal < billTotal || paymentTotal === 0;
-}
+});
+
+document.getElementById('paymentReference').addEventListener('keydown', function(e) {
+    if (e.key === 'Enter') {
+        document.getElementById('paymentAmount').focus();
+    }
+});
 
 // ===== PAYMENT MODAL OPEN =====
 document.getElementById('payBtn').addEventListener('click', function() {
@@ -1101,11 +1029,9 @@ document.getElementById('payBtn').addEventListener('click', function() {
         total: total
     };
     
-    payments = [];
-    paymentTotal = 0;
     selectedMethod = 'cash';
     
-    document.querySelectorAll('.payment-method-btn').forEach(btn => {
+    document.querySelectorAll('#paymentModal .payment-method-btn').forEach(btn => {
         btn.classList.toggle('active', btn.dataset.method === 'cash');
     });
     document.getElementById('paymentReferenceGroup').style.display = 'none';
@@ -1118,35 +1044,50 @@ document.getElementById('payBtn').addEventListener('click', function() {
         <div class="pay-line total"><span>TOTAL</span><span>Rs. ${currentBill.total.toFixed(2)}</span></div>
     `;
     
-    updatePaymentSummarySimple();
+    // Reset change display
+    const changeEl = document.getElementById('paymentChange');
+    const changeSpan = document.getElementById('paymentChangeAmount');
+    changeSpan.textContent = 'Rs. 0.00';
+    changeSpan.style.color = '#16a34a';
+    changeEl.style.borderColor = '#86efac';
+    changeEl.style.background = '#f0fdf4';
+    changeEl.querySelector('span:first-child').textContent = 'Change Due:';
+    document.getElementById('confirmPaymentBtn').disabled = true;
+    
     document.getElementById('paymentModal').classList.add('open');
     setTimeout(() => document.getElementById('paymentAmount').focus(), 100);
-});
-
-document.getElementById('paymentAmount').addEventListener('keydown', function(e) {
-    if (e.key === 'Enter') {
-        addPayment();
-    }
-});
-
-document.getElementById('paymentReference').addEventListener('keydown', function(e) {
-    if (e.key === 'Enter') {
-        addPayment();
-    }
 });
 
 // ===== CONFIRM PAYMENT =====
 document.getElementById('confirmPaymentBtn').addEventListener('click', function() {
     if (!currentBill) return;
     
+    const received = parseFloat(document.getElementById('paymentAmount').value) || 0;
     const billTotal = currentBill.total;
+    const reference = document.getElementById('paymentReference').value.trim() || '-';
     
-    if (paymentTotal < billTotal) {
-        showToast(`❌ Insufficient amount!\nTotal: Rs. ${billTotal.toFixed(2)}\nPaid: Rs. ${paymentTotal.toFixed(2)}\nRemaining: Rs. ${(billTotal - paymentTotal).toFixed(2)}`);
+    if (received < billTotal) {
+        showToast(`❌ Insufficient amount!\nTotal: Rs. ${billTotal.toFixed(2)}\nReceived: Rs. ${received.toFixed(2)}\nRemaining: Rs. ${(billTotal - received).toFixed(2)}`);
         return;
     }
     
-    const changeAmount = paymentTotal - billTotal;
+    const changeAmount = received - billTotal;
+    
+    const methodIcons = {
+        'cash': '💵',
+        'card': '💳',
+        'mobile': '📱',
+        'bank': '🏦',
+        'credit': '💰'
+    };
+    
+    const methodNames = {
+        'cash': 'Cash',
+        'card': 'Card',
+        'mobile': 'Mobile',
+        'bank': 'Bank',
+        'credit': 'Credit'
+    };
     
     const bill = {
         id: Date.now(),
@@ -1155,13 +1096,13 @@ document.getElementById('confirmPaymentBtn').addEventListener('click', function(
         subtotal: currentBill.subtotal,
         discount: currentBill.discount,
         total: currentBill.total,
-        payments: payments.map(p => ({
-            method: p.method,
-            methodLabel: p.methodLabel,
-            amount: p.amount,
-            reference: p.reference
-        })),
-        received: paymentTotal,
+        payments: [{
+            method: selectedMethod,
+            methodLabel: `${methodIcons[selectedMethod]} ${methodNames[selectedMethod]}`,
+            amount: received,
+            reference: reference
+        }],
+        received: received,
         change: changeAmount,
         edited: false
     };
@@ -1176,39 +1117,32 @@ document.getElementById('confirmPaymentBtn').addEventListener('click', function(
         printBill(bill);
     }
     
-    let paymentSummary = payments.map(p => `${p.methodLabel}: Rs. ${p.amount.toFixed(2)}`).join('\n');
-    let changeText = changeAmount > 0 ? `\nChange: Rs. ${changeAmount.toFixed(2)}` : '';
-    showToast(`✅ Payment Successful!\nTotal: Rs. ${bill.total.toFixed(2)}\n${paymentSummary}${changeText}\nThank you! 🍽️`);
+    const methodDisplay = `${methodIcons[selectedMethod]} ${methodNames[selectedMethod]}`;
+    let refText = reference !== '-' ? ` (${reference})` : '';
+    
+    showToast(`✅ Payment Successful!\n${methodDisplay}${refText}: Rs. ${bill.received.toFixed(2)}\nChange: Rs. ${bill.change.toFixed(2)}\nThank you! 🍽️`);
     
     cart = [];
     saveCart();
     updateBilling();
     renderItems();
     currentBill = null;
-    payments = [];
-    paymentTotal = 0;
 });
 
 document.getElementById('cancelPaymentBtn').addEventListener('click', function() {
     document.getElementById('paymentModal').classList.remove('open');
     currentBill = null;
-    payments = [];
-    paymentTotal = 0;
 });
 
 document.getElementById('closePaymentModalBtn').addEventListener('click', function() {
     document.getElementById('paymentModal').classList.remove('open');
     currentBill = null;
-    payments = [];
-    paymentTotal = 0;
 });
 
 document.getElementById('paymentModal').addEventListener('click', function(e) {
     if (e.target === this) {
         this.classList.remove('open');
         currentBill = null;
-        payments = [];
-        paymentTotal = 0;
     }
 });
 
@@ -1899,8 +1833,6 @@ window.updateEditDiscount = updateEditDiscount;
 window.saveEditBill = saveEditBill;
 window.cancelEditBill = cancelEditBill;
 window.selectPaymentMethod = selectPaymentMethod;
-window.addPayment = addPayment;
-window.removePayment = removePayment;
 window.openCustomerOrders = openCustomerOrders;
 window.loadCustomerOrder = loadCustomerOrder;
 window.renderCustomerOrders = renderCustomerOrders;
