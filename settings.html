@@ -80,6 +80,8 @@
     <div class="settings-section">
         <h2>📋 General Settings</h2>
         <div class="settings-group">
+            
+            <!-- ===== Tax Rate ===== -->
             <div class="setting-item">
                 <div class="setting-info">
                     <span class="setting-label">Tax Rate</span>
@@ -336,6 +338,7 @@
 const SETTINGS_KEY = 'hotel_settings';
 const LOGIN_PASSWORD_KEY = 'hotel_password';
 const STOCK_PASSWORD_KEY = 'hotel_stock_password';
+const TAX_KEY = 'tax_rate';
 
 // ============================================================
 //  GET STORED PASSWORDS
@@ -371,6 +374,12 @@ function loadSettings() {
     } catch (e) {
         console.log('No settings found');
     }
+    
+    // Load tax rate separately
+    const taxRate = localStorage.getItem(TAX_KEY);
+    if (taxRate !== null) {
+        document.getElementById('taxRate').value = taxRate;
+    }
 }
 
 // ============================================================
@@ -388,6 +397,7 @@ function saveSetting(key) {
     switch(key) {
         case 'taxRate':
             value = parseFloat(document.getElementById('taxRate').value) || 0;
+            localStorage.setItem(TAX_KEY, value);
             break;
         case 'currency':
             value = document.getElementById('currency').value;
@@ -430,6 +440,9 @@ function saveSetting(key) {
     }
     if (key === 'fontSize') {
         applyFontSize(value);
+    }
+    if (key === 'taxRate') {
+        showToast(`✅ Tax rate set to ${value}%`);
     }
 }
 
@@ -669,6 +682,7 @@ function exportAllData() {
         customerOrders: JSON.parse(localStorage.getItem('hotel_customer_orders') || '{}'),
         settings: JSON.parse(localStorage.getItem(SETTINGS_KEY) || '{}'),
         categories: JSON.parse(localStorage.getItem('hotel_categories') || '[]'),
+        taxRate: localStorage.getItem(TAX_KEY) || '0',
         exportDate: new Date().toISOString()
     };
     
@@ -705,6 +719,7 @@ document.getElementById('importFile').addEventListener('change', function(e) {
             if (data.customerOrders) localStorage.setItem('hotel_customer_orders', JSON.stringify(data.customerOrders));
             if (data.settings) localStorage.setItem(SETTINGS_KEY, JSON.stringify(data.settings));
             if (data.categories) localStorage.setItem('hotel_categories', JSON.stringify(data.categories));
+            if (data.taxRate) localStorage.setItem(TAX_KEY, data.taxRate);
             
             showToast('✅ Data imported successfully!');
             loadSettings();
@@ -732,6 +747,7 @@ function clearAllData() {
         'hotel_customer_orders',
         'hotel_categories',
         SETTINGS_KEY,
+        TAX_KEY,
         'hotel_logged_in',
         'hotel_username'
     ];
