@@ -730,7 +730,7 @@ body.theme-dark .theme-toggle-btn {
 }
 
 /* ============================================================
-   LEFT BILLING
+   LEFT BILLING - වැඩි කරන ලදි
    ============================================================ */
 .left-billing {
     background: white;
@@ -739,7 +739,7 @@ body.theme-dark .theme-toggle-btn {
     display: flex;
     flex-direction: column;
     overflow: hidden;
-    min-height: 400px;
+    min-height: 450px;
     height: 100%;
 }
 
@@ -845,14 +845,14 @@ body.theme-dark .theme-toggle-btn {
 }
 
 /* ============================================================
-   BILLING TABLE - IMPROVED HEIGHT
+   BILLING TABLE - ප්‍රධාන වෙනස මෙයයි
    ============================================================ */
 .billing-table {
     flex: 1;
     overflow-y: auto;
     padding: 0 10px;
-    min-height: 200px;
-    max-height: 400px;
+    min-height: 250px;
+    max-height: none;
 }
 
 .table-header {
@@ -874,11 +874,12 @@ body.theme-dark .theme-toggle-btn {
     display: grid;
     grid-template-columns: 2fr 0.8fr 1fr 1fr 1fr 0.5fr;
     gap: 4px;
-    padding: 3px 4px;
-    font-size: 0.7rem;
+    padding: 6px 4px;
+    font-size: 0.75rem;
     align-items: center;
     border-bottom: 1px solid #f1f5f9;
     transition: background 0.2s;
+    min-height: 32px;
 }
 
 .billing-row:hover {
@@ -957,9 +958,9 @@ body.theme-dark .theme-toggle-btn {
 
 .empty-cart {
     text-align: center;
-    padding: 30px 0;
+    padding: 40px 0;
     color: #94a3b8;
-    font-size: 0.85rem;
+    font-size: 0.9rem;
 }
 
 /* ============================================================
@@ -2274,12 +2275,12 @@ body.theme-dark .theme-toggle-btn {
     }
     
     .left-billing {
-        min-height: 300px;
+        min-height: 350px;
     }
     
     .billing-table {
-        min-height: 150px;
-        max-height: 300px;
+        min-height: 200px;
+        max-height: none;
     }
     
     .header-left h1 {
@@ -2316,9 +2317,9 @@ body.theme-dark .theme-toggle-btn {
     }
     
     .table-header, .billing-row {
-        font-size: 0.55rem;
+        font-size: 0.6rem;
         grid-template-columns: 1.5fr 0.7fr 0.8fr 0.8fr 0.8fr 0.5fr;
-        padding: 3px 2px;
+        padding: 4px 2px;
         gap: 3px;
     }
     
@@ -2487,13 +2488,13 @@ body.theme-dark .theme-toggle-btn {
     }
     
     .left-billing {
-        min-height: 250px;
+        min-height: 300px;
         border-radius: 10px;
     }
     
     .billing-table {
-        min-height: 120px;
-        max-height: 250px;
+        min-height: 150px;
+        max-height: none;
         padding: 0 6px;
     }
     
@@ -2512,10 +2513,15 @@ body.theme-dark .theme-toggle-btn {
     }
     
     .table-header, .billing-row {
-        font-size: 0.5rem;
+        font-size: 0.55rem;
         grid-template-columns: 1.2fr 0.6fr 0.7fr 0.7fr 0.7fr 0.4fr;
         gap: 2px;
-        padding: 2px 2px;
+        padding: 3px 2px;
+    }
+    
+    .billing-row {
+        min-height: 28px;
+        padding: 4px 2px;
     }
     
     .item-qty button {
@@ -2750,6 +2756,11 @@ body.theme-dark .theme-toggle-btn {
     
     .payment-change span:last-child {
         font-size: 0.85rem;
+    }
+    
+    .empty-cart {
+        padding: 25px 0;
+        font-size: 0.75rem;
     }
 }
 
