@@ -186,6 +186,7 @@
                 </label>
             </div>
             
+            <!-- ===== PAYMENT ACTIONS ===== -->
             <div class="payment-actions">
                 <button class="confirm-btn" id="confirmTablePaymentBtn" disabled>✅ Confirm Payment</button>
                 <button class="cancel-btn" id="cancelTablePaymentBtn">✕ Cancel</button>
@@ -798,20 +799,16 @@ function setupTableNumericKeypad() {
             const value = this.dataset.value;
             
             if (value === 'backspace') {
-                // Remove last character
                 const currentValue = input.value;
                 input.value = currentValue.slice(0, -1);
             } else if (value === '.') {
-                // Add decimal point if not already present
                 if (!input.value.includes('.')) {
                     input.value += value;
                 }
             } else {
-                // Add number
                 input.value += value;
             }
             
-            // Trigger input event for change calculation
             const event = new Event('input', { bubbles: true });
             input.dispatchEvent(event);
         });
@@ -834,6 +831,67 @@ function setupTableNumericKeypad() {
             setTimeout(() => firstBtn.focus(), 50);
         }
     });
+}
+
+// ============================================================
+//  COMPUTER NUMBER PAD SUPPORT (Table)
+// ============================================================
+function setupTableNumberPadSupport() {
+    const input = document.getElementById('tableAmountReceived');
+    if (!input) return;
+    
+    // Global keyboard listener for when table payment modal is open
+    document.addEventListener('keydown', function(e) {
+        const modal = document.getElementById('tablePaymentModal');
+        if (!modal.classList.contains('open')) return;
+        
+        const key = e.key;
+        
+        // Number keys (0-9) including numpad
+        if (key >= '0' && key <= '9') {
+            e.preventDefault();
+            input.value += key;
+            const event = new Event('input', { bubbles: true });
+            input.dispatchEvent(event);
+            return;
+        }
+        
+        // Decimal point
+        if (key === '.') {
+            e.preventDefault();
+            if (!input.value.includes('.')) {
+                input.value += key;
+                const event = new Event('input', { bubbles: true });
+                input.dispatchEvent(event);
+            }
+            return;
+        }
+        
+        // Backspace
+        if (key === 'Backspace') {
+            e.preventDefault();
+            input.value = input.value.slice(0, -1);
+            const event = new Event('input', { bubbles: true });
+            input.dispatchEvent(event);
+            return;
+        }
+        
+        // Enter - Confirm Payment
+        if (key === 'Enter') {
+            e.preventDefault();
+            if (!document.getElementById('confirmTablePaymentBtn').disabled) {
+                document.getElementById('confirmTablePaymentBtn').click();
+            }
+            return;
+        }
+        
+        // Escape - Cancel
+        if (key === 'Escape') {
+            e.preventDefault();
+            document.getElementById('cancelTablePaymentBtn').click();
+            return;
+        }
+    }, true); // Use capture phase to ensure it catches events
 }
 
 // ============================================================
@@ -886,9 +944,6 @@ document.getElementById('payTableBtn').addEventListener('click', function() {
     changeEl.querySelector('span:first-child').textContent = 'Change Due:';
     confirmTablePaymentBtn.disabled = true;
     
-    // Do NOT set checkbox to checked - keep default OFF
-    // tablePrintBillCheckbox.checked = true; // ❌ මෙය ඉවත් කරන්න
-    
     tablePaymentModal.classList.add('open');
     modal.classList.remove('open');
     
@@ -896,6 +951,8 @@ document.getElementById('payTableBtn').addEventListener('click', function() {
     setTimeout(() => {
         const firstBtn = document.querySelector('#tableNumericKeypad .keypad-btn');
         if (firstBtn) firstBtn.focus();
+        // Also focus the input so it can receive keyboard events
+        tableAmountReceived.focus();
     }, 200);
 });
 
@@ -931,13 +988,6 @@ tableAmountReceived.addEventListener('input', function() {
         changeEl.style.background = '#f0fdf4';
         changeEl.querySelector('span:first-child').textContent = 'Change Due:';
         confirmTablePaymentBtn.disabled = true;
-    }
-});
-
-// Enter key support for keypad
-tableAmountReceived.addEventListener('keydown', function(e) {
-    if (e.key === 'Enter' && !confirmTablePaymentBtn.disabled) {
-        confirmTablePaymentBtn.click();
     }
 });
 
@@ -1201,6 +1251,9 @@ document.addEventListener('DOMContentLoaded', function() {
     
     // ✅ Setup Numeric Keypad for Table Payment
     setupTableNumericKeypad();
+    
+    // ✅ Computer Number Pad Support for Table
+    setupTableNumberPadSupport();
 });
 </script>
 

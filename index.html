@@ -264,6 +264,7 @@
                 </label>
             </div>
             
+            <!-- ===== PAYMENT ACTIONS ===== -->
             <div class="payment-actions">
                 <button class="confirm-btn" id="confirmPaymentBtn" disabled>✅ Confirm Payment</button>
                 <button class="cancel-btn" id="cancelPaymentBtn">✕ Cancel</button>
@@ -1045,7 +1046,7 @@ function loadCustomerOrder(name) {
     if (stockError) return;
     saveStock();
     
-    // ✅ FIXED: Use spread operator correctly - {...item} instead of ..item
+    // ✅ Fixed: Use spread operator correctly - {...item}
     items.forEach(item => {
         const existing = cart.find(c => c.id === item.id);
         if (existing) {
@@ -1104,20 +1105,16 @@ function setupNumericKeypad(inputId, clearBtnId, keypadId) {
             const value = this.dataset.value;
             
             if (value === 'backspace') {
-                // Remove last character
                 const currentValue = input.value;
                 input.value = currentValue.slice(0, -1);
             } else if (value === '.') {
-                // Add decimal point if not already present
                 if (!input.value.includes('.')) {
                     input.value += value;
                 }
             } else {
-                // Add number
                 input.value += value;
             }
             
-            // Trigger input event for change calculation
             const event = new Event('input', { bubbles: true });
             input.dispatchEvent(event);
         });
@@ -1138,6 +1135,66 @@ function setupNumericKeypad(inputId, clearBtnId, keypadId) {
         const firstBtn = keypad.querySelector('.keypad-btn');
         if (firstBtn) {
             setTimeout(() => firstBtn.focus(), 50);
+        }
+    });
+}
+
+// ============================================================
+//  COMPUTER NUMBER PAD SUPPORT
+// ============================================================
+function setupNumberPadSupport() {
+    const input = document.getElementById('paymentAmount');
+    if (!input) return;
+    
+    document.addEventListener('keydown', function(e) {
+        const modal = document.getElementById('paymentModal');
+        if (!modal.classList.contains('open')) return;
+        
+        const key = e.key;
+        
+        // Number keys (0-9) including numpad
+        if (key >= '0' && key <= '9') {
+            e.preventDefault();
+            input.value += key;
+            const event = new Event('input', { bubbles: true });
+            input.dispatchEvent(event);
+            return;
+        }
+        
+        // Decimal point
+        if (key === '.') {
+            e.preventDefault();
+            if (!input.value.includes('.')) {
+                input.value += key;
+                const event = new Event('input', { bubbles: true });
+                input.dispatchEvent(event);
+            }
+            return;
+        }
+        
+        // Backspace
+        if (key === 'Backspace') {
+            e.preventDefault();
+            input.value = input.value.slice(0, -1);
+            const event = new Event('input', { bubbles: true });
+            input.dispatchEvent(event);
+            return;
+        }
+        
+        // Enter - Confirm Payment
+        if (key === 'Enter') {
+            e.preventDefault();
+            if (!document.getElementById('confirmPaymentBtn').disabled) {
+                document.getElementById('confirmPaymentBtn').click();
+            }
+            return;
+        }
+        
+        // Escape - Cancel
+        if (key === 'Escape') {
+            e.preventDefault();
+            document.getElementById('cancelPaymentBtn').click();
+            return;
         }
     });
 }
@@ -1174,18 +1231,6 @@ document.getElementById('paymentAmount').addEventListener('input', function() {
         changeEl.style.background = '#f0fdf4';
         changeEl.querySelector('span:first-child').textContent = 'Change Due:';
         document.getElementById('confirmPaymentBtn').disabled = true;
-    }
-});
-
-// Enter key support for keypad
-document.addEventListener('keydown', function(e) {
-    if (e.key === 'Enter') {
-        const paymentModal = document.getElementById('paymentModal');
-        if (paymentModal.classList.contains('open')) {
-            if (!document.getElementById('confirmPaymentBtn').disabled) {
-                document.getElementById('confirmPaymentBtn').click();
-            }
-        }
     }
 });
 
@@ -2281,6 +2326,9 @@ document.addEventListener('DOMContentLoaded', function() {
     loadQuickAddItems();
     setupHistoryFilters();
     setupNumericKeypad('paymentAmount', 'clearAmountBtn', 'numericKeypad');
+    
+    // ✅ Computer Number Pad Support
+    setupNumberPadSupport();
     
     autoClearOldBills();
     renderHistory();

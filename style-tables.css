@@ -1504,3 +1504,282 @@ body.theme-dark .clear-amount-btn:hover {
         min-width: 36px;
     }
 }
+
+/* ============================================================
+   NUMERIC KEYPAD (Table)
+   ============================================================ */
+.payment-amount-section {
+    margin: 12px 0;
+}
+
+.payment-amount-section label {
+    display: block;
+    font-weight: 500;
+    font-size: 0.85rem;
+    margin-bottom: 4px;
+    color: #475569;
+}
+
+.amount-display-row {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    margin-bottom: 8px;
+}
+
+.amount-display-row input {
+    flex: 1;
+    padding: 10px 14px;
+    border: 2px solid #e2e8f0;
+    border-radius: 10px;
+    font-size: 1.1rem;
+    background: #f8fafc;
+    color: #1e293b;
+    font-weight: 600;
+    text-align: right;
+    min-height: 48px;
+}
+
+.amount-display-row input:focus {
+    outline: none;
+    border-color: #8b5cf6;
+}
+
+.clear-amount-btn {
+    width: 40px;
+    height: 40px;
+    border: none;
+    border-radius: 10px;
+    background: #ef4444;
+    color: white;
+    font-size: 1rem;
+    cursor: pointer;
+    transition: all 0.3s;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    min-width: 40px;
+}
+
+.clear-amount-btn:hover {
+    background: #dc2626;
+    transform: scale(1.05);
+}
+
+.numeric-keypad {
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+    background: #f1f5f9;
+    padding: 10px;
+    border-radius: 12px;
+    border: 1px solid #e2e8f0;
+}
+
+.keypad-row {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 6px;
+}
+
+.keypad-btn {
+    padding: 14px 8px;
+    border: 2px solid #e2e8f0;
+    border-radius: 10px;
+    background: white;
+    cursor: pointer;
+    font-size: 1.2rem;
+    font-weight: 600;
+    transition: all 0.2s;
+    color: #1e293b;
+    user-select: none;
+    -webkit-tap-highlight-color: transparent;
+    min-height: 52px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.keypad-btn:hover {
+    background: #f5f3ff;
+    border-color: #8b5cf6;
+    transform: scale(1.02);
+}
+
+.keypad-btn:active {
+    transform: scale(0.95);
+    background: #8b5cf6;
+    color: white;
+}
+
+.keypad-btn.keypad-dot {
+    font-weight: 700;
+    color: #8b5cf6;
+}
+
+.keypad-btn.keypad-backspace {
+    color: #ef4444;
+    font-size: 1.1rem;
+}
+
+/* ============================================================
+   PAYMENT ACTIONS (Table)
+   ============================================================ */
+.payment-actions {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 10px;
+    margin-top: 16px;
+}
+
+.payment-actions .confirm-btn {
+    padding: 12px 16px;
+    background: #22c55e;
+    color: white;
+    border: none;
+    border-radius: 10px;
+    font-weight: 700;
+    font-size: 1rem;
+    cursor: pointer;
+    transition: all 0.3s;
+}
+
+.payment-actions .confirm-btn:hover:not(:disabled) {
+    background: #16a34a;
+    transform: scale(1.02);
+}
+
+.payment-actions .confirm-btn:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+    transform: none;
+}
+
+.payment-actions .cancel-btn {
+    padding: 12px 16px;
+    background: #ef4444;
+    color: white;
+    border: none;
+    border-radius: 10px;
+    font-weight: 700;
+    font-size: 1rem;
+    cursor: pointer;
+    transition: all 0.3s;
+}
+
+.payment-actions .cancel-btn:hover {
+    background: #dc2626;
+    transform: scale(1.02);
+}
+
+/* Dark Theme */
+body.theme-dark .payment-amount-section label {
+    color: #94a3b8;
+}
+
+body.theme-dark .amount-display-row input {
+    background: #0f172a;
+    border-color: #334155;
+    color: #f1f5f9;
+}
+
+body.theme-dark .numeric-keypad {
+    background: #0f172a;
+    border-color: #334155;
+}
+
+body.theme-dark .keypad-btn {
+    background: #1e293b;
+    border-color: #334155;
+    color: #f1f5f9;
+}
+
+body.theme-dark .keypad-btn:hover {
+    background: #2d1a0e;
+    border-color: #8b5cf6;
+}
+
+body.theme-dark .keypad-btn:active {
+    background: #8b5cf6;
+    color: white;
+}
+
+body.theme-dark .keypad-btn.keypad-dot {
+    color: #8b5cf6;
+}
+
+body.theme-dark .keypad-btn.keypad-backspace {
+    color: #f87171;
+}
+
+body.theme-dark .clear-amount-btn {
+    background: #dc2626;
+}
+
+body.theme-dark .clear-amount-btn:hover {
+    background: #b91c1c;
+}
+
+body.theme-dark .payment-actions .confirm-btn {
+    background: #16a34a;
+}
+
+body.theme-dark .payment-actions .confirm-btn:hover:not(:disabled) {
+    background: #15803d;
+}
+
+body.theme-dark .payment-actions .cancel-btn {
+    background: #dc2626;
+}
+
+body.theme-dark .payment-actions .cancel-btn:hover {
+    background: #b91c1c;
+}
+
+/* Responsive */
+@media (max-width: 480px) {
+    .keypad-btn {
+        padding: 12px 6px;
+        font-size: 1rem;
+        min-height: 44px;
+    }
+    
+    .numeric-keypad {
+        padding: 6px;
+        gap: 4px;
+    }
+    
+    .keypad-row {
+        gap: 4px;
+    }
+    
+    .amount-display-row input {
+        font-size: 1rem;
+        padding: 8px 12px;
+        min-height: 40px;
+    }
+    
+    .clear-amount-btn {
+        width: 36px;
+        height: 36px;
+        min-width: 36px;
+    }
+
+    .payment-actions {
+        grid-template-columns: 1fr 1fr;
+        gap: 8px;
+    }
+    
+    .payment-actions .confirm-btn,
+    .payment-actions .cancel-btn {
+        padding: 10px 12px;
+        font-size: 0.9rem;
+    }
+}
+
+@media (max-width: 360px) {
+    .payment-actions {
+        grid-template-columns: 1fr;
+        gap: 6px;
+    }
+}
