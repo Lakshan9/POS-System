@@ -1,28 +1,29 @@
 // ============================================================
-//  SERVICE WORKER - PWA OFFLINE SUPPORT
-//  Hotel POS System
+//  SERVICE WORKER - GitHub Pages
+//  URL: https://lakshan9.github.io/POS-System/
 // ============================================================
 
+const REPO_NAME = 'POS-System';
 const CACHE_NAME = 'hotel-pos-v2';
 const OFFLINE_URL = 'offline.html';
 
-// Assets to cache
+// Assets to cache - GitHub Pages path එකට අනුව
 const ASSETS = [
-  '/',
-  'index.html',
-  'login.html',
-  'items-stock.html',
-  'report.html',
-  'settings.html',
-  'tables.html',
-  'offline.html',
-  'style.css',
-  'style-items-stock.css',
-  'style-login.css',
-  'style-report.css',
-  'style-settings.css',
-  'style-tables.css',
-  'manifest.json'
+  '/POS-System/',
+  '/POS-System/index.html',
+  '/POS-System/login.html',
+  '/POS-System/items-stock.html',
+  '/POS-System/report.html',
+  '/POS-System/settings.html',
+  '/POS-System/tables.html',
+  '/POS-System/offline.html',
+  '/POS-System/style.css',
+  '/POS-System/style-items-stock.css',
+  '/POS-System/style-login.css',
+  '/POS-System/style-report.css',
+  '/POS-System/style-settings.css',
+  '/POS-System/style-tables.css',
+  '/POS-System/manifest.json'
 ];
 
 // ============================================================
@@ -150,7 +151,7 @@ self.addEventListener('push', event => {
     data = {
       title: 'Hotel POS',
       message: 'You have a new notification',
-      url: '/'
+      url: '/POS-System/'
     };
   }
   
@@ -160,7 +161,7 @@ self.addEventListener('push', event => {
     badge: 'data:image/svg+xml,%3Csvg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 72 72"%3E%3Crect width="72" height="72" rx="20" fill="%238b5cf6"/%3E%3Ctext x="36" y="50" text-anchor="middle" font-size="40" fill="white"%3E%F0%9F%8D%BD%3C/text%3E%3C/svg%3E',
     vibrate: [200, 100, 200],
     data: {
-      url: data.url || '/'
+      url: data.url || '/POS-System/'
     }
   };
   
@@ -179,7 +180,7 @@ self.addEventListener('notificationclick', event => {
   console.log('Service Worker: Notification clicked');
   event.notification.close();
   
-  const url = event.notification.data?.url || '/';
+  const url = event.notification.data?.url || '/POS-System/';
   
   if (event.action === 'close') {
     return;
