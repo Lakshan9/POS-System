@@ -3,7 +3,7 @@
 //  Hotel POS System
 // ============================================================
 
-const CACHE_NAME = 'hotel-pos-v1';
+const CACHE_NAME = 'hotel-pos-v2';
 const OFFLINE_URL = 'offline.html';
 
 // Assets to cache
@@ -15,6 +15,7 @@ const ASSETS = [
   'report.html',
   'settings.html',
   'tables.html',
+  'offline.html',
   'style.css',
   'style-items-stock.css',
   'style-login.css',
@@ -25,7 +26,7 @@ const ASSETS = [
 ];
 
 // ============================================================
-//  INSTALL EVENT - Cache all assets
+//  INSTALL EVENT
 // ============================================================
 self.addEventListener('install', event => {
   console.log('Service Worker: Installing...');
@@ -47,7 +48,7 @@ self.addEventListener('install', event => {
 });
 
 // ============================================================
-//  ACTIVATE EVENT - Clean up old caches
+//  ACTIVATE EVENT
 // ============================================================
 self.addEventListener('activate', event => {
   console.log('Service Worker: Activating...');
@@ -71,7 +72,7 @@ self.addEventListener('activate', event => {
 });
 
 // ============================================================
-//  FETCH EVENT - Serve from cache or network
+//  FETCH EVENT
 // ============================================================
 self.addEventListener('fetch', event => {
   const requestUrl = new URL(event.request.url);
@@ -89,28 +90,16 @@ self.addEventListener('fetch', event => {
   event.respondWith(
     caches.match(event.request)
       .then(cachedResponse => {
-        // Return cached version if available
         if (cachedResponse) {
-          // Check if cache is fresh (less than 24 hours old)
-          const cachedDate = cachedResponse.headers.get('date');
-          if (cachedDate) {
-            const age = Date.now() - new Date(cachedDate).getTime();
-            if (age < 86400000) { // 24 hours
-              return cachedResponse;
-            }
-          }
           return cachedResponse;
         }
         
-        // Otherwise fetch from network
         return fetch(event.request)
           .then(response => {
-            // Don't cache if not a valid response
             if (!response || response.status !== 200 || response.type !== 'basic') {
               return response;
             }
             
-            // Clone the response
             const responseToCache = response.clone();
             
             caches.open(CACHE_NAME)
@@ -126,16 +115,14 @@ self.addEventListener('fetch', event => {
           .catch(error => {
             console.warn('Service Worker: Network fetch failed:', error);
             
-            // Try to return offline page
             return caches.match(OFFLINE_URL)
               .then(offlineResponse => {
                 if (offlineResponse) {
                   return offlineResponse;
                 }
                 
-                // Return a simple offline message
                 return new Response(
-                  '<html><body><h1>You are offline</h1><p>Please connect to the internet to access this page.</p></body></html>',
+                  '<html><body style="font-family:Arial;text-align:center;padding:50px;background:#0f172a;color:white;"><h1>📡 You are offline</h1><p>Please connect to the internet to access this page.</p></body></html>',
                   {
                     status: 503,
                     statusText: 'Service Unavailable',
@@ -169,23 +156,12 @@ self.addEventListener('push', event => {
   
   const options = {
     body: data.message || 'New notification',
-    icon: 'icons/icon-192.png',
-    badge: 'icons/icon-72.png',
+    icon: 'data:image/svg+xml,%3Csvg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 192 192"%3E%3Crect width="192" height="192" rx="40" fill="%238b5cf6"/%3E%3Ctext x="96" y="120" text-anchor="middle" font-size="100" fill="white"%3E%F0%9F%8D%BD%3C/text%3E%3Ctext x="96" y="165" text-anchor="middle" font-size="30" fill="white" font-weight="bold"%3EPOS%3C/text%3E%3C/svg%3E',
+    badge: 'data:image/svg+xml,%3Csvg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 72 72"%3E%3Crect width="72" height="72" rx="20" fill="%238b5cf6"/%3E%3Ctext x="36" y="50" text-anchor="middle" font-size="40" fill="white"%3E%F0%9F%8D%BD%3C/text%3E%3C/svg%3E',
     vibrate: [200, 100, 200],
     data: {
-      url: data.url || '/',
-      date: new Date().toISOString()
-    },
-    actions: [
-      {
-        action: 'open',
-        title: 'Open'
-      },
-      {
-        action: 'close',
-        title: 'Dismiss'
-      }
-    ]
+      url: data.url || '/'
+    }
   };
   
   event.waitUntil(
@@ -215,41 +191,17 @@ self.addEventListener('notificationclick', event => {
       includeUncontrolled: true
     })
     .then(windowClients => {
-      // Check if there is already a window/tab open with the target URL
       for (let client of windowClients) {
         if (client.url === url && 'focus' in client) {
           return client.focus();
         }
       }
-      // If not, open a new window
       if (clients.openWindow) {
         return clients.openWindow(url);
       }
     })
   );
 });
-
-// ============================================================
-//  BACKGROUND SYNC
-// ============================================================
-self.addEventListener('sync', event => {
-  console.log('Service Worker: Background sync triggered:', event.tag);
-  
-  if (event.tag === 'sync-orders') {
-    event.waitUntil(syncOrders());
-  }
-});
-
-async function syncOrders() {
-  console.log('Service Worker: Syncing orders...');
-  try {
-    // Get pending orders from localStorage (or IndexedDB)
-    // This is where you would sync offline orders
-    console.log('Service Worker: Sync complete');
-  } catch (error) {
-    console.error('Service Worker: Sync failed:', error);
-  }
-}
 
 // ============================================================
 //  MESSAGE HANDLER

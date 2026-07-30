@@ -4,19 +4,24 @@
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
     <title>Hotel POS System</title>
-    <link rel="stylesheet" href="style.css" />
-
+    
     <!-- ===== PWA META TAGS ===== -->
     <link rel="manifest" href="manifest.json" />
-    <link rel="apple-touch-icon" href="icons/icon-192.png" />
-    <link rel="icon" href="icons/icon-192.png" />
     <meta name="theme-color" content="#8b5cf6" />
     <meta name="apple-mobile-web-app-capable" content="yes" />
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
     <meta name="apple-mobile-web-app-title" content="Hotel POS" />
-
+    
+    <link rel="stylesheet" href="style.css" />
 </head>
 <body>
+
+<!-- ===== INSTALL APP BANNER ===== -->
+<div id="installBanner" style="display:none;position:fixed;bottom:20px;left:50%;transform:translateX(-50%);z-index:9999;background:#1e293b;color:white;padding:12px 20px;border-radius:12px;box-shadow:0 4px 20px rgba(0,0,0,0.3);display:flex;align-items:center;gap:12px;flex-wrap:wrap;justify-content:center;max-width:90%;">
+    <span style="font-size:1.1rem;">📲 Install Hotel POS App</span>
+    <button id="installAppBtn" style="background:#8b5cf6;color:white;border:none;padding:8px 20px;border-radius:8px;cursor:pointer;font-weight:600;font-size:0.9rem;">Install</button>
+    <button onclick="document.getElementById('installBanner').style.display='none'" style="background:transparent;border:none;color:#94a3b8;cursor:pointer;font-size:1.2rem;padding:4px 8px;">✕</button>
+</div>
 
 <!-- ===== HEADER ===== -->
 <div class="main-header">
@@ -52,13 +57,13 @@
             <span class="drop-icon">📊</span>
             <span class="drop-text">Report</span>
         </a>
-        <a href="tables.html" class="dropdown-item" onclick="closeDropdown();">
-            <span class="drop-icon">🪑</span>
-            <span class="drop-text">Tables</span>
-        </a>
         <a href="items-stock.html" class="dropdown-item" onclick="closeDropdown();">
             <span class="drop-icon">📋</span>
             <span class="drop-text">Menu & Stock</span>
+        </a>
+        <a href="tables.html" class="dropdown-item" onclick="closeDropdown();">
+            <span class="drop-icon">🪑</span>
+            <span class="drop-text">Tables</span>
         </a>
         <a href="settings.html" class="dropdown-item" onclick="closeDropdown();">
             <span class="drop-icon">⚙️</span>
@@ -323,13 +328,6 @@
             </div>
         </div>
     </div>
-</div>
-
-<!-- ===== INSTALL APP BANNER ===== -->
-<div id="installBanner" style="display:none;position:fixed;bottom:20px;left:50%;transform:translateX(-50%);z-index:9999;background:#1e293b;color:white;padding:12px 20px;border-radius:12px;box-shadow:0 4px 20px rgba(0,0,0,0.3);display:flex;align-items:center;gap:12px;flex-wrap:wrap;justify-content:center;max-width:90%;">
-    <span style="font-size:1.1rem;">📲 Install Hotel POS App</span>
-    <button id="installAppBtn" style="background:#8b5cf6;color:white;border:none;padding:8px 20px;border-radius:8px;cursor:pointer;font-weight:600;font-size:0.9rem;">Install</button>
-    <button onclick="document.getElementById('installBanner').style.display='none'" style="background:transparent;border:none;color:#94a3b8;cursor:pointer;font-size:1.2rem;padding:4px 8px;">✕</button>
 </div>
 
 <!-- ===== TOAST NOTIFICATION ===== -->
@@ -642,7 +640,7 @@ function renderCategories(categories) {
         document.getElementById('itemsGrid').innerHTML = `
             <div class="empty-state" style="grid-column:1/-1;padding:20px;">
                 No categories found.
-                <br/><button onclick="window.location.href='items.html'" style="margin-top:8px;background:#8b5cf6;color:#fff;border:none;padding:4px 16px;border-radius:30px;cursor:pointer;">📋 Add Categories</button>
+                <br/><button onclick="window.location.href='items-stock.html'" style="margin-top:8px;background:#8b5cf6;color:#fff;border:none;padding:4px 16px;border-radius:30px;cursor:pointer;">📋 Add Categories</button>
             </div>
         `;
         return;
@@ -722,7 +720,7 @@ document.getElementById('refreshItemsBtn').addEventListener('click', function() 
 });
 
 // ============================================================
-//  ADD TO CART - NO STOCK REDUCTION HERE
+//  ADD TO CART
 // ============================================================
 function addToCart(itemId) {
     const item = items.find(i => i.id === itemId);
@@ -851,7 +849,6 @@ document.getElementById('clearCartBtn').addEventListener('click', function() {
     if (cart.length === 0) return;
     if (!confirm('Clear all items from cart?')) return;
     
-    // Restore stock when clearing cart
     cart.forEach(item => {
         const stockItem = stockData.find(s => s.id === item.id);
         if (stockItem) {
@@ -868,7 +865,7 @@ document.getElementById('clearCartBtn').addEventListener('click', function() {
 });
 
 // ============================================================
-//  HOLD FUNCTIONS - STOCK REDUCED AT HOLD TIME
+//  HOLD FUNCTIONS
 // ============================================================
 document.getElementById('holdBtn').addEventListener('click', function() {
     if (cart.length === 0) {
@@ -896,7 +893,6 @@ document.getElementById('holdToTableBtn').addEventListener('click', function() {
         return;
     }
     
-    // ✅ REDUCE STOCK WHEN HOLDING TO TABLE
     let stockError = false;
     let stockUpdateMsg = '';
     
@@ -943,7 +939,6 @@ document.getElementById('holdToCustomerBtn').addEventListener('click', function(
     }
     const name = customerName.trim();
     
-    // ✅ REDUCE STOCK WHEN HOLDING TO CUSTOMER
     let stockError = false;
     let stockUpdateMsg = '';
     
@@ -1038,7 +1033,6 @@ function loadCustomerOrder(name) {
         return;
     }
     
-    // ✅ REDUCE STOCK WHEN LOADING CUSTOMER ORDER TO POS
     let stockError = false;
     let stockUpdateMsg = '';
     
@@ -1059,7 +1053,6 @@ function loadCustomerOrder(name) {
     if (stockError) return;
     saveStock();
     
-    // ✅ Fixed: Use spread operator correctly - {...item}
     items.forEach(item => {
         const existing = cart.find(c => c.id === item.id);
         if (existing) {
@@ -1110,7 +1103,6 @@ function setupNumericKeypad(inputId, clearBtnId, keypadId) {
     
     if (!input || !keypad) return;
     
-    // Keypad button clicks
     keypad.querySelectorAll('.keypad-btn').forEach(btn => {
         btn.addEventListener('click', function(e) {
             e.preventDefault();
@@ -1133,7 +1125,6 @@ function setupNumericKeypad(inputId, clearBtnId, keypadId) {
         });
     });
     
-    // Clear button
     if (clearBtn) {
         clearBtn.addEventListener('click', function() {
             input.value = '';
@@ -1142,7 +1133,6 @@ function setupNumericKeypad(inputId, clearBtnId, keypadId) {
         });
     }
     
-    // Prevent keyboard from opening on mobile
     input.addEventListener('focus', function(e) {
         this.blur();
         const firstBtn = keypad.querySelector('.keypad-btn');
@@ -1165,7 +1155,6 @@ function setupNumberPadSupport() {
         
         const key = e.key;
         
-        // Number keys (0-9) including numpad
         if (key >= '0' && key <= '9') {
             e.preventDefault();
             input.value += key;
@@ -1174,7 +1163,6 @@ function setupNumberPadSupport() {
             return;
         }
         
-        // Decimal point
         if (key === '.') {
             e.preventDefault();
             if (!input.value.includes('.')) {
@@ -1185,7 +1173,6 @@ function setupNumberPadSupport() {
             return;
         }
         
-        // Backspace
         if (key === 'Backspace') {
             e.preventDefault();
             input.value = input.value.slice(0, -1);
@@ -1194,7 +1181,6 @@ function setupNumberPadSupport() {
             return;
         }
         
-        // Enter - Confirm Payment
         if (key === 'Enter') {
             e.preventDefault();
             if (!document.getElementById('confirmPaymentBtn').disabled) {
@@ -1203,7 +1189,6 @@ function setupNumberPadSupport() {
             return;
         }
         
-        // Escape - Cancel
         if (key === 'Escape') {
             e.preventDefault();
             document.getElementById('cancelPaymentBtn').click();
@@ -1251,7 +1236,6 @@ document.getElementById('paymentAmount').addEventListener('input', function() {
 document.getElementById('payBtn').addEventListener('click', function() {
     if (cart.length === 0) return;
     
-    // ✅ CHECK STOCK AVAILABILITY BEFORE PAYMENT
     let stockError = false;
     cart.forEach(item => {
         const stockItem = stockData.find(s => s.id === item.id);
@@ -1318,14 +1302,13 @@ document.getElementById('payBtn').addEventListener('click', function() {
     
     document.getElementById('paymentModal').classList.add('open');
     
-    // Focus the keypad after modal opens
     setTimeout(() => {
         const firstBtn = document.querySelector('#numericKeypad .keypad-btn');
         if (firstBtn) firstBtn.focus();
     }, 200);
 });
 
-// ===== CONFIRM PAYMENT - STOCK IS REDUCED HERE FOR POS PAYMENT =====
+// ===== CONFIRM PAYMENT =====
 document.getElementById('confirmPaymentBtn').addEventListener('click', function() {
     if (!currentBill) return;
     
@@ -1338,7 +1321,6 @@ document.getElementById('confirmPaymentBtn').addEventListener('click', function(
         return;
     }
     
-    // ✅ REDUCE STOCK FOR POS PAYMENT
     let stockError = false;
     currentBill.items.forEach(item => {
         const stockItem = stockData.find(s => s.id === item.id);
@@ -1407,7 +1389,6 @@ document.getElementById('confirmPaymentBtn').addEventListener('click', function(
     
     showToast(`✅ Payment Successful!\n${methodDisplay}${refText}: Rs. ${bill.received.toFixed(2)}\nChange: Rs. ${bill.change.toFixed(2)}\nThank you! 🍽️`);
     
-    // Clear cart
     cart = [];
     saveCart();
     updateBilling();
@@ -2155,9 +2136,6 @@ function setupHistoryFilters() {
     }
 }
 
-// ============================================================
-//  HISTORY EVENT LISTENERS
-// ============================================================
 document.getElementById('clearHistoryBtn').addEventListener('click', function() {
     if (!confirm('⚠️ Clear all bill history? This cannot be undone!')) return;
     history = [];
@@ -2296,6 +2274,104 @@ document.addEventListener('keydown', function(e) {
 });
 
 // ============================================================
+//  PWA - REGISTER SERVICE WORKER
+// ============================================================
+if ('serviceWorker' in navigator) {
+    window.addEventListener('load', function() {
+        navigator.serviceWorker.register('sw.js')
+            .then(function(registration) {
+                console.log('✅ Service Worker registered successfully!');
+                console.log('Scope:', registration.scope);
+                
+                registration.addEventListener('updatefound', function() {
+                    const newWorker = registration.installing;
+                    console.log('🔄 Service Worker update found');
+                    
+                    newWorker.addEventListener('statechange', function() {
+                        if (newWorker.state === 'installed' && navigator.serviceWorker.controller) {
+                            console.log('🔄 New version available!');
+                            showToast('🔄 New version available! Refresh to update.');
+                        }
+                    });
+                });
+            })
+            .catch(function(error) {
+                console.log('❌ Service Worker registration failed:', error);
+            });
+    });
+}
+
+// ============================================================
+//  CHECK APP INSTALL STATUS
+// ============================================================
+function isAppInstalled() {
+    if (window.matchMedia('(display-mode: standalone)').matches) {
+        console.log('✅ App is installed and running in standalone mode');
+        return true;
+    }
+    return false;
+}
+
+// ============================================================
+//  INSTALL PROMPT HANDLER
+// ============================================================
+let deferredPrompt;
+
+window.addEventListener('beforeinstallprompt', function(e) {
+    console.log('📲 App can be installed');
+    e.preventDefault();
+    deferredPrompt = e;
+    
+    const banner = document.getElementById('installBanner');
+    if (banner) {
+        if (!isAppInstalled()) {
+            banner.style.display = 'flex';
+        }
+    }
+});
+
+document.getElementById('installAppBtn')?.addEventListener('click', function() {
+    if (deferredPrompt) {
+        deferredPrompt.prompt();
+        deferredPrompt.userChoice.then(function(choiceResult) {
+            if (choiceResult.outcome === 'accepted') {
+                console.log('✅ User accepted the install prompt');
+                document.getElementById('installBanner').style.display = 'none';
+                showToast('✅ App installed successfully!');
+            } else {
+                console.log('❌ User dismissed the install prompt');
+            }
+            deferredPrompt = null;
+        });
+    }
+});
+
+window.addEventListener('appinstalled', function(e) {
+    console.log('✅ App was installed successfully!');
+    document.getElementById('installBanner').style.display = 'none';
+    showToast('✅ App installed successfully!');
+});
+
+// ============================================================
+//  CHECK ONLINE STATUS
+// ============================================================
+function checkOnlineStatus() {
+    if (!navigator.onLine) {
+        showToast('📡 You are offline. Some features may not work.');
+    }
+}
+
+window.addEventListener('online', function() {
+    showToast('✅ Back online!');
+});
+
+window.addEventListener('offline', function() {
+    showToast('📡 You are offline. Some features may not work.');
+});
+
+checkOnlineStatus();
+
+// ============================================================
 //  EXPORT FUNCTIONS
 // ============================================================
 window.addToCart = addToCart;
@@ -2339,119 +2415,10 @@ document.addEventListener('DOMContentLoaded', function() {
     loadQuickAddItems();
     setupHistoryFilters();
     setupNumericKeypad('paymentAmount', 'clearAmountBtn', 'numericKeypad');
-    
-    // ✅ Computer Number Pad Support
     setupNumberPadSupport();
-    
     autoClearOldBills();
     renderHistory();
 });
-
-// ============================================================
-//  PWA - REGISTER SERVICE WORKER
-// ============================================================
-
-// Register Service Worker
-if ('serviceWorker' in navigator) {
-    window.addEventListener('load', function() {
-        navigator.serviceWorker.register('sw.js')
-            .then(function(registration) {
-                console.log('✅ Service Worker registered successfully!');
-                console.log('Scope:', registration.scope);
-                
-                // Check for updates
-                registration.addEventListener('updatefound', function() {
-                    const newWorker = registration.installing;
-                    console.log('🔄 Service Worker update found');
-                    
-                    newWorker.addEventListener('statechange', function() {
-                        if (newWorker.state === 'installed' && navigator.serviceWorker.controller) {
-                            console.log('🔄 New version available!');
-                            showToast('🔄 New version available! Refresh to update.');
-                        }
-                    });
-                });
-            })
-            .catch(function(error) {
-                console.log('❌ Service Worker registration failed:', error);
-            });
-    });
-}
-
-// ============================================================
-//  CHECK APP INSTALL STATUS
-// ============================================================
-function isAppInstalled() {
-    if (window.matchMedia('(display-mode: standalone)').matches) {
-        console.log('✅ App is installed and running in standalone mode');
-        return true;
-    }
-    return false;
-}
-
-// ============================================================
-//  INSTALL PROMPT HANDLER
-// ============================================================
-let deferredPrompt;
-
-window.addEventListener('beforeinstallprompt', function(e) {
-    console.log('📲 App can be installed');
-    e.preventDefault();
-    deferredPrompt = e;
-    
-    // Show install banner
-    const banner = document.getElementById('installBanner');
-    if (banner) {
-        // Don't show if already installed
-        if (!isAppInstalled()) {
-            banner.style.display = 'flex';
-        }
-    }
-});
-
-// Install button click handler
-document.getElementById('installAppBtn')?.addEventListener('click', function() {
-    if (deferredPrompt) {
-        deferredPrompt.prompt();
-        deferredPrompt.userChoice.then(function(choiceResult) {
-            if (choiceResult.outcome === 'accepted') {
-                console.log('✅ User accepted the install prompt');
-                document.getElementById('installBanner').style.display = 'none';
-                showToast('✅ App installed successfully!');
-            } else {
-                console.log('❌ User dismissed the install prompt');
-            }
-            deferredPrompt = null;
-        });
-    }
-});
-
-// App installed event
-window.addEventListener('appinstalled', function(e) {
-    console.log('✅ App was installed successfully!');
-    document.getElementById('installBanner').style.display = 'none';
-    showToast('✅ App installed successfully!');
-});
-
-// ============================================================
-//  CHECK ONLINE STATUS
-// ============================================================
-function checkOnlineStatus() {
-    if (!navigator.onLine) {
-        showToast('📡 You are offline. Some features may not work.');
-    }
-}
-
-window.addEventListener('online', function() {
-    showToast('✅ Back online!');
-});
-
-window.addEventListener('offline', function() {
-    showToast('📡 You are offline. Some features may not work.');
-});
-
-checkOnlineStatus();
-
 </script>
 
 </body>
