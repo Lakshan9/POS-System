@@ -1,0 +1,1335 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
+    <title>Menu & Stock - Hotel POS</title>
+    <link rel="stylesheet" href="style-items-stock.css" />
+
+    <!-- ===== PWA META TAGS ===== -->
+<link rel="manifest" href="manifest.json" />
+<link rel="apple-touch-icon" href="icons/icon-192.png" />
+<link rel="icon" href="icons/icon-192.png" />
+<meta name="theme-color" content="#8b5cf6" />
+<meta name="apple-mobile-web-app-capable" content="yes" />
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
+<meta name="apple-mobile-web-app-title" content="Hotel POS" />
+
+</head>
+<body>
+
+<!-- ===== HEADER ===== -->
+<div class="main-header">
+    <div class="header-left">
+        <button class="hamburger-btn" id="hamburgerBtn" onclick="toggleDropdown()">
+            <span></span>
+            <span></span>
+            <span></span>
+        </button>
+        <h1>📋 MENU & STOCK</h1>
+        <span class="datetime" id="datetime">--</span>
+        <button id="darkModeToggle" class="theme-toggle-btn" onclick="toggleTheme()">🌙</button>
+    </div>
+    <div class="header-right">
+        <button onclick="window.location.href='index.html'" class="back-btn">🏠 Back to POS</button>
+        <button onclick="lockPage()" class="lock-btn" id="lockBtn">🔒 Lock</button>
+        <button class="tab-btn" onclick="logout()" style="background:#ef4444;color:#fff;">🚪 Logout</button>
+    </div>
+</div>
+
+<!-- ===== DROPDOWN MENU ===== -->
+<div class="dropdown-menu" id="dropdownMenu">
+    <div class="dropdown-content">
+        <a href="index.html" class="dropdown-item">
+            <span class="drop-icon">🧾</span>
+            <span class="drop-text">POS</span>
+        </a>
+        <a href="index.html#history" class="dropdown-item" onclick="switchTab('history')">
+            <span class="drop-icon">📜</span>
+            <span class="drop-text">History</span>
+        </a>
+        <a href="report.html" class="dropdown-item">
+            <span class="drop-icon">📊</span>
+            <span class="drop-text">Report</span>
+        </a>
+        <a href="items-stock.html" class="dropdown-item active-link">
+            <span class="drop-icon">📋</span>
+            <span class="drop-text">Menu & Stock</span>
+        </a>
+        <a href="tables.html" class="dropdown-item">
+            <span class="drop-icon">🪑</span>
+            <span class="drop-text">Tables</span>
+        </a>
+        <a href="settings.html" class="dropdown-item">
+            <span class="drop-icon">⚙️</span>
+            <span class="drop-text">Settings</span>
+        </a>
+        <div class="dropdown-divider"></div>
+        <a href="#" class="dropdown-item" onclick="toggleFullScreen();">
+            <span class="drop-icon">⛶</span>
+            <span class="drop-text">Full Screen</span>
+        </a>
+        <a href="#" class="dropdown-item" onclick="logout();">
+            <span class="drop-icon">🚪</span>
+            <span class="drop-text">Logout</span>
+        </a>
+    </div>
+</div>
+
+<!-- ===== DROPDOWN OVERLAY ===== -->
+<div class="dropdown-overlay" id="dropdownOverlay" onclick="closeDropdown()"></div>
+
+<!-- ===== PASSWORD PROTECTION OVERLAY ===== -->
+<div class="password-overlay" id="passwordOverlay">
+    <div class="password-box">
+        <div class="password-header">
+            <span class="lock-icon">🔒</span>
+            <h2>Menu & Stock Management</h2>
+            <p>Admin only - Please enter your password</p>
+        </div>
+        
+        <!-- Password Input -->
+        <div class="password-input-group">
+            <input type="password" id="pagePasswordInput" placeholder="Enter admin password" autofocus />
+            <button class="toggle-password-btn" onclick="togglePagePassword()">👁️</button>
+        </div>
+        
+        <!-- Error Message -->
+        <div class="password-error" id="passwordError"></div>
+        
+        <!-- Buttons -->
+        <button class="password-submit-btn" onclick="verifyPagePassword()">🔓 Unlock</button>
+        <button class="password-cancel-btn" onclick="window.location.href='index.html'">🏠 Back to POS</button>
+        
+        <!-- Footer -->
+        <div class="password-footer">
+            <span>Default Admin Password: <strong>admin123</strong></span>
+            <br/>
+            <span style="font-size:0.65rem;color:#94a3b8;">Change password in Settings → Security</span>
+        </div>
+    </div>
+</div>
+
+<!-- ===== MAIN CONTENT ===== -->
+<div class="main-content-wrapper" id="mainContentWrapper" style="display:none;">
+
+    <!-- ===== ACTIONS BAR ===== -->
+    <div class="actions-bar">
+        <button class="active" id="showAllBtn">📋 All Items</button>
+        <button id="showLowStockBtn">⚠️ Low Stock</button>
+        <button id="showOutOfStockBtn">🚫 Out of Stock</button>
+        <button onclick="openAddCategory()" class="add-btn" style="background:#8b5cf6;">📁 Add Category</button>
+        <button onclick="openAddItem()" class="add-btn" style="background:#22c55e;">➕ Add Item</button>
+        <button onclick="exportData()" class="export-btn">⬇ Export CSV</button>
+        <button onclick="refreshData()" class="refresh-btn">⟳ Refresh</button>
+        <button onclick="lockPage()" class="lock-btn-small" style="background:#ef4444;color:white;border:none;padding:6px 14px;border-radius:6px;cursor:pointer;font-weight:500;">🔒 Lock</button>
+    </div>
+
+    <!-- ===== SUMMARY CARDS ===== -->
+    <div class="stock-summary" id="stockSummary">
+        <div class="summary-card">
+            <div class="card-icon">📋</div>
+            <div class="card-info">
+                <div class="num" id="totalItems">0</div>
+                <div class="label">Total Items</div>
+            </div>
+        </div>
+        <div class="summary-card">
+            <div class="card-icon">📦</div>
+            <div class="card-info">
+                <div class="num" id="totalStock">0</div>
+                <div class="label">Total Stock</div>
+            </div>
+        </div>
+        <div class="summary-card warning">
+            <div class="card-icon">⚠️</div>
+            <div class="card-info">
+                <div class="num" id="lowStockCount">0</div>
+                <div class="label">Low Stock Items</div>
+            </div>
+        </div>
+        <div class="summary-card success">
+            <div class="card-icon">💰</div>
+            <div class="card-info">
+                <div class="num" id="totalValue">Rs. 0.00</div>
+                <div class="label">Total Stock Value</div>
+            </div>
+        </div>
+    </div>
+
+    <!-- ===== MAIN GRID: Categories + Items ===== -->
+    <div class="main-grid">
+        
+        <!-- ===== LEFT: Categories ===== -->
+        <div class="categories-section">
+            <div class="section-header">
+                <h3>📂 Categories</h3>
+                <button onclick="openAddCategory()" class="small-add-btn">+</button>
+            </div>
+            <div class="categories-list" id="categoriesList">
+                <!-- Rendered by JS -->
+            </div>
+        </div>
+
+        <!-- ===== RIGHT: Items with Stock ===== -->
+        <div class="items-section">
+            <div class="section-header">
+                <h3 id="categoryTitle">🍽️ All Items</h3>
+                <div class="section-actions">
+                    <input type="text" id="searchItems" placeholder="🔍 Search items..." oninput="searchItems(this.value)" />
+                    <button onclick="openAddItem()" class="small-add-btn">+</button>
+                </div>
+            </div>
+            <div class="items-grid" id="itemsGrid">
+                <!-- Rendered by JS -->
+            </div>
+        </div>
+
+    </div>
+
+    <!-- ===== CATEGORY MODAL ===== -->
+    <div class="modal-overlay" id="categoryModal">
+        <div class="modal modal-small">
+            <div class="modal-header">
+                <h2 id="categoryModalTitle">📁 Add Category</h2>
+                <button class="close-btn" onclick="closeCategoryModal()">✕</button>
+            </div>
+            <div class="modal-body">
+                <label>Category Name</label>
+                <input type="text" id="categoryName" placeholder="e.g. Appetizers" />
+                
+                <label>Category Icon</label>
+                <select id="categoryIcon">
+                    <option value="🍽️">🍽️ Main Dishes</option>
+                    <option value="🥤">🥤 Beverages</option>
+                    <option value="🍰">🍰 Desserts</option>
+                    <option value="🍣">🍣 Seafood</option>
+                    <option value="🥗">🥗 Salads</option>
+                    <option value="🍜">🍜 Soups</option>
+                    <option value="🍕">🍕 Fast Food</option>
+                    <option value="📦">📦 Other</option>
+                </select>
+                
+                <input type="hidden" id="editCategoryId" value="" />
+                
+                <div class="modal-actions">
+                    <button class="save-btn" onclick="saveCategory()">💾 Save</button>
+                    <button class="delete-btn" id="deleteCategoryBtn" style="display:none;" onclick="deleteCategory()">🗑 Delete</button>
+                    <button class="cancel-btn" onclick="closeCategoryModal()">✕ Cancel</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- ===== ITEM MODAL ===== -->
+    <div class="modal-overlay" id="itemModal">
+        <div class="modal modal-small">
+            <div class="modal-header">
+                <h2 id="itemModalTitle">➕ Add Item</h2>
+                <button class="close-btn" onclick="closeItemModal()">✕</button>
+            </div>
+            <div class="modal-body">
+                <label>Item Name</label>
+                <input type="text" id="itemName" placeholder="e.g. Burger" />
+                
+                <label>Price (Rs.)</label>
+                <input type="number" id="itemPrice" placeholder="0.00" step="0.01" min="0" />
+                
+                <label>Category</label>
+                <select id="itemCategory">
+                    <!-- Rendered by JS -->
+                </select>
+                
+                <label>Stock Quantity</label>
+                <input type="number" id="itemStock" placeholder="0" step="1" min="0" />
+                
+                <label>Min Stock Alert</label>
+                <input type="number" id="itemMinStock" placeholder="5" step="1" min="0" value="5" />
+                
+                <input type="hidden" id="editItemId" value="" />
+                
+                <div class="modal-actions">
+                    <button class="save-btn" onclick="saveItem()">💾 Save</button>
+                    <button class="delete-btn" id="deleteItemBtn" style="display:none;" onclick="deleteItem()">🗑 Delete</button>
+                    <button class="cancel-btn" onclick="closeItemModal()">✕ Cancel</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- ===== LOW STOCK ALERT MODAL ===== -->
+    <div class="modal-overlay" id="alertModal">
+        <div class="modal modal-small alert-modal">
+            <div class="modal-header alert-header">
+                <h2>⚠️ Low Stock Alert</h2>
+                <button class="close-btn" onclick="closeAlert()">✕</button>
+            </div>
+            <div class="alert-body" id="alertBody">
+                <!-- Rendered by JS -->
+            </div>
+        </div>
+    </div>
+
+    <!-- ===== TOAST NOTIFICATION ===== -->
+    <div id="toast"></div>
+
+</div>
+
+<script>
+// ============================================================
+//  DATA KEYS
+// ============================================================
+const ITEMS_KEY = 'hotel_items';
+const STOCK_KEY = 'hotel_stock';
+const CATEGORIES_KEY = 'hotel_categories';
+
+// ============================================================
+//  PAGE LOCK / UNLOCK FUNCTIONS
+// ============================================================
+
+// Get admin password from localStorage (set in settings)
+function getAdminPassword() {
+    try {
+        const stored = localStorage.getItem('hotel_password');
+        if (!stored) {
+            // Set default password if not exists
+            localStorage.setItem('hotel_password', 'admin123');
+            return 'admin123';
+        }
+        return stored;
+    } catch (e) {
+        return 'admin123';
+    }
+}
+
+// Check if page is locked
+function isPageLocked() {
+    try {
+        // Check if this page is locked separately
+        const locked = localStorage.getItem('menu_stock_locked');
+        // If no value set, lock by default
+        if (locked === null) {
+            localStorage.setItem('menu_stock_locked', 'true');
+            return true;
+        }
+        return locked === 'true';
+    } catch (e) {
+        return true;
+    }
+}
+
+// Lock the page
+function lockPage() {
+    if (confirm('🔒 Lock Menu & Stock page? You will need to enter password again.')) {
+        localStorage.setItem('menu_stock_locked', 'true');
+        document.getElementById('mainContentWrapper').style.display = 'none';
+        document.getElementById('passwordOverlay').style.display = 'flex';
+        document.getElementById('pagePasswordInput').value = '';
+        document.getElementById('passwordError').style.display = 'none';
+        setTimeout(() => { document.getElementById('pagePasswordInput').focus(); }, 200);
+        showToast('🔒 Page locked!');
+    }
+}
+
+// Verify page password
+function verifyPagePassword() {
+    const input = document.getElementById('pagePasswordInput');
+    const error = document.getElementById('passwordError');
+    const password = input.value.trim();
+    const storedPassword = getAdminPassword();
+    
+    // Clear previous error
+    error.style.display = 'none';
+    error.textContent = '';
+    
+    if (!password) {
+        error.textContent = '❌ Please enter your password!';
+        error.style.display = 'block';
+        input.focus();
+        return;
+    }
+    
+    // Check if user is admin
+    const username = localStorage.getItem('hotel_username');
+    if (username !== 'admin') {
+        error.textContent = '❌ Only admin can access this page!';
+        error.style.display = 'block';
+        input.value = '';
+        input.focus();
+        return;
+    }
+    
+    if (password === storedPassword) {
+        // Unlock
+        localStorage.setItem('menu_stock_locked', 'false');
+        document.getElementById('passwordOverlay').style.display = 'none';
+        document.getElementById('mainContentWrapper').style.display = 'block';
+        error.style.display = 'none';
+        input.value = '';
+        
+        // Load data and render
+        loadData();
+        renderAll();
+        showToast('🔓 Page unlocked!');
+    } else {
+        error.textContent = '❌ Invalid password! Please try again.';
+        error.style.display = 'block';
+        input.value = '';
+        input.focus();
+        
+        // Shake animation
+        const box = document.querySelector('.password-box');
+        if (box) {
+            box.style.animation = 'shake 0.5s ease';
+            setTimeout(() => { box.style.animation = ''; }, 500);
+        }
+    }
+}
+
+// Toggle password visibility
+function togglePagePassword() {
+    const input = document.getElementById('pagePasswordInput');
+    const btn = document.querySelector('.toggle-password-btn');
+    if (input.type === 'password') {
+        input.type = 'text';
+        btn.textContent = '🙈';
+    } else {
+        input.type = 'password';
+        btn.textContent = '👁️';
+    }
+}
+
+// Check page lock on load
+function checkPageLock() {
+    // First check if user is admin
+    const username = localStorage.getItem('hotel_username');
+    if (username !== 'admin') {
+        // Non-admin users: show access denied
+        document.getElementById('passwordOverlay').style.display = 'flex';
+        document.getElementById('mainContentWrapper').style.display = 'none';
+        document.querySelector('.password-header h2').textContent = '⛔ Access Denied';
+        document.querySelector('.password-header p').textContent = 'Only admin can access Menu & Stock management';
+        document.querySelector('.password-submit-btn').style.display = 'none';
+        document.querySelector('.password-input-group').style.display = 'none';
+        document.querySelector('.password-footer').innerHTML = `
+            <span style="color:#ef4444;">⛔ Admin access only</span>
+            <br/>
+            <button onclick="window.location.href='index.html'" style="margin-top:8px;padding:8px 20px;border:none;border-radius:8px;background:#8b5cf6;color:white;cursor:pointer;font-weight:600;">🏠 Back to POS</button>
+        `;
+        return;
+    }
+    
+    // Admin user: check lock status
+    const locked = isPageLocked();
+    if (locked) {
+        document.getElementById('passwordOverlay').style.display = 'flex';
+        document.getElementById('mainContentWrapper').style.display = 'none';
+        document.querySelector('.password-header h2').textContent = '🔒 Menu & Stock Management';
+        document.querySelector('.password-header p').textContent = 'Admin only - Please enter your password';
+        document.querySelector('.password-submit-btn').style.display = 'block';
+        document.querySelector('.password-input-group').style.display = 'block';
+        document.querySelector('.password-footer').innerHTML = `
+            <span>Default Admin Password: <strong>admin123</strong></span>
+            <br/>
+            <span style="font-size:0.65rem;color:#94a3b8;">Change password in Settings → Security</span>
+        `;
+        setTimeout(() => { document.getElementById('pagePasswordInput').focus(); }, 300);
+    } else {
+        document.getElementById('passwordOverlay').style.display = 'none';
+        document.getElementById('mainContentWrapper').style.display = 'block';
+        loadData();
+        renderAll();
+    }
+}
+
+// ============================================================
+//  DATA
+// ============================================================
+let items = [];
+let stockItems = [];
+let categories = [];
+let selectedCategory = null;
+let currentFilter = 'all';
+let searchQuery = '';
+
+// ============================================================
+//  LOAD / SAVE DATA
+// ============================================================
+function loadData() {
+    try {
+        // Load Items
+        const storedItems = localStorage.getItem(ITEMS_KEY);
+        if (storedItems) {
+            items = JSON.parse(storedItems);
+        } else {
+            items = [
+                { id: 1, name: '🍔 Burger', price: 8.99, category: 'main' },
+                { id: 2, name: '🍕 Pizza', price: 10.99, category: 'main' },
+                { id: 3, name: '🍝 Pasta', price: 9.99, category: 'main' },
+                { id: 4, name: '🥗 Salad', price: 6.99, category: 'main' },
+                { id: 5, name: '🥤 Soda', price: 2.99, category: 'drinks' },
+                { id: 6, name: '🧃 Juice', price: 3.49, category: 'drinks' },
+                { id: 7, name: '☕ Coffee', price: 2.99, category: 'drinks' },
+                { id: 8, name: '🍰 Cake', price: 4.99, category: 'desserts' },
+                { id: 9, name: '🍦 Ice Cream', price: 3.99, category: 'desserts' },
+            ];
+            saveItems();
+        }
+
+        // Load Stock
+        const storedStock = localStorage.getItem(STOCK_KEY);
+        if (storedStock) {
+            stockItems = JSON.parse(storedStock);
+        } else {
+            stockItems = items.map(item => ({
+                id: item.id,
+                name: item.name,
+                price: item.price,
+                category: item.category || 'other',
+                stock: 15,
+                minStock: 5
+            }));
+            saveStock();
+        }
+
+        // Sync stock with items
+        items.forEach(item => {
+            const stockItem = stockItems.find(s => s.id === item.id);
+            if (!stockItem) {
+                stockItems.push({
+                    id: item.id,
+                    name: item.name,
+                    price: item.price,
+                    category: item.category || 'other',
+                    stock: 15,
+                    minStock: 5
+                });
+            } else {
+                stockItem.name = item.name;
+                stockItem.price = item.price;
+                stockItem.category = item.category || 'other';
+            }
+        });
+        
+        // Remove stock items that don't have corresponding menu items
+        stockItems = stockItems.filter(s => items.some(i => i.id === s.id));
+        saveStock();
+        saveItems();
+
+        // Load Categories
+        const storedCategories = localStorage.getItem(CATEGORIES_KEY);
+        if (storedCategories) {
+            categories = JSON.parse(storedCategories);
+        } else {
+            categories = [
+                { id: 'main', name: 'Main Dishes', icon: '🍽️' },
+                { id: 'drinks', name: 'Beverages', icon: '🥤' },
+                { id: 'desserts', name: 'Desserts', icon: '🍰' }
+            ];
+            saveCategories();
+        }
+
+    } catch (e) {
+        console.error('Load error:', e);
+        items = [];
+        stockItems = [];
+        categories = [];
+    }
+}
+
+function saveItems() { localStorage.setItem(ITEMS_KEY, JSON.stringify(items)); }
+function saveStock() { localStorage.setItem(STOCK_KEY, JSON.stringify(stockItems)); }
+function saveCategories() { localStorage.setItem(CATEGORIES_KEY, JSON.stringify(categories)); }
+
+// ============================================================
+//  THEME FUNCTIONS
+// ============================================================
+function toggleTheme() {
+    const body = document.body;
+    const btn = document.getElementById('darkModeToggle');
+    const isDark = body.classList.contains('theme-dark');
+    
+    if (isDark) {
+        body.classList.remove('theme-dark');
+        btn.textContent = '🌙';
+        localStorage.setItem('theme', 'light');
+    } else {
+        body.classList.add('theme-dark');
+        btn.textContent = '☀️';
+        localStorage.setItem('theme', 'dark');
+    }
+}
+
+function loadSavedTheme() {
+    const savedTheme = localStorage.getItem('theme');
+    const btn = document.getElementById('darkModeToggle');
+    if (savedTheme === 'dark') {
+        document.body.classList.add('theme-dark');
+        if (btn) btn.textContent = '☀️';
+    } else {
+        document.body.classList.remove('theme-dark');
+        if (btn) btn.textContent = '🌙';
+    }
+}
+
+// ============================================================
+//  HELPER FUNCTIONS
+// ============================================================
+function getStockForItem(itemId) {
+    const stockItem = stockItems.find(s => s.id === itemId);
+    return stockItem ? stockItem.stock : 0;
+}
+
+function getStockColor(stock) {
+    if (stock < 5) return 'stock-danger';
+    else if (stock < 10) return 'stock-warning';
+    else return 'stock-success';
+}
+
+function getStockStatus(stock) {
+    if (stock < 5) return '🔴 Very Low';
+    else if (stock < 10) return '🟡 Low';
+    else return '🟢 Sufficient';
+}
+
+function getCategoryDisplay(id) {
+    const cat = categories.find(c => c.id === id);
+    return cat ? `${cat.icon} ${cat.name}` : '📦 Other';
+}
+
+function getCategoryIcon(id) {
+    const cat = categories.find(c => c.id === id);
+    return cat ? cat.icon : '📦';
+}
+
+// ============================================================
+//  CLOCK
+// ============================================================
+function updateClock() {
+    const now = new Date();
+    const d = now.toLocaleDateString('en-US', { month: '2-digit', day: '2-digit', year: 'numeric' });
+    const t = now.toLocaleTimeString('en-US', { hour12: true, hour: '2-digit', minute: '2-digit', second: '2-digit' });
+    document.getElementById('datetime').textContent = `${d} ${t}`;
+}
+updateClock();
+setInterval(updateClock, 1000);
+
+// ============================================================
+//  DROPDOWN MENU
+// ============================================================
+function toggleDropdown() {
+    const btn = document.getElementById('hamburgerBtn');
+    const menu = document.getElementById('dropdownMenu');
+    const overlay = document.getElementById('dropdownOverlay');
+    
+    btn.classList.toggle('open');
+    menu.classList.toggle('open');
+    overlay.classList.toggle('active');
+    document.body.style.overflow = menu.classList.contains('open') ? 'hidden' : '';
+}
+
+function closeDropdown() {
+    document.getElementById('hamburgerBtn').classList.remove('open');
+    document.getElementById('dropdownMenu').classList.remove('open');
+    document.getElementById('dropdownOverlay').classList.remove('active');
+    document.body.style.overflow = '';
+}
+
+// ============================================================
+//  RENDER ALL
+// ============================================================
+function renderAll() {
+    renderCategories();
+    renderItems();
+    updateSummary();
+    populateCategorySelect();
+    checkLowStock();
+}
+
+function renderCategories() {
+    const container = document.getElementById('categoriesList');
+    
+    if (categories.length === 0) {
+        container.innerHTML = `
+            <div class="empty-state-small">
+                No categories yet
+                <button onclick="openAddCategory()" class="small-add-btn">+ Add</button>
+            </div>
+        `;
+        return;
+    }
+    
+    let html = '';
+    categories.forEach(cat => {
+        const itemCount = items.filter(i => i.category === cat.id).length;
+        const isActive = selectedCategory === cat.id;
+        
+        html += `
+            <div class="category-item ${isActive ? 'active' : ''}" onclick="selectCategory('${cat.id}')">
+                <span class="cat-icon">${cat.icon}</span>
+                <span class="cat-name">${cat.name}</span>
+                <span class="cat-count">${itemCount}</span>
+                <button class="cat-edit-btn" onclick="event.stopPropagation();editCategory('${cat.id}')">✎</button>
+            </div>
+        `;
+    });
+    
+    // All items option
+    html += `
+        <div class="category-item ${!selectedCategory ? 'active' : ''}" onclick="selectCategory(null)">
+            <span class="cat-icon">📋</span>
+            <span class="cat-name">All Items</span>
+            <span class="cat-count">${items.length}</span>
+        </div>
+    `;
+    
+    container.innerHTML = html;
+}
+
+function renderItems() {
+    const container = document.getElementById('itemsGrid');
+    const title = document.getElementById('categoryTitle');
+    
+    let filteredItems = [...items];
+    
+    // Filter by category
+    if (selectedCategory) {
+        filteredItems = filteredItems.filter(i => i.category === selectedCategory);
+        const cat = categories.find(c => c.id === selectedCategory);
+        title.textContent = `${cat ? cat.icon : '📁'} ${cat ? cat.name : 'Items'}`;
+    } else {
+        title.textContent = '🍽️ All Items';
+    }
+    
+    // Filter by search
+    if (searchQuery) {
+        filteredItems = filteredItems.filter(i => 
+            i.name.toLowerCase().includes(searchQuery.toLowerCase())
+        );
+    }
+    
+    // Filter by stock status
+    if (currentFilter === 'low') {
+        filteredItems = filteredItems.filter(i => getStockForItem(i.id) < 5 && getStockForItem(i.id) > 0);
+    } else if (currentFilter === 'out') {
+        filteredItems = filteredItems.filter(i => getStockForItem(i.id) <= 0);
+    }
+    
+    // Sort by name
+    filteredItems.sort((a, b) => a.name.localeCompare(b.name));
+    
+    if (filteredItems.length === 0) {
+        container.innerHTML = `
+            <div class="empty-state-small" style="grid-column:1/-1;text-align:center;padding:40px 20px;color:#94a3b8;">
+                No items found
+                <br/>
+                <button onclick="openAddItem()" class="small-add-btn" style="margin-top:8px;">+ Add Item</button>
+            </div>
+        `;
+        return;
+    }
+    
+    let html = '';
+    filteredItems.forEach(item => {
+        const stock = getStockForItem(item.id);
+        const colorClass = getStockColor(stock);
+        const status = getStockStatus(stock);
+        const totalValue = item.price * stock;
+        
+        html += `
+            <div class="item-card ${colorClass}">
+                <div class="item-header">
+                    <span class="item-name">${item.name}</span>
+                    <span class="item-price">Rs. ${item.price.toFixed(2)}</span>
+                </div>
+                <div class="item-details">
+                    <span class="item-category">${getCategoryDisplay(item.category)}</span>
+                    <span class="item-stock ${colorClass}">📦 ${stock} (${status})</span>
+                    <span class="item-value">💰 Rs. ${totalValue.toFixed(2)}</span>
+                </div>
+                <div class="item-actions">
+                    <button onclick="editItem(${item.id})" class="action-btn edit-btn" title="Edit">✎</button>
+                    <button onclick="addStock(${item.id})" class="action-btn add-stock-btn" title="Add Stock">➕</button>
+                    <button onclick="removeStock(${item.id})" class="action-btn remove-stock-btn" title="Remove Stock">➖</button>
+                    <button onclick="deleteItemConfirm(${item.id})" class="action-btn delete-btn" title="Delete">✕</button>
+                </div>
+            </div>
+        `;
+    });
+    
+    container.innerHTML = html;
+}
+
+function updateSummary() {
+    const total = items.length;
+    const totalStockQty = stockItems.reduce((sum, s) => sum + s.stock, 0);
+    const lowItems = stockItems.filter(s => s.stock < 5 && s.stock > 0).length;
+    const outItems = stockItems.filter(s => s.stock <= 0).length;
+    const totalVal = stockItems.reduce((sum, s) => sum + (s.price * s.stock), 0);
+    
+    document.getElementById('totalItems').textContent = total;
+    document.getElementById('totalStock').textContent = totalStockQty;
+    document.getElementById('lowStockCount').textContent = lowItems + outItems;
+    document.getElementById('totalValue').textContent = `Rs. ${totalVal.toFixed(2)}`;
+}
+
+function populateCategorySelect() {
+    const select = document.getElementById('itemCategory');
+    const currentValue = select.value;
+    
+    select.innerHTML = categories.map(cat => 
+        `<option value="${cat.id}">${cat.icon} ${cat.name}</option>`
+    ).join('');
+    
+    if (currentValue) {
+        select.value = currentValue;
+    }
+}
+
+// ============================================================
+//  CATEGORY FUNCTIONS
+// ============================================================
+function selectCategory(catId) {
+    selectedCategory = catId;
+    renderCategories();
+    renderItems();
+}
+
+function openAddCategory() {
+    document.getElementById('categoryModalTitle').textContent = '📁 Add Category';
+    document.getElementById('categoryName').value = '';
+    document.getElementById('categoryIcon').value = '🍽️';
+    document.getElementById('editCategoryId').value = '';
+    document.getElementById('deleteCategoryBtn').style.display = 'none';
+    document.getElementById('categoryModal').classList.add('open');
+    setTimeout(() => document.getElementById('categoryName').focus(), 100);
+}
+
+function editCategory(catId) {
+    const cat = categories.find(c => c.id === catId);
+    if (!cat) return;
+    
+    document.getElementById('categoryModalTitle').textContent = '✎ Edit Category';
+    document.getElementById('categoryName').value = cat.name;
+    document.getElementById('categoryIcon').value = cat.icon;
+    document.getElementById('editCategoryId').value = catId;
+    document.getElementById('deleteCategoryBtn').style.display = 'block';
+    document.getElementById('categoryModal').classList.add('open');
+    setTimeout(() => document.getElementById('categoryName').focus(), 100);
+}
+
+function saveCategory() {
+    const name = document.getElementById('categoryName').value.trim();
+    const icon = document.getElementById('categoryIcon').value;
+    const editId = document.getElementById('editCategoryId').value;
+    
+    if (!name) {
+        showToast('⚠️ Please enter category name!');
+        document.getElementById('categoryName').focus();
+        return;
+    }
+    
+    const id = name.toLowerCase().replace(/[^a-z0-9]/g, '_');
+    
+    if (editId) {
+        // Edit existing
+        const index = categories.findIndex(c => c.id === editId);
+        if (index !== -1) {
+            // Update items with new category id
+            items.forEach(item => {
+                if (item.category === editId) {
+                    item.category = id;
+                }
+            });
+            categories[index] = { id, name, icon };
+            saveCategories();
+            saveItems();
+            showToast(`✅ "${name}" updated!`);
+        }
+    } else {
+        // Add new
+        if (categories.find(c => c.id === id)) {
+            showToast('⚠️ Category already exists!');
+            return;
+        }
+        categories.push({ id, name, icon });
+        saveCategories();
+        showToast(`✅ "${name}" added!`);
+    }
+    
+    closeCategoryModal();
+    renderAll();
+}
+
+function deleteCategory() {
+    const editId = document.getElementById('editCategoryId').value;
+    if (!editId) return;
+    
+    const cat = categories.find(c => c.id === editId);
+    if (!cat) return;
+    
+    if (!confirm(`Delete category "${cat.name}"? Items will be moved to "Other".`)) return;
+    
+    // Move items to 'other' category
+    items.forEach(item => {
+        if (item.category === editId) {
+            item.category = 'other';
+        }
+    });
+    saveItems();
+    
+    categories = categories.filter(c => c.id !== editId);
+    saveCategories();
+    
+    closeCategoryModal();
+    renderAll();
+    showToast(`✅ "${cat.name}" deleted!`);
+}
+
+function closeCategoryModal() {
+    document.getElementById('categoryModal').classList.remove('open');
+}
+
+// ============================================================
+//  ITEM FUNCTIONS
+// ============================================================
+function openAddItem() {
+    document.getElementById('itemModalTitle').textContent = '➕ Add Item';
+    document.getElementById('itemName').value = '';
+    document.getElementById('itemPrice').value = '';
+    document.getElementById('itemStock').value = '';
+    document.getElementById('itemMinStock').value = '5';
+    document.getElementById('editItemId').value = '';
+    document.getElementById('deleteItemBtn').style.display = 'none';
+    populateCategorySelect();
+    document.getElementById('itemModal').classList.add('open');
+    setTimeout(() => document.getElementById('itemName').focus(), 100);
+}
+
+function editItem(itemId) {
+    const item = items.find(i => i.id === itemId);
+    if (!item) return;
+    
+    const stock = getStockForItem(itemId);
+    const minStock = stockItems.find(s => s.id === itemId)?.minStock || 5;
+    
+    document.getElementById('itemModalTitle').textContent = '✎ Edit Item';
+    document.getElementById('itemName').value = item.name;
+    document.getElementById('itemPrice').value = item.price;
+    document.getElementById('itemStock').value = stock;
+    document.getElementById('itemMinStock').value = minStock;
+    document.getElementById('editItemId').value = itemId;
+    document.getElementById('deleteItemBtn').style.display = 'block';
+    populateCategorySelect();
+    document.getElementById('itemCategory').value = item.category || 'main';
+    document.getElementById('itemModal').classList.add('open');
+    setTimeout(() => document.getElementById('itemName').focus(), 100);
+}
+
+function saveItem() {
+    const name = document.getElementById('itemName').value.trim();
+    const price = parseFloat(document.getElementById('itemPrice').value);
+    const category = document.getElementById('itemCategory').value;
+    const stock = parseInt(document.getElementById('itemStock').value) || 0;
+    const minStock = parseInt(document.getElementById('itemMinStock').value) || 5;
+    const editId = document.getElementById('editItemId').value;
+    
+    if (!name) {
+        showToast('⚠️ Please enter item name!');
+        document.getElementById('itemName').focus();
+        return;
+    }
+    if (isNaN(price) || price < 0) {
+        showToast('⚠️ Please enter valid price!');
+        document.getElementById('itemPrice').focus();
+        return;
+    }
+    
+    if (editId) {
+        // Edit existing
+        const id = parseInt(editId);
+        const itemIndex = items.findIndex(i => i.id === id);
+        if (itemIndex !== -1) {
+            items[itemIndex] = { ...items[itemIndex], name, price, category };
+            saveItems();
+            
+            const stockIndex = stockItems.findIndex(s => s.id === id);
+            if (stockIndex !== -1) {
+                stockItems[stockIndex] = { ...stockItems[stockIndex], name, price, category, stock, minStock };
+                saveStock();
+            }
+            showToast(`✅ "${name}" updated!`);
+        }
+    } else {
+        // Add new
+        const newId = items.length > 0 ? Math.max(...items.map(i => i.id)) + 1 : 1;
+        
+        items.push({ id: newId, name, price, category });
+        saveItems();
+        
+        stockItems.push({ id: newId, name, price, category, stock, minStock });
+        saveStock();
+        
+        showToast(`✅ "${name}" added!`);
+    }
+    
+    closeItemModal();
+    renderAll();
+}
+
+function deleteItem() {
+    const editId = document.getElementById('editItemId').value;
+    if (!editId) return;
+    
+    const id = parseInt(editId);
+    const item = items.find(i => i.id === id);
+    if (!item) return;
+    
+    if (!confirm(`Delete "${item.name}" permanently?`)) return;
+    
+    items = items.filter(i => i.id !== id);
+    saveItems();
+    
+    stockItems = stockItems.filter(s => s.id !== id);
+    saveStock();
+    
+    closeItemModal();
+    renderAll();
+    showToast(`✅ "${item.name}" deleted!`);
+}
+
+function deleteItemConfirm(itemId) {
+    const item = items.find(i => i.id === itemId);
+    if (!item) return;
+    if (!confirm(`Delete "${item.name}" permanently?`)) return;
+    
+    items = items.filter(i => i.id !== itemId);
+    saveItems();
+    
+    stockItems = stockItems.filter(s => s.id !== itemId);
+    saveStock();
+    
+    renderAll();
+    showToast(`✅ "${item.name}" deleted!`);
+}
+
+function closeItemModal() {
+    document.getElementById('itemModal').classList.remove('open');
+}
+
+// ============================================================
+//  STOCK FUNCTIONS
+// ============================================================
+function addStock(itemId) {
+    const item = items.find(i => i.id === itemId);
+    if (!item) return;
+    
+    const currentStock = getStockForItem(itemId);
+    const amount = prompt(`Add stock for "${item.name}":\nCurrent Stock: ${currentStock}`, '10');
+    if (amount === null) return;
+    
+    const qty = parseInt(amount);
+    if (isNaN(qty) || qty <= 0) {
+        showToast('⚠️ Please enter valid quantity!');
+        return;
+    }
+    
+    const stockItem = stockItems.find(s => s.id === itemId);
+    if (stockItem) {
+        stockItem.stock += qty;
+        saveStock();
+        renderAll();
+        showToast(`✅ Added ${qty} stock to "${item.name}"\nNew Stock: ${stockItem.stock}`);
+    }
+}
+
+function removeStock(itemId) {
+    const item = items.find(i => i.id === itemId);
+    if (!item) return;
+    
+    const currentStock = getStockForItem(itemId);
+    if (currentStock <= 0) {
+        showToast(`⚠️ "${item.name}" has no stock to remove!`);
+        return;
+    }
+    
+    const amount = prompt(`Remove stock for "${item.name}":\nCurrent Stock: ${currentStock}`, '1');
+    if (amount === null) return;
+    
+    const qty = parseInt(amount);
+    if (isNaN(qty) || qty <= 0) {
+        showToast('⚠️ Please enter valid quantity!');
+        return;
+    }
+    
+    if (qty > currentStock) {
+        showToast(`⚠️ Cannot remove more than current stock (${currentStock})!`);
+        return;
+    }
+    
+    const stockItem = stockItems.find(s => s.id === itemId);
+    if (stockItem) {
+        stockItem.stock -= qty;
+        saveStock();
+        renderAll();
+        showToast(`✅ Removed ${qty} stock from "${item.name}"\nNew Stock: ${stockItem.stock}`);
+    }
+}
+
+// ============================================================
+//  SEARCH FUNCTION
+// ============================================================
+function searchItems(query) {
+    searchQuery = query;
+    renderItems();
+}
+
+// ============================================================
+//  FILTER FUNCTIONS
+// ============================================================
+function setFilter(filter) {
+    currentFilter = filter;
+    document.querySelectorAll('.actions-bar button').forEach(b => {
+        b.classList.remove('active');
+        b.style.background = 'white';
+        b.style.color = '#475569';
+        b.style.borderColor = '#e2e8f0';
+    });
+    
+    const btnMap = {
+        'all': 'showAllBtn',
+        'low': 'showLowStockBtn',
+        'out': 'showOutOfStockBtn'
+    };
+    
+    const btn = document.getElementById(btnMap[filter]);
+    if (btn) {
+        btn.classList.add('active');
+        btn.style.background = '#8b5cf6';
+        btn.style.color = 'white';
+        btn.style.borderColor = '#8b5cf6';
+    }
+    
+    renderItems();
+}
+
+// ============================================================
+//  LOW STOCK ALERT
+// ============================================================
+function checkLowStock() {
+    const lowItems = stockItems.filter(s => s.stock < 5 && s.stock > 0);
+    const outItems = stockItems.filter(s => s.stock <= 0);
+    
+    if (lowItems.length === 0 && outItems.length === 0) return;
+    
+    // Show alert modal
+    const alertBody = document.getElementById('alertBody');
+    let html = `
+        <div class="alert-icon">⚠️</div>
+        <div class="alert-title">Low Stock Alert!</div>
+        <div class="alert-message">${lowItems.length} items are critically low, ${outItems.length} items are out of stock.</div>
+        <div class="alert-list">
+    `;
+    
+    [...lowItems, ...outItems].forEach(item => {
+        const isOut = item.stock <= 0;
+        html += `
+            <div class="alert-item ${isOut ? 'danger' : 'warning'}">
+                <div class="alert-item-info">
+                    <span class="alert-item-name"><strong>${item.name}</strong></span>
+                    <span class="alert-item-stock" style="color:${isOut ? '#dc2626' : '#d97706'};">Stock: ${item.stock}</span>
+                    <span class="alert-item-min">Min: ${item.minStock}</span>
+                </div>
+                <button onclick="addStock(${item.id});closeAlert();" class="add-stock-small">➕ Add</button>
+            </div>
+        `;
+    });
+    
+    html += `
+        </div>
+        <button onclick="closeAlert()" class="alert-close-btn">Got it!</button>
+    `;
+    
+    alertBody.innerHTML = html;
+    document.getElementById('alertModal').classList.add('open');
+}
+
+function closeAlert() {
+    document.getElementById('alertModal').classList.remove('open');
+}
+
+// ============================================================
+//  EXPORT DATA
+// ============================================================
+function exportData() {
+    if (items.length === 0) {
+        showToast('⚠️ No data to export!');
+        return;
+    }
+    
+    let csv = 'Item Name,Category,Price (Rs.),Stock,Min Stock,Total Value (Rs.),Status\n';
+    items.forEach(item => {
+        const stock = getStockForItem(item.id);
+        const minStock = stockItems.find(s => s.id === item.id)?.minStock || 5;
+        const total = item.price * stock;
+        const status = getStockStatus(stock).replace(/[🔴🟡🟢]/g, '').trim();
+        csv += `"${item.name}","${getCategoryDisplay(item.category).replace(/[^\w\s]/g, '').trim()}",${item.price.toFixed(2)},${stock},${minStock},${total.toFixed(2)},${status}\n`;
+    });
+    
+    const blob = new Blob([csv], { type: 'text/csv;charset=utf-8;' });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = `menu_stock_${new Date().toISOString().split('T')[0]}.csv`;
+    document.body.appendChild(a);
+    a.click();
+    document.body.removeChild(a);
+    URL.revokeObjectURL(url);
+    
+    showToast('✅ Data exported!');
+}
+
+// ============================================================
+//  REFRESH
+// ============================================================
+function refreshData() {
+    loadData();
+    renderAll();
+    showToast('🔄 Refreshed!');
+}
+
+// ============================================================
+//  TOAST
+// ============================================================
+function showToast(message) {
+    const toast = document.getElementById('toast');
+    toast.textContent = message;
+    toast.className = 'show';
+    clearTimeout(toast._timeout);
+    toast._timeout = setTimeout(() => {
+        toast.className = '';
+    }, 3000);
+}
+
+// ============================================================
+//  FULL SCREEN
+// ============================================================
+function toggleFullScreen() {
+    if (!document.fullscreenElement && !document.webkitFullscreenElement) {
+        const el = document.documentElement;
+        if (el.requestFullscreen) el.requestFullscreen();
+        else if (el.webkitRequestFullscreen) el.webkitRequestFullscreen();
+    } else {
+        if (document.exitFullscreen) document.exitFullscreen();
+        else if (document.webkitExitFullscreen) document.webkitExitFullscreen();
+    }
+}
+
+// ============================================================
+//  LOGOUT
+// ============================================================
+function logout() {
+    if (confirm('Are you sure you want to logout?')) {
+        // Lock the page when logging out
+        localStorage.setItem('menu_stock_locked', 'true');
+        localStorage.removeItem('hotel_logged_in');
+        localStorage.removeItem('hotel_username');
+        window.location.href = 'login.html';
+    }
+}
+
+// ============================================================
+//  CHECK LOGIN STATUS
+// ============================================================
+function checkLoginStatus() {
+    const isLoggedIn = localStorage.getItem('hotel_logged_in');
+    if (isLoggedIn !== 'true') {
+        window.location.href = 'login.html';
+    }
+}
+
+// ============================================================
+//  KEYBOARD SHORTCUTS
+// ============================================================
+document.addEventListener('keydown', function(e) {
+    if (e.key === 'Escape') {
+        closeCategoryModal();
+        closeItemModal();
+        closeAlert();
+        closeDropdown();
+    }
+    if ((e.ctrlKey || e.metaKey) && e.key === 'r') {
+        e.preventDefault();
+        refreshData();
+    }
+    if ((e.ctrlKey || e.metaKey) && e.key === 'l') {
+        e.preventDefault();
+        lockPage();
+    }
+});
+
+// ============================================================
+//  INIT
+// ============================================================
+document.addEventListener('DOMContentLoaded', function() {
+    checkLoginStatus();
+    loadSavedTheme();
+    
+    // Check page lock status
+    checkPageLock();
+    
+    // Event listeners for filter buttons
+    document.getElementById('showAllBtn').addEventListener('click', () => setFilter('all'));
+    document.getElementById('showLowStockBtn').addEventListener('click', () => setFilter('low'));
+    document.getElementById('showOutOfStockBtn').addEventListener('click', () => setFilter('out'));
+    
+    // Enter key for password
+    document.getElementById('pagePasswordInput').addEventListener('keydown', function(e) {
+        if (e.key === 'Enter') {
+            verifyPagePassword();
+        }
+    });
+    
+    // Enter key for modals
+    document.getElementById('categoryName').addEventListener('keydown', function(e) {
+        if (e.key === 'Enter') saveCategory();
+    });
+    document.getElementById('itemName').addEventListener('keydown', function(e) {
+        if (e.key === 'Enter') saveItem();
+    });
+});
+
+// ============================================================
+//  EXPORT FUNCTIONS
+// ============================================================
+window.toggleTheme = toggleTheme;
+window.toggleDropdown = toggleDropdown;
+window.closeDropdown = closeDropdown;
+window.toggleFullScreen = toggleFullScreen;
+window.logout = logout;
+window.showToast = showToast;
+window.lockPage = lockPage;
+window.verifyPagePassword = verifyPagePassword;
+window.togglePagePassword = togglePagePassword;
+window.openAddCategory = openAddCategory;
+window.openAddItem = openAddItem;
+window.saveCategory = saveCategory;
+window.saveItem = saveItem;
+window.deleteCategory = deleteCategory;
+window.deleteItem = deleteItem;
+window.deleteItemConfirm = deleteItemConfirm;
+window.editCategory = editCategory;
+window.editItem = editItem;
+window.addStock = addStock;
+window.removeStock = removeStock;
+window.selectCategory = selectCategory;
+window.searchItems = searchItems;
+window.closeCategoryModal = closeCategoryModal;
+window.closeItemModal = closeItemModal;
+window.closeAlert = closeAlert;
+window.exportData = exportData;
+window.refreshData = refreshData;
+</script>
+
+</body>
+</html>

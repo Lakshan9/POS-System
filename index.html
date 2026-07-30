@@ -5,6 +5,16 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
     <title>Hotel POS System</title>
     <link rel="stylesheet" href="style.css" />
+
+    <!-- ===== PWA META TAGS ===== -->
+    <link rel="manifest" href="manifest.json" />
+    <link rel="apple-touch-icon" href="icons/icon-192.png" />
+    <link rel="icon" href="icons/icon-192.png" />
+    <meta name="theme-color" content="#8b5cf6" />
+    <meta name="apple-mobile-web-app-capable" content="yes" />
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
+    <meta name="apple-mobile-web-app-title" content="Hotel POS" />
+
 </head>
 <body>
 
@@ -42,17 +52,13 @@
             <span class="drop-icon">📊</span>
             <span class="drop-text">Report</span>
         </a>
-        <a href="items.html" class="dropdown-item" onclick="closeDropdown();">
-            <span class="drop-icon">📋</span>
-            <span class="drop-text">Menu</span>
-        </a>
         <a href="tables.html" class="dropdown-item" onclick="closeDropdown();">
             <span class="drop-icon">🪑</span>
             <span class="drop-text">Tables</span>
         </a>
-        <a href="stock.html" class="dropdown-item" onclick="closeDropdown();">
-            <span class="drop-icon">📦</span>
-            <span class="drop-text">Stock</span>
+        <a href="items-stock.html" class="dropdown-item" onclick="closeDropdown();">
+            <span class="drop-icon">📋</span>
+            <span class="drop-text">Menu & Stock</span>
         </a>
         <a href="settings.html" class="dropdown-item" onclick="closeDropdown();">
             <span class="drop-icon">⚙️</span>
@@ -317,6 +323,13 @@
             </div>
         </div>
     </div>
+</div>
+
+<!-- ===== INSTALL APP BANNER ===== -->
+<div id="installBanner" style="display:none;position:fixed;bottom:20px;left:50%;transform:translateX(-50%);z-index:9999;background:#1e293b;color:white;padding:12px 20px;border-radius:12px;box-shadow:0 4px 20px rgba(0,0,0,0.3);display:flex;align-items:center;gap:12px;flex-wrap:wrap;justify-content:center;max-width:90%;">
+    <span style="font-size:1.1rem;">📲 Install Hotel POS App</span>
+    <button id="installAppBtn" style="background:#8b5cf6;color:white;border:none;padding:8px 20px;border-radius:8px;cursor:pointer;font-weight:600;font-size:0.9rem;">Install</button>
+    <button onclick="document.getElementById('installBanner').style.display='none'" style="background:transparent;border:none;color:#94a3b8;cursor:pointer;font-size:1.2rem;padding:4px 8px;">✕</button>
 </div>
 
 <!-- ===== TOAST NOTIFICATION ===== -->
@@ -2333,6 +2346,112 @@ document.addEventListener('DOMContentLoaded', function() {
     autoClearOldBills();
     renderHistory();
 });
+
+// ============================================================
+//  PWA - REGISTER SERVICE WORKER
+// ============================================================
+
+// Register Service Worker
+if ('serviceWorker' in navigator) {
+    window.addEventListener('load', function() {
+        navigator.serviceWorker.register('sw.js')
+            .then(function(registration) {
+                console.log('✅ Service Worker registered successfully!');
+                console.log('Scope:', registration.scope);
+                
+                // Check for updates
+                registration.addEventListener('updatefound', function() {
+                    const newWorker = registration.installing;
+                    console.log('🔄 Service Worker update found');
+                    
+                    newWorker.addEventListener('statechange', function() {
+                        if (newWorker.state === 'installed' && navigator.serviceWorker.controller) {
+                            console.log('🔄 New version available!');
+                            showToast('🔄 New version available! Refresh to update.');
+                        }
+                    });
+                });
+            })
+            .catch(function(error) {
+                console.log('❌ Service Worker registration failed:', error);
+            });
+    });
+}
+
+// ============================================================
+//  CHECK APP INSTALL STATUS
+// ============================================================
+function isAppInstalled() {
+    if (window.matchMedia('(display-mode: standalone)').matches) {
+        console.log('✅ App is installed and running in standalone mode');
+        return true;
+    }
+    return false;
+}
+
+// ============================================================
+//  INSTALL PROMPT HANDLER
+// ============================================================
+let deferredPrompt;
+
+window.addEventListener('beforeinstallprompt', function(e) {
+    console.log('📲 App can be installed');
+    e.preventDefault();
+    deferredPrompt = e;
+    
+    // Show install banner
+    const banner = document.getElementById('installBanner');
+    if (banner) {
+        // Don't show if already installed
+        if (!isAppInstalled()) {
+            banner.style.display = 'flex';
+        }
+    }
+});
+
+// Install button click handler
+document.getElementById('installAppBtn')?.addEventListener('click', function() {
+    if (deferredPrompt) {
+        deferredPrompt.prompt();
+        deferredPrompt.userChoice.then(function(choiceResult) {
+            if (choiceResult.outcome === 'accepted') {
+                console.log('✅ User accepted the install prompt');
+                document.getElementById('installBanner').style.display = 'none';
+                showToast('✅ App installed successfully!');
+            } else {
+                console.log('❌ User dismissed the install prompt');
+            }
+            deferredPrompt = null;
+        });
+    }
+});
+
+// App installed event
+window.addEventListener('appinstalled', function(e) {
+    console.log('✅ App was installed successfully!');
+    document.getElementById('installBanner').style.display = 'none';
+    showToast('✅ App installed successfully!');
+});
+
+// ============================================================
+//  CHECK ONLINE STATUS
+// ============================================================
+function checkOnlineStatus() {
+    if (!navigator.onLine) {
+        showToast('📡 You are offline. Some features may not work.');
+    }
+}
+
+window.addEventListener('online', function() {
+    showToast('✅ Back online!');
+});
+
+window.addEventListener('offline', function() {
+    showToast('📡 You are offline. Some features may not work.');
+});
+
+checkOnlineStatus();
+
 </script>
 
 </body>
