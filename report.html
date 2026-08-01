@@ -292,8 +292,8 @@ function loadData() {
         const storedStock = localStorage.getItem(STOCK_KEY);
         stockData = storedStock ? JSON.parse(storedStock) : [];
         
-        console.log('History loaded:', history.length, 'bills');
-        console.log('Stock loaded:', stockData.length, 'items');
+        console.log('📊 History loaded:', history.length, 'bills');
+        console.log('📊 Stock loaded:', stockData.length, 'items');
     } catch (e) {
         console.error('Load error:', e);
         history = [];
@@ -313,8 +313,6 @@ function getAllReports() {
 }
 
 function generateAndSaveTodayReport() {
-    // This function is defined in index.html
-    // If not available, use fallback
     if (typeof generateDailyReport === 'function' && typeof saveDailyReport === 'function') {
         const report = generateDailyReport();
         if (report) {
@@ -594,22 +592,27 @@ function closeDropdown() {
 }
 
 // ============================================================
-//  DATE HELPERS
+//  DATE HELPERS - FIXED
 // ============================================================
 function getDateRange(filter) {
     const today = new Date();
+    today.setHours(0, 0, 0, 0);
+    
     const start = new Date(today);
     const end = new Date(today);
+    end.setHours(23, 59, 59, 999);
     
     switch(filter) {
         case 'today':
+            // Already set to today
             break;
         case 'yesterday':
             start.setDate(today.getDate() - 1);
             end.setDate(today.getDate() - 1);
+            end.setHours(23, 59, 59, 999);
             break;
         case 'week':
-            start.setDate(today.getDate() - 7);
+            start.setDate(today.getDate() - 6);
             break;
         case 'month':
             start.setMonth(today.getMonth() - 1);
@@ -626,9 +629,6 @@ function getDateRange(filter) {
         default:
             break;
     }
-    
-    start.setHours(0, 0, 0, 0);
-    end.setHours(23, 59, 59, 999);
     
     return { start, end };
 }
@@ -746,7 +746,7 @@ function renderTopSellingItems(bills, dateStr) {
 }
 
 // ============================================================
-//  PAYMENT METHOD BREAKDOWN
+//  PAYMENT METHOD BREAKDOWN - FIXED
 // ============================================================
 function getPaymentMethodTotals(bills) {
     const methods = {
@@ -757,6 +757,7 @@ function getPaymentMethodTotals(bills) {
         'credit': { name: 'Credit', icon: '💰', total: 0, count: 0, color: '#dc2626' }
     };
     
+    // Only process the bills that were passed in (these are already filtered)
     bills.forEach(bill => {
         if (bill.payments && bill.payments.length > 0) {
             bill.payments.forEach(payment => {
@@ -773,11 +774,12 @@ function getPaymentMethodTotals(bills) {
 }
 
 function renderPaymentBreakdown(bills) {
+    // Get payment method totals from the filtered bills
     const methods = getPaymentMethodTotals(bills);
     const totalAmount = Object.values(methods).reduce((sum, m) => sum + m.total, 0);
     
     if (totalAmount === 0) {
-        paymentBreakdown.innerHTML = '<div style="text-align:center;padding:20px;color:#94a3b8;">No payment data available</div>';
+        paymentBreakdown.innerHTML = `<div style="text-align:center;padding:20px;color:#94a3b8;">No payment data available for this period</div>`;
         return;
     }
     
@@ -1135,7 +1137,7 @@ function closeItemsSoldModal() {
 }
 
 // ============================================================
-//  UPDATE REPORT
+//  UPDATE REPORT - FIXED
 // ============================================================
 function updateReport(filter = 'today') {
     const range = getDateRange(filter);
@@ -1145,10 +1147,16 @@ function updateReport(filter = 'today') {
     }
     
     const { start, end } = range;
+    
+    // Get filtered bills for the selected date range
     const filteredBills = history.filter(bill => {
         const billDate = new Date(bill.date);
         return billDate >= start && billDate <= end;
     });
+    
+    // Log for debugging
+    console.log(`📊 Filter: ${filter}, Bills: ${filteredBills.length}`);
+    console.log('📊 Filtered Bills:', filteredBills);
     
     // Update Summary Cards
     const orders = filteredBills.length;
@@ -1166,7 +1174,7 @@ function updateReport(filter = 'today') {
     // Date string for display
     const dateStr = start.toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' });
     
-    // Render all sections
+    // ✅ Render all sections using the SAME filtered bills
     renderTopSellingItems(filteredBills, dateStr);
     renderPaymentBreakdown(filteredBills);
     renderStockMovement(filteredBills);
