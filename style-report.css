@@ -228,6 +228,88 @@ body.font-xlarge {
 }
 
 /* ============================================================
+   SAVED REPORTS STYLES
+   ============================================================ */
+
+.saved-reports-list {
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+}
+
+.saved-report-item {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 10px 14px;
+    background: #f8fafc;
+    border-radius: 8px;
+    cursor: pointer;
+    transition: all 0.2s;
+    border: 1px solid #e2e8f0;
+}
+
+.saved-report-item:hover {
+    background: #f1f5f9;
+    transform: translateX(4px);
+    border-color: #8b5cf6;
+}
+
+.saved-report-item .report-info {
+    display: flex;
+    gap: 16px;
+    align-items: center;
+    flex-wrap: wrap;
+}
+
+.saved-report-item .report-date {
+    font-weight: 600;
+    font-size: 0.85rem;
+}
+
+.saved-report-item .report-orders {
+    font-size: 0.75rem;
+    color: #3b82f6;
+}
+
+.saved-report-item .report-revenue {
+    font-size: 0.85rem;
+    font-weight: 600;
+    color: #16a34a;
+}
+
+.saved-report-item .report-items {
+    font-size: 0.75rem;
+    color: #8b5cf6;
+}
+
+.saved-report-item .view-btn {
+    padding: 4px 14px;
+    border: none;
+    border-radius: 6px;
+    background: #8b5cf6;
+    color: white;
+    cursor: pointer;
+    font-size: 0.75rem;
+    transition: all 0.2s;
+}
+
+.saved-report-item .view-btn:hover {
+    background: #7c3aed;
+}
+
+/* Dark Theme for Saved Reports */
+body.theme-dark .saved-report-item {
+    background: #0f172a;
+    border-color: #334155;
+}
+
+body.theme-dark .saved-report-item:hover {
+    background: #1e293b;
+    border-color: #8b5cf6;
+}
+
+/* ============================================================
    HEADER
    ============================================================ */
 .main-header {
@@ -1292,6 +1374,15 @@ body.font-xlarge {
     .items-sold-table td {
         padding: 6px 8px;
     }
+    
+    .saved-report-item .report-info {
+        gap: 8px;
+    }
+    
+    .saved-report-item .report-orders,
+    .saved-report-item .report-items {
+        font-size: 0.65rem;
+    }
 }
 
 @media (max-width: 480px) {
@@ -1363,6 +1454,22 @@ body.font-xlarge {
     .items-sold-footer {
         flex-direction: column;
         align-items: center;
+        text-align: center;
+    }
+    
+    .saved-report-item {
+        flex-direction: column;
+        align-items: stretch;
+        gap: 8px;
+    }
+    
+    .saved-report-item .report-info {
+        flex-direction: column;
+        align-items: flex-start;
+    }
+    
+    .saved-report-item .view-btn {
+        width: 100%;
         text-align: center;
     }
 }

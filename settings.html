@@ -5,17 +5,6 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
     <title>Settings - Hotel POS</title>
     <link rel="stylesheet" href="style-settings.css" />
-
-    <!-- ===== PWA META TAGS ===== -->
-<link rel="manifest" href="manifest.json" />
-<link rel="apple-touch-icon" href="icons/icon-192.png" />
-<link rel="icon" href="icons/icon-192.png" />
-<meta name="theme-color" content="#8b5cf6" />
-<meta name="apple-mobile-web-app-capable" content="yes" />
-<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
-<meta name="apple-mobile-web-app-title" content="Hotel POS" />
-
-
 </head>
 <body>
 
@@ -201,6 +190,80 @@
         </div>
     </div>
 
+    <!-- ===== BACKUP & RECOVERY ===== -->
+    <div class="settings-section">
+        <h2>💾 Backup & Recovery</h2>
+        <div class="settings-group">
+            
+            <div class="setting-item">
+                <div class="setting-info">
+                    <span class="setting-label">Auto Backup</span>
+                    <span class="setting-desc">Automatically backup data every 5 minutes</span>
+                </div>
+                <div class="setting-control">
+                    <label class="switch">
+                        <input type="checkbox" id="autoBackupToggle" checked />
+                        <span class="slider"></span>
+                    </label>
+                </div>
+            </div>
+
+            <div class="setting-item">
+                <div class="setting-info">
+                    <span class="setting-label">Manual Backup</span>
+                    <span class="setting-desc">Create a backup right now</span>
+                </div>
+                <div class="setting-control">
+                    <button class="export-btn" onclick="createManualBackup()">💾 Create Backup</button>
+                </div>
+            </div>
+
+            <div class="setting-item">
+                <div class="setting-info">
+                    <span class="setting-label">Restore Backup</span>
+                    <span class="setting-desc">Restore data from a backup</span>
+                </div>
+                <div class="setting-control">
+                    <select id="backupList">
+                        <option value="">No backups found</option>
+                    </select>
+                    <button class="import-btn" onclick="restoreSelectedBackup()">📂 Restore</button>
+                </div>
+            </div>
+
+            <div class="setting-item">
+                <div class="setting-info">
+                    <span class="setting-label">Export All Data</span>
+                    <span class="setting-desc">Download all data as JSON file</span>
+                </div>
+                <div class="setting-control">
+                    <button class="export-btn" onclick="exportAllData()">⬇ Export</button>
+                </div>
+            </div>
+
+            <div class="setting-item">
+                <div class="setting-info">
+                    <span class="setting-label">Import Data</span>
+                    <span class="setting-desc">Import data from JSON file</span>
+                </div>
+                <div class="setting-control">
+                    <input type="file" id="importFile" accept=".json" style="display:none;" />
+                    <button class="import-btn" onclick="document.getElementById('importFile').click()">📂 Import</button>
+                </div>
+            </div>
+
+            <div class="setting-item danger">
+                <div class="setting-info">
+                    <span class="setting-label" style="color:#ef4444;">Clear All Data</span>
+                    <span class="setting-desc" style="color:#ef4444;">⚠️ This will delete all data permanently</span>
+                </div>
+                <div class="setting-control">
+                    <button class="clear-btn" onclick="clearAllData()">🗑️ Clear All</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
     <!-- ===== Security Settings ===== -->
     <div class="settings-section">
         <h2>🔒 Security Settings</h2>
@@ -260,43 +323,6 @@
         </div>
     </div>
 
-    <!-- ===== Data Management ===== -->
-    <div class="settings-section">
-        <h2>💾 Data Management</h2>
-        <div class="settings-group">
-            <div class="setting-item">
-                <div class="setting-info">
-                    <span class="setting-label">Export All Data</span>
-                    <span class="setting-desc">Export all data as JSON file</span>
-                </div>
-                <div class="setting-control">
-                    <button class="export-btn" onclick="exportAllData()">⬇ Export</button>
-                </div>
-            </div>
-
-            <div class="setting-item">
-                <div class="setting-info">
-                    <span class="setting-label">Import Data</span>
-                    <span class="setting-desc">Import data from JSON file</span>
-                </div>
-                <div class="setting-control">
-                    <input type="file" id="importFile" accept=".json" style="display:none;" />
-                    <button class="import-btn" onclick="document.getElementById('importFile').click()">📂 Import</button>
-                </div>
-            </div>
-
-            <div class="setting-item danger">
-                <div class="setting-info">
-                    <span class="setting-label" style="color:#ef4444;">Clear All Data</span>
-                    <span class="setting-desc" style="color:#ef4444;">⚠️ This will delete all data permanently</span>
-                </div>
-                <div class="setting-control">
-                    <button class="clear-btn" onclick="clearAllData()">🗑️ Clear All</button>
-                </div>
-            </div>
-        </div>
-    </div>
-
 </div>
 
 <!-- ===== FOOTER ===== -->
@@ -311,6 +337,7 @@
 const SETTINGS_KEY = 'hotel_settings';
 const LOGIN_PASSWORD_KEY = 'hotel_password';
 const TAX_KEY = 'tax_rate';
+const BACKUP_KEY = 'hotel_backups';
 
 // ============================================================
 //  GET STORED PASSWORD
@@ -343,7 +370,6 @@ function loadSettings() {
         console.log('No settings found');
     }
     
-    // Load tax rate separately
     const taxRate = localStorage.getItem(TAX_KEY);
     if (taxRate !== null) {
         document.getElementById('taxRate').value = taxRate;
@@ -493,8 +519,6 @@ function updateLoginPassword() {
     }
     
     localStorage.setItem(LOGIN_PASSWORD_KEY, newPass);
-    
-    // Lock Menu & Stock page so user needs to re-enter new password
     localStorage.setItem('menu_stock_locked', 'true');
     
     showToast('✅ Login password changed successfully!\n⚠️ Menu & Stock page is now locked. Please use new password.');
@@ -584,6 +608,111 @@ function resetRequirements(type) {
 }
 
 // ============================================================
+//  BACKUP FUNCTIONS
+// ============================================================
+function getBackups() {
+    try {
+        return JSON.parse(localStorage.getItem(BACKUP_KEY) || '[]');
+    } catch (error) {
+        return [];
+    }
+}
+
+function createManualBackup() {
+    if (typeof createBackup === 'function') {
+        const backup = createBackup();
+        if (backup) {
+            showToast('✅ Manual backup created successfully!');
+            loadBackupList();
+        } else {
+            showToast('❌ Backup creation failed!');
+        }
+    } else {
+        // Fallback backup creation
+        try {
+            const backup = {
+                id: Date.now(),
+                date: new Date().toLocaleString(),
+                data: {
+                    items: JSON.parse(localStorage.getItem('hotel_items') || '[]'),
+                    history: JSON.parse(localStorage.getItem('hotel_history') || '[]'),
+                    stock: JSON.parse(localStorage.getItem('hotel_stock') || '[]'),
+                    categories: JSON.parse(localStorage.getItem('hotel_categories') || '[]'),
+                    settings: localStorage.getItem('hotel_settings') || '{}',
+                    taxRate: localStorage.getItem('tax_rate') || '0'
+                }
+            };
+            let backups = getBackups();
+            backups.push(backup);
+            if (backups.length > 10) {
+                backups = backups.slice(-10);
+            }
+            localStorage.setItem(BACKUP_KEY, JSON.stringify(backups));
+            showToast('✅ Manual backup created successfully!');
+            loadBackupList();
+        } catch (error) {
+            console.error('Backup error:', error);
+            showToast('❌ Backup creation failed!');
+        }
+    }
+}
+
+function loadBackupList() {
+    const backups = getBackups();
+    const select = document.getElementById('backupList');
+    
+    if (backups.length === 0) {
+        select.innerHTML = '<option value="">No backups found</option>';
+        return;
+    }
+    
+    select.innerHTML = backups.map(backup => 
+        `<option value="${backup.id}">${backup.date} (${backup.data?.items?.length || 0} items)</option>`
+    ).join('');
+}
+
+function restoreSelectedBackup() {
+    const select = document.getElementById('backupList');
+    const backupId = parseInt(select.value);
+    
+    if (!backupId) {
+        showToast('⚠️ Please select a backup!');
+        return;
+    }
+    
+    if (confirm('⚠️ Restoring will replace all current data! Continue?')) {
+        if (typeof restoreFromBackup === 'function') {
+            const result = restoreFromBackup(backupId);
+            if (result) {
+                showToast('✅ Data restored successfully!');
+            }
+        } else {
+            // Fallback restore
+            try {
+                const backups = getBackups();
+                const backup = backups.find(b => b.id === backupId);
+                if (!backup) {
+                    showToast('❌ Backup not found!');
+                    return;
+                }
+                const data = backup.data;
+                if (data.items) localStorage.setItem('hotel_items', JSON.stringify(data.items));
+                if (data.history) localStorage.setItem('hotel_history', JSON.stringify(data.history));
+                if (data.stock) localStorage.setItem('hotel_stock', JSON.stringify(data.stock));
+                if (data.categories) localStorage.setItem('hotel_categories', JSON.stringify(data.categories));
+                if (data.settings) localStorage.setItem('hotel_settings', data.settings);
+                if (data.taxRate) localStorage.setItem('tax_rate', data.taxRate);
+                showToast('✅ Data restored successfully!');
+                loadBackupList();
+            } catch (error) {
+                console.error('Restore error:', error);
+                showToast('❌ Restore failed!');
+            }
+        }
+    }
+}
+
+// ============================================================
 //  EXPORT ALL DATA
 // ============================================================
 function exportAllData() {
@@ -597,6 +726,7 @@ function exportAllData() {
         settings: JSON.parse(localStorage.getItem(SETTINGS_KEY) || '{}'),
         categories: JSON.parse(localStorage.getItem('hotel_categories') || '[]'),
         taxRate: localStorage.getItem(TAX_KEY) || '0',
+        backups: JSON.parse(localStorage.getItem(BACKUP_KEY) || '[]'),
         exportDate: new Date().toISOString()
     };
     
@@ -634,12 +764,13 @@ document.getElementById('importFile').addEventListener('change', function(e) {
             if (data.settings) localStorage.setItem(SETTINGS_KEY, JSON.stringify(data.settings));
             if (data.categories) localStorage.setItem('hotel_categories', JSON.stringify(data.categories));
             if (data.taxRate) localStorage.setItem(TAX_KEY, data.taxRate);
+            if (data.backups) localStorage.setItem(BACKUP_KEY, JSON.stringify(data.backups));
             
-            // Lock Menu & Stock page after import for security
             localStorage.setItem('menu_stock_locked', 'true');
             
             showToast('✅ Data imported successfully!\n⚠️ Menu & Stock page is now locked.');
             loadSettings();
+            loadBackupList();
         } catch (e) {
             showToast('❌ Invalid file format!');
         }
@@ -665,9 +796,11 @@ function clearAllData() {
         'hotel_categories',
         SETTINGS_KEY,
         TAX_KEY,
+        BACKUP_KEY,
         'hotel_logged_in',
         'hotel_username',
-        'menu_stock_locked'
+        'menu_stock_locked',
+        'hotel_daily_reports'
     ];
     
     keys.forEach(key => localStorage.removeItem(key));
@@ -749,7 +882,6 @@ function toggleFullScreen() {
 // ============================================================
 function logout() {
     if (confirm('Are you sure you want to logout?')) {
-        // Lock Menu & Stock page when logging out
         localStorage.setItem('menu_stock_locked', 'true');
         localStorage.removeItem('hotel_logged_in');
         localStorage.removeItem('hotel_username');
@@ -777,6 +909,23 @@ document.addEventListener('keydown', (e) => {
 });
 
 // ============================================================
+//  AUTO BACKUP TOGGLE
+// ============================================================
+document.getElementById('autoBackupToggle')?.addEventListener('change', function() {
+    if (this.checked) {
+        if (typeof startAutoBackup === 'function') {
+            startAutoBackup();
+        }
+        showToast('✅ Auto-backup enabled');
+    } else {
+        if (typeof stopAutoBackup === 'function') {
+            stopAutoBackup();
+        }
+        showToast('⏸ Auto-backup disabled');
+    }
+});
+
+// ============================================================
 //  EXPORT FUNCTIONS
 // ============================================================
 window.saveSetting = saveSetting;
@@ -792,15 +941,9 @@ window.toggleFullScreen = toggleFullScreen;
 window.logout = logout;
 window.showToast = showToast;
 window.toggleTheme = toggleTheme;
-
-// ============================================================
-//  INIT
-// ============================================================
-document.addEventListener('DOMContentLoaded', function() {
-    checkLoginStatus();
-    loadSavedTheme();
-    loadSettings();
-});
+window.createManualBackup = createManualBackup;
+window.loadBackupList = loadBackupList;
+window.restoreSelectedBackup = restoreSelectedBackup;
 
 // ============================================================
 //  APPLY SAVED THEME
@@ -816,7 +959,16 @@ function loadSavedTheme() {
         if (btn) btn.textContent = '🌙';
     }
 }
-</script>
 
+// ============================================================
+//  INIT
+// ============================================================
+document.addEventListener('DOMContentLoaded', function() {
+    checkLoginStatus();
+    loadSavedTheme();
+    loadSettings();
+    loadBackupList();
+});
+</script>
 </body>
 </html>

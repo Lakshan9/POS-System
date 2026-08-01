@@ -5,19 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
     <title>Business Report - Hotel POS</title>
     <link rel="stylesheet" href="style-report.css" />
-
-    <!-- ===== PWA META TAGS ===== -->
-<link rel="manifest" href="manifest.json" />
-<link rel="apple-touch-icon" href="icons/icon-192.png" />
-<link rel="icon" href="icons/icon-192.png" />
-<meta name="theme-color" content="#8b5cf6" />
-<meta name="apple-mobile-web-app-capable" content="yes" />
-<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
-<meta name="apple-mobile-web-app-title" content="Hotel POS" />
-
 </head>
-
-
 <body>
 
 <!-- ===== HEADER ===== -->
@@ -30,6 +18,7 @@
         </button>
         <h1>📊 BUSINESS REPORT</h1>
         <span class="datetime" id="datetime">--</span>
+        <button id="darkModeToggle" class="theme-toggle-btn" onclick="toggleTheme()">🌙</button>
     </div>
     <div class="header-right">
         <button onclick="window.location.href='index.html'" class="back-btn">🏠 Back to POS</button>
@@ -53,14 +42,13 @@
             <span class="drop-icon">📊</span>
             <span class="drop-text">Report</span>
         </a>
-
+        <a href="items-stock.html" class="dropdown-item">
+            <span class="drop-icon">📋</span>
+            <span class="drop-text">Menu & Stock</span>
+        </a>
         <a href="tables.html" class="dropdown-item">
             <span class="drop-icon">🪑</span>
             <span class="drop-text">Tables</span>
-        </a>
-        <a href="items-stock.html" class="dropdown-item" onclick="closeDropdown();">
-            <span class="drop-icon">📋</span>
-            <span class="drop-text">Menu & Stock</span>
         </a>
         <a href="settings.html" class="dropdown-item">
             <span class="drop-icon">⚙️</span>
@@ -138,7 +126,21 @@
     </div>
 </div>
 
-<!-- ===== BUSINESS REPORT GRID ===== -->
+<!-- ===== SAVED DAILY REPORTS ===== -->
+<div class="report-card-modern full-width">
+    <div class="card-title">
+        <span class="icon">📅</span>
+        Saved Daily Reports
+        <span style="margin-left:auto;font-size:0.7rem;color:#94a3b8;">
+            <button onclick="generateAndSaveTodayReport();renderSavedReports();" style="background:#22c55e;color:white;border:none;padding:4px 12px;border-radius:6px;cursor:pointer;">💾 Save Today</button>
+        </span>
+    </div>
+    <div class="saved-reports-list" id="savedReportsList">
+        <!-- Rendered by JS -->
+    </div>
+</div>
+
+<!-- ===== REPORT GRID ===== -->
 <div class="report-grid" id="reportGrid">
 
     <!-- ===== Top Selling Items ===== -->
@@ -251,6 +253,19 @@
     </div>
 </div>
 
+<!-- ===== DAILY REPORT DETAIL MODAL ===== -->
+<div class="modal-overlay" id="reportDetailModal">
+    <div class="modal modal-wide">
+        <div class="modal-header">
+            <h2 id="reportDetailTitle">📊 Daily Report</h2>
+            <button class="close-btn" onclick="closeReportDetail()">✕</button>
+        </div>
+        <div class="modal-body" id="reportDetailBody">
+            <!-- Rendered by JS -->
+        </div>
+    </div>
+</div>
+
 <!-- ===== TOAST ===== -->
 <div id="toast"></div>
 
@@ -260,6 +275,7 @@
 // ============================================================
 const HISTORY_KEY = 'hotel_history';
 const STOCK_KEY = 'hotel_stock';
+const REPORTS_KEY = 'hotel_daily_reports';
 
 let history = [];
 let stockData = [];
@@ -283,6 +299,225 @@ function loadData() {
         history = [];
         stockData = [];
     }
+}
+
+// ============================================================
+//  DAILY REPORT FUNCTIONS
+// ============================================================
+function getAllReports() {
+    try {
+        return JSON.parse(localStorage.getItem(REPORTS_KEY) || '[]');
+    } catch (error) {
+        return [];
+    }
+}
+
+function generateAndSaveTodayReport() {
+    // This function is defined in index.html
+    // If not available, use fallback
+    if (typeof generateDailyReport === 'function' && typeof saveDailyReport === 'function') {
+        const report = generateDailyReport();
+        if (report) {
+            saveDailyReport(report);
+            showToast('✅ Today\'s report saved!');
+            renderSavedReports();
+            return report;
+        }
+    } else {
+        // Fallback: Generate report from history
+        try {
+            const today = new Date();
+            today.setHours(0, 0, 0, 0);
+            const todayStr = today.toDateString();
+            
+            const todayBills = history.filter(bill => {
+                const billDate = new Date(bill.date);
+                billDate.setHours(0, 0, 0, 0);
+                return billDate.toDateString() === todayStr;
+            });
+            
+            const totalRevenue = todayBills.reduce((sum, bill) => sum + (bill.total || 0), 0);
+            const totalOrders = todayBills.length;
+            const totalItems = todayBills.reduce((sum, bill) => {
+                return sum + bill.items.reduce((s, item) => s + (item.qty || item.quantity || 1), 0);
+            }, 0);
+            
+            const report = {
+                date: todayStr,
+                dateFormatted: today.toLocaleDateString('en-US', { 
+                    weekday: 'long', 
+                    year: 'numeric', 
+                    month: 'long', 
+                    day: 'numeric' 
+                }),
+                generatedAt: new Date().toLocaleString(),
+                summary: {
+                    totalRevenue: totalRevenue,
+                    totalOrders: totalOrders,
+                    totalItems: totalItems,
+                    totalDiscount: 0,
+                    averageOrder: totalOrders > 0 ? totalRevenue / totalOrders : 0
+                },
+                topItems: [],
+                paymentMethods: {},
+                hourlySales: {},
+                bills: []
+            };
+            
+            let reports = getAllReports();
+            reports = reports.filter(r => r.date !== report.date);
+            reports.push(report);
+            reports.sort((a, b) => new Date(b.date) - new Date(a.date));
+            if (reports.length > 90) {
+                reports = reports.slice(0, 90);
+            }
+            localStorage.setItem(REPORTS_KEY, JSON.stringify(reports));
+            showToast('✅ Today\'s report saved!');
+            renderSavedReports();
+            return report;
+        } catch (error) {
+            console.error('Error saving report:', error);
+            showToast('❌ Failed to save report');
+        }
+    }
+}
+
+function renderSavedReports() {
+    const container = document.getElementById('savedReportsList');
+    if (!container) return;
+    
+    const reports = getAllReports();
+    
+    if (reports.length === 0) {
+        container.innerHTML = `
+            <div style="text-align:center;padding:20px;color:#94a3b8;">
+                No saved reports yet
+                <br/>
+                <button onclick="generateAndSaveTodayReport();" 
+                        style="margin-top:8px;background:#8b5cf6;color:white;border:none;padding:6px 16px;border-radius:6px;cursor:pointer;">
+                    Generate Today's Report
+                </button>
+            </div>
+        `;
+        return;
+    }
+    
+    container.innerHTML = reports.map(report => {
+        const summary = report.summary || {};
+        return `
+            <div class="saved-report-item" onclick="showReportDetail('${report.date}')">
+                <div class="report-info">
+                    <span class="report-date">📅 ${report.dateFormatted || report.date}</span>
+                    <span class="report-orders">📋 ${summary.totalOrders || 0} orders</span>
+                    <span class="report-revenue">💰 Rs. ${(summary.totalRevenue || 0).toFixed(2)}</span>
+                    <span class="report-items">📦 ${summary.totalItems || 0} items</span>
+                </div>
+                <button class="view-btn" onclick="event.stopPropagation();showReportDetail('${report.date}')">👁️ View</button>
+            </div>
+        `;
+    }).join('');
+}
+
+function showReportDetail(dateStr) {
+    const reports = getAllReports();
+    const report = reports.find(r => r.date === dateStr);
+    
+    if (!report) {
+        showToast('❌ Report not found!');
+        return;
+    }
+    
+    document.getElementById('reportDetailTitle').textContent = `📊 Daily Report - ${report.dateFormatted || report.date}`;
+    
+    const summary = report.summary || {};
+    const topItems = report.topItems || [];
+    const paymentMethods = report.paymentMethods || {};
+    const hourlySales = report.hourlySales || {};
+    
+    let html = `
+        <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(120px,1fr));gap:10px;margin-bottom:16px;">
+            <div class="summary-mini" style="background:#f8fafc;padding:12px;border-radius:8px;text-align:center;">
+                <div style="font-size:1.2rem;font-weight:700;color:#16a34a;">Rs. ${(summary.totalRevenue || 0).toFixed(2)}</div>
+                <div style="font-size:0.7rem;color:#94a3b8;">Total Revenue</div>
+            </div>
+            <div class="summary-mini" style="background:#f8fafc;padding:12px;border-radius:8px;text-align:center;">
+                <div style="font-size:1.2rem;font-weight:700;color:#3b82f6;">${summary.totalOrders || 0}</div>
+                <div style="font-size:0.7rem;color:#94a3b8;">Total Orders</div>
+            </div>
+            <div class="summary-mini" style="background:#f8fafc;padding:12px;border-radius:8px;text-align:center;">
+                <div style="font-size:1.2rem;font-weight:700;color:#8b5cf6;">${summary.totalItems || 0}</div>
+                <div style="font-size:0.7rem;color:#94a3b8;">Items Sold</div>
+            </div>
+            <div class="summary-mini" style="background:#f8fafc;padding:12px;border-radius:8px;text-align:center;">
+                <div style="font-size:1.2rem;font-weight:700;color:#d97706;">${(summary.totalDiscount || 0) > 0 ? `Rs. ${(summary.totalDiscount || 0).toFixed(2)}` : '0'}</div>
+                <div style="font-size:0.7rem;color:#94a3b8;">Total Discount</div>
+            </div>
+        </div>
+    `;
+    
+    // Top Items
+    if (topItems && topItems.length > 0) {
+        html += `
+            <div style="margin-bottom:12px;">
+                <h4 style="font-size:0.85rem;font-weight:600;margin-bottom:6px;">🏆 Top Selling Items</h4>
+                ${topItems.map((item, index) => `
+                    <div style="display:flex;justify-content:space-between;padding:4px 8px;background:#f8fafc;border-radius:4px;margin-bottom:2px;">
+                        <span>${index + 1}. ${item.name}</span>
+                        <span>${item.quantity} sold - Rs. ${(item.revenue || 0).toFixed(2)}</span>
+                    </div>
+                `).join('')}
+            </div>
+        `;
+    }
+    
+    // Payment Methods
+    if (paymentMethods && Object.keys(paymentMethods).length > 0) {
+        html += `
+            <div style="margin-bottom:12px;">
+                <h4 style="font-size:0.85rem;font-weight:600;margin-bottom:6px;">💳 Payment Methods</h4>
+                ${Object.entries(paymentMethods).map(([method, data]) => `
+                    <div style="display:flex;justify-content:space-between;padding:4px 8px;background:#f8fafc;border-radius:4px;margin-bottom:2px;">
+                        <span>${method}</span>
+                        <span>${data.count || 0} payments - Rs. ${(data.total || 0).toFixed(2)}</span>
+                    </div>
+                `).join('')}
+            </div>
+        `;
+    }
+    
+    // Hourly Sales
+    if (hourlySales && Object.keys(hourlySales).length > 0) {
+        html += `
+            <div style="margin-bottom:12px;">
+                <h4 style="font-size:0.85rem;font-weight:600;margin-bottom:6px;">⏰ Hourly Sales</h4>
+                <div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(80px,1fr));gap:4px;">
+                    ${Object.entries(hourlySales).map(([hour, data]) => `
+                        <div style="background:#f8fafc;padding:6px;border-radius:4px;text-align:center;">
+                            <div style="font-size:0.7rem;color:#94a3b8;">${hour}</div>
+                            <div style="font-weight:600;">${data.orders || 0}</div>
+                        </div>
+                    `).join('')}
+                </div>
+            </div>
+        `;
+    }
+    
+    html += `
+        <div style="margin-top:12px;padding:8px;background:#f1f5f9;border-radius:6px;font-size:0.7rem;color:#94a3b8;">
+            Generated: ${report.generatedAt || 'Unknown'}
+        </div>
+        <div style="margin-top:8px;display:flex;gap:8px;">
+            <button onclick="window.print()" style="background:#3b82f6;color:white;border:none;padding:6px 16px;border-radius:6px;cursor:pointer;">🖨️ Print</button>
+            <button onclick="closeReportDetail()" style="background:#e2e8f0;color:#475569;border:none;padding:6px 16px;border-radius:6px;cursor:pointer;">✕ Close</button>
+        </div>
+    `;
+    
+    document.getElementById('reportDetailBody').innerHTML = html;
+    document.getElementById('reportDetailModal').classList.add('open');
+}
+
+function closeReportDetail() {
+    document.getElementById('reportDetailModal').classList.remove('open');
 }
 
 // ============================================================
@@ -1107,6 +1342,7 @@ document.getElementById('exportReportBtn').addEventListener('click', function() 
 document.getElementById('refreshBtn').addEventListener('click', function() {
     loadData();
     updateReport(currentFilter);
+    renderSavedReports();
     showToast('🔄 Report refreshed!');
 });
 
@@ -1121,6 +1357,7 @@ document.getElementById('itemsSoldModal').addEventListener('click', function(e) 
 document.addEventListener('keydown', function(e) {
     if (e.key === 'Escape') {
         closeItemsSoldModal();
+        closeReportDetail();
         closeDropdown();
     }
 });
@@ -1189,13 +1426,49 @@ window.logout = logout;
 window.showToast = showToast;
 window.openItemsSoldModal = openItemsSoldModal;
 window.closeItemsSoldModal = closeItemsSoldModal;
+window.toggleTheme = toggleTheme;
+window.renderSavedReports = renderSavedReports;
+window.generateAndSaveTodayReport = generateAndSaveTodayReport;
+window.showReportDetail = showReportDetail;
+window.closeReportDetail = closeReportDetail;
+
+// ============================================================
+//  THEME FUNCTIONS
+// ============================================================
+function toggleTheme() {
+    const body = document.body;
+    const btn = document.getElementById('darkModeToggle');
+    const isDark = body.classList.contains('theme-dark');
+    
+    if (isDark) {
+        body.classList.remove('theme-dark');
+        btn.textContent = '🌙';
+        localStorage.setItem('theme', 'light');
+    } else {
+        body.classList.add('theme-dark');
+        btn.textContent = '☀️';
+        localStorage.setItem('theme', 'dark');
+    }
+}
+
+function loadSavedTheme() {
+    const savedTheme = localStorage.getItem('theme');
+    const btn = document.getElementById('darkModeToggle');
+    if (savedTheme === 'dark') {
+        document.body.classList.add('theme-dark');
+        if (btn) btn.textContent = '☀️';
+    } else {
+        document.body.classList.remove('theme-dark');
+        if (btn) btn.textContent = '🌙';
+    }
+}
 
 // ============================================================
 //  INIT
 // ============================================================
 document.addEventListener('DOMContentLoaded', function() {
     checkLoginStatus();
-    applySavedTheme();
+    loadSavedTheme();
     loadData();
     
     const today = new Date();
@@ -1205,6 +1478,7 @@ document.addEventListener('DOMContentLoaded', function() {
     toDate.value = today.toISOString().split('T')[0];
     
     updateReport('today');
+    renderSavedReports();
 });
 </script>
 

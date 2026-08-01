@@ -1,18 +1,12 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <base href="/POS-System/">
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
     <title>Hotel POS System</title>
-    
-    <!-- ===== PWA META TAGS ===== -->
-    <link rel="manifest" href="manifest.json" />
-    <meta name="theme-color" content="#8b5cf6" />
-    <meta name="apple-mobile-web-app-capable" content="yes" />
-    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
-    <meta name="apple-mobile-web-app-title" content="Hotel POS" />
-    
+    <base href="/POS-System/">
+    <link rel="manifest" href="manifest.json">
+    <meta name="theme-color" content="#8b5cf6">
     <link rel="stylesheet" href="style.css" />
 </head>
 <body>
@@ -139,7 +133,6 @@
             </div>
         </div>
 
-        <!-- ===== QUICK ADD SECTION ===== -->
         <div class="quick-add-section" id="quickAddSection">
             <div class="quick-add-header" onclick="toggleQuickAdd()">
                 <span>⚡ Quick Add</span>
@@ -168,7 +161,6 @@
         </div>
     </h2>
     
-    <!-- ===== DATE FILTER ===== -->
     <div class="history-filter-bar">
         <input type="date" id="historyDateFilter" />
         <button id="applyDateFilterBtn" style="background:#3b82f6;color:white;border:none;padding:6px 16px;border-radius:8px;cursor:pointer;">🔍 Filter</button>
@@ -181,7 +173,7 @@
     </div>
 </div>
 
-<!-- ===== HOLD MODAL ===== -->
+<!-- ===== MODALS ===== -->
 <div class="modal-overlay" id="holdModal">
     <div class="modal modal-small">
         <div class="modal-header">
@@ -203,7 +195,6 @@
     </div>
 </div>
 
-<!-- ===== PAYMENT MODAL ===== -->
 <div class="modal-overlay" id="paymentModal">
     <div class="modal modal-small">
         <div class="modal-header">
@@ -211,10 +202,7 @@
             <button class="close-btn" id="closePaymentModalBtn">✕</button>
         </div>
         <div class="payment-body">
-            <div class="payment-details" id="paymentDetails">
-                <!-- Rendered by JS -->
-            </div>
-            
+            <div class="payment-details" id="paymentDetails"></div>
             <div class="payment-methods-simple">
                 <label>Payment Method</label>
                 <div class="payment-methods-grid">
@@ -225,21 +213,16 @@
                     <button class="payment-method-btn" data-method="credit" onclick="selectPaymentMethod('credit')">💰 Credit</button>
                 </div>
             </div>
-            
             <div class="payment-input-group" id="paymentReferenceGroup" style="display:none;">
                 <label>Reference</label>
                 <input type="text" id="paymentReference" placeholder="Card/Mobile/Bank ref" />
             </div>
-            
-            <!-- ===== AMOUNT WITH NUMERIC KEYPAD ===== -->
             <div class="payment-amount-section">
                 <label>Amount Received (Rs.)</label>
                 <div class="amount-display-row">
                     <input type="number" id="paymentAmount" placeholder="0.00" step="0.01" min="0" readonly />
                     <button class="clear-amount-btn" id="clearAmountBtn" title="Clear amount">✕</button>
                 </div>
-                
-                <!-- Numeric Keypad -->
                 <div class="numeric-keypad" id="numericKeypad">
                     <div class="keypad-row">
                         <button class="keypad-btn" data-value="1">1</button>
@@ -263,20 +246,16 @@
                     </div>
                 </div>
             </div>
-            
             <div class="payment-change" id="paymentChange">
                 <span>Change Due:</span>
                 <span id="paymentChangeAmount">Rs. 0.00</span>
             </div>
-            
             <div class="print-option">
                 <label>
                     <input type="checkbox" id="printBillCheckbox" />
                     🖨️ Print Bill
                 </label>
             </div>
-            
-            <!-- ===== PAYMENT ACTIONS ===== -->
             <div class="payment-actions">
                 <button class="confirm-btn" id="confirmPaymentBtn" disabled>✅ Confirm Payment</button>
                 <button class="cancel-btn" id="cancelPaymentBtn">✕ Cancel</button>
@@ -285,7 +264,6 @@
     </div>
 </div>
 
-<!-- ===== EDIT BILL MODAL ===== -->
 <div class="modal-overlay" id="editBillModal">
     <div class="modal modal-wide">
         <div class="modal-header">
@@ -313,7 +291,6 @@
     </div>
 </div>
 
-<!-- ===== CUSTOMER ORDERS MODAL ===== -->
 <div class="modal-overlay" id="customerOrdersModal">
     <div class="modal modal-wide">
         <div class="modal-header">
@@ -324,14 +301,12 @@
             <div class="customer-search">
                 <input type="text" id="customerSearchInput" placeholder="Search customer..." oninput="renderCustomerOrders(this.value)" />
             </div>
-            <div id="customerOrdersList">
-                <!-- Rendered by JS -->
-            </div>
+            <div id="customerOrdersList"></div>
         </div>
     </div>
 </div>
 
-<!-- ===== TOAST NOTIFICATION ===== -->
+<!-- ===== TOAST ===== -->
 <div id="toast"></div>
 
 <script>
@@ -345,6 +320,9 @@ const TABLE_ORDERS_KEY = 'hotel_table_orders';
 const CUSTOMER_ORDERS_KEY = 'hotel_customer_orders';
 const STOCK_KEY = 'hotel_stock';
 const TAX_KEY = 'tax_rate';
+const BACKUP_KEY = 'hotel_backups';
+const REPORTS_KEY = 'hotel_daily_reports';
+const MAX_BACKUPS = 10;
 
 // ============================================================
 //  GLOBAL VARIABLES
@@ -363,10 +341,6 @@ let editedBillData = null;
 let quickAddExpanded = true;
 let historyFilter = 'today';
 let historyFilterDate = null;
-
-// ============================================================
-//  PAYMENT VARIABLES
-// ============================================================
 let selectedMethod = 'cash';
 
 // ============================================================
@@ -451,13 +425,250 @@ function getTaxRate() {
 }
 
 // ============================================================
+//  AUTO-BACKUP SYSTEM
+// ============================================================
+
+function createBackup() {
+    try {
+        const backup = {
+            id: Date.now(),
+            date: new Date().toLocaleString(),
+            data: {
+                items: JSON.parse(localStorage.getItem('hotel_items') || '[]'),
+                history: JSON.parse(localStorage.getItem('hotel_history') || '[]'),
+                stock: JSON.parse(localStorage.getItem('hotel_stock') || '[]'),
+                categories: JSON.parse(localStorage.getItem('hotel_categories') || '[]'),
+                settings: localStorage.getItem('hotel_settings') || '{}',
+                taxRate: localStorage.getItem('tax_rate') || '0'
+            }
+        };
+        
+        let backups = JSON.parse(localStorage.getItem(BACKUP_KEY) || '[]');
+        backups.push(backup);
+        if (backups.length > MAX_BACKUPS) {
+            backups = backups.slice(-MAX_BACKUPS);
+        }
+        localStorage.setItem(BACKUP_KEY, JSON.stringify(backups));
+        console.log('✅ Auto-backup created:', backup.date);
+        return backup;
+    } catch (error) {
+        console.error('❌ Backup failed:', error);
+        return null;
+    }
+}
+
+function getBackups() {
+    try {
+        return JSON.parse(localStorage.getItem(BACKUP_KEY) || '[]');
+    } catch (error) {
+        return [];
+    }
+}
+
+function restoreFromBackup(backupId) {
+    try {
+        const backups = getBackups();
+        const backup = backups.find(b => b.id === backupId);
+        if (!backup) {
+            showToast('❌ Backup not found!');
+            return false;
+        }
+        
+        const data = backup.data;
+        if (data.items) localStorage.setItem('hotel_items', JSON.stringify(data.items));
+        if (data.history) localStorage.setItem('hotel_history', JSON.stringify(data.history));
+        if (data.stock) localStorage.setItem('hotel_stock', JSON.stringify(data.stock));
+        if (data.categories) localStorage.setItem('hotel_categories', JSON.stringify(data.categories));
+        if (data.settings) localStorage.setItem('hotel_settings', data.settings);
+        if (data.taxRate) localStorage.setItem('tax_rate', data.taxRate);
+        
+        showToast(`✅ Restored from backup: ${backup.date}`);
+        loadData();
+        renderItems();
+        updateBilling();
+        renderHistory();
+        return true;
+    } catch (error) {
+        console.error('❌ Restore failed:', error);
+        showToast('❌ Restore failed!');
+        return false;
+    }
+}
+
+let backupInterval = null;
+
+function startAutoBackup() {
+    if (backupInterval) clearInterval(backupInterval);
+    backupInterval = setInterval(() => {
+        createBackup();
+    }, 300000);
+}
+
+function stopAutoBackup() {
+    if (backupInterval) {
+        clearInterval(backupInterval);
+        backupInterval = null;
+    }
+}
+
+startAutoBackup();
+
+// ============================================================
+//  DAILY REPORT SYSTEM
+// ============================================================
+
+function generateDailyReport(date = new Date()) {
+    try {
+        const today = new Date(date);
+        today.setHours(0, 0, 0, 0);
+        const todayStr = today.toDateString();
+        
+        const history = JSON.parse(localStorage.getItem('hotel_history') || '[]');
+        const todayBills = history.filter(bill => {
+            const billDate = new Date(bill.date);
+            billDate.setHours(0, 0, 0, 0);
+            return billDate.toDateString() === todayStr;
+        });
+        
+        const totalRevenue = todayBills.reduce((sum, bill) => sum + (bill.total || 0), 0);
+        const totalOrders = todayBills.length;
+        const totalItems = todayBills.reduce((sum, bill) => {
+            return sum + bill.items.reduce((s, item) => s + (item.qty || item.quantity || 1), 0);
+        }, 0);
+        const totalDiscount = todayBills.reduce((sum, bill) => sum + (bill.discount || 0), 0);
+        
+        const itemSales = {};
+        todayBills.forEach(bill => {
+            bill.items.forEach(item => {
+                const name = item.name;
+                const qty = item.qty || item.quantity || 1;
+                const price = item.price || 0;
+                if (!itemSales[name]) {
+                    itemSales[name] = { name, quantity: 0, revenue: 0 };
+                }
+                itemSales[name].quantity += qty;
+                itemSales[name].revenue += price * qty;
+            });
+        });
+        const topItems = Object.values(itemSales)
+            .sort((a, b) => b.quantity - a.quantity)
+            .slice(0, 5);
+        
+        const paymentMethods = {};
+        todayBills.forEach(bill => {
+            if (bill.payments && bill.payments.length > 0) {
+                bill.payments.forEach(payment => {
+                    const method = payment.method || 'cash';
+                    if (!paymentMethods[method]) {
+                        paymentMethods[method] = { count: 0, total: 0 };
+                    }
+                    paymentMethods[method].count += 1;
+                    paymentMethods[method].total += payment.amount || 0;
+                });
+            }
+        });
+        
+        const hourlySales = {};
+        todayBills.forEach(bill => {
+            const hour = new Date(bill.date).getHours();
+            const hourKey = `${hour.toString().padStart(2, '0')}:00`;
+            if (!hourlySales[hourKey]) {
+                hourlySales[hourKey] = { orders: 0, revenue: 0 };
+            }
+            hourlySales[hourKey].orders += 1;
+            hourlySales[hourKey].revenue += bill.total || 0;
+        });
+        
+        return {
+            date: todayStr,
+            dateFormatted: today.toLocaleDateString('en-US', { 
+                weekday: 'long', 
+                year: 'numeric', 
+                month: 'long', 
+                day: 'numeric' 
+            }),
+            generatedAt: new Date().toLocaleString(),
+            summary: {
+                totalRevenue: totalRevenue,
+                totalOrders: totalOrders,
+                totalItems: totalItems,
+                totalDiscount: totalDiscount,
+                averageOrder: totalOrders > 0 ? totalRevenue / totalOrders : 0
+            },
+            topItems: topItems,
+            paymentMethods: paymentMethods,
+            hourlySales: hourlySales,
+            bills: todayBills.map(bill => ({
+                id: bill.id,
+                time: bill.date,
+                total: bill.total,
+                items: bill.items.length
+            }))
+        };
+    } catch (error) {
+        console.error('❌ Error generating report:', error);
+        return null;
+    }
+}
+
+function saveDailyReport(report) {
+    try {
+        if (!report) return false;
+        let reports = JSON.parse(localStorage.getItem(REPORTS_KEY) || '[]');
+        reports = reports.filter(r => r.date !== report.date);
+        reports.push(report);
+        reports.sort((a, b) => new Date(b.date) - new Date(a.date));
+        if (reports.length > 90) {
+            reports = reports.slice(0, 90);
+        }
+        localStorage.setItem(REPORTS_KEY, JSON.stringify(reports));
+        console.log('✅ Daily report saved:', report.date);
+        return true;
+    } catch (error) {
+        console.error('❌ Error saving report:', error);
+        return false;
+    }
+}
+
+function getAllReports() {
+    try {
+        return JSON.parse(localStorage.getItem(REPORTS_KEY) || '[]');
+    } catch (error) {
+        return [];
+    }
+}
+
+function generateAndSaveTodayReport() {
+    const report = generateDailyReport();
+    if (report) {
+        saveDailyReport(report);
+        return report;
+    }
+    return null;
+}
+
+function checkAndGenerateEndOfDay() {
+    const now = new Date();
+    const hour = now.getHours();
+    const minute = now.getMinutes();
+    if (hour === 23 && minute >= 55) {
+        const report = generateDailyReport(new Date());
+        if (report) {
+            saveDailyReport(report);
+            console.log('✅ End of day report generated automatically');
+        }
+    }
+}
+
+setInterval(checkAndGenerateEndOfDay, 60000);
+
+// ============================================================
 //  THEME FUNCTIONS
 // ============================================================
 function toggleTheme() {
     const body = document.body;
     const btn = document.getElementById('darkModeToggle');
     const isDark = body.classList.contains('theme-dark');
-    
     if (isDark) {
         body.classList.remove('theme-dark');
         btn.textContent = '🌙';
@@ -488,7 +699,6 @@ function loadQuickAddItems() {
     const popularItems = items.slice(0, 10);
     const container = document.getElementById('quickAddItems');
     if (!container) return;
-    
     container.innerHTML = popularItems.map(item => {
         const stock = getStockForItem(item.id);
         const isDisabled = stock <= 0;
@@ -507,7 +717,6 @@ function toggleQuickAdd() {
     const container = document.getElementById('quickAddItems');
     const btn = document.getElementById('toggleQuickAddBtn');
     quickAddExpanded = !quickAddExpanded;
-    
     if (quickAddExpanded) {
         container.classList.remove('collapsed');
         btn.classList.remove('collapsed');
@@ -537,22 +746,6 @@ function getStockStatus(stock) {
     if (stock < 5) return '🔴 Very Low';
     else if (stock < 10) return '🟡 Low';
     else return '🟢 In Stock';
-}
-
-function updateStock(itemId, quantity) {
-    const stockItem = stockData.find(s => s.id === itemId);
-    if (stockItem) {
-        stockItem.stock = Math.max(0, stockItem.stock - quantity);
-        saveStock();
-    }
-}
-
-function addStock(itemId, quantity) {
-    const stockItem = stockData.find(s => s.id === itemId);
-    if (stockItem) {
-        stockItem.stock += quantity;
-        saveStock();
-    }
 }
 
 // ============================================================
@@ -598,6 +791,7 @@ document.addEventListener('keydown', function(e) {
         document.getElementById('paymentModal').classList.remove('open');
         document.getElementById('holdModal').classList.remove('open');
         document.getElementById('customerOrdersModal').classList.remove('open');
+        document.getElementById('reportDetailModal')?.classList.remove('open');
     }
 });
 
@@ -606,7 +800,6 @@ document.addEventListener('keydown', function(e) {
 // ============================================================
 function renderItems() {
     const categories = getCategories();
-    
     if (!selectedCategory) {
         renderCategories(categories);
     } else {
@@ -628,15 +821,12 @@ function getCategories() {
 
 function renderCategories(categories) {
     document.getElementById('backToCategoriesBtn').style.display = 'none';
-    
     const categoryNames = {
         'main': { icon: '🍽️', name: 'Main Dishes' },
         'drinks': { icon: '🥤', name: 'Beverages' },
         'desserts': { icon: '🍰', name: 'Desserts' }
     };
-    
     const categoryKeys = Object.keys(categories);
-    
     if (categoryKeys.length === 0) {
         document.getElementById('itemsGrid').innerHTML = `
             <div class="empty-state" style="grid-column:1/-1;padding:20px;">
@@ -646,7 +836,6 @@ function renderCategories(categories) {
         `;
         return;
     }
-    
     let html = '';
     categoryKeys.forEach(cat => {
         const info = categoryNames[cat] || { icon: '📁', name: cat.charAt(0).toUpperCase() + cat.slice(1) };
@@ -659,7 +848,6 @@ function renderCategories(categories) {
             </div>
         `;
     });
-    
     document.getElementById('itemsGrid').innerHTML = html;
 }
 
@@ -677,7 +865,6 @@ function renderCategoryItems(category) {
         'desserts': 'Desserts'
     };
     const catName = categoryNames[category] || category.charAt(0).toUpperCase() + category.slice(1);
-    
     if (catItems.length === 0) {
         document.getElementById('itemsGrid').innerHTML = `
             <div style="grid-column:1/-1;text-align:center;padding:30px 0;color:#94a3b8;">
@@ -686,14 +873,12 @@ function renderCategoryItems(category) {
         `;
         return;
     }
-    
     let html = `<div class="category-label">${catName}</div>`;
     catItems.forEach(item => {
         const stockQty = getStockForItem(item.id);
         const stockColor = getStockColor(stockQty);
         const stockStatus = getStockStatus(stockQty);
         const isOutOfStock = stockQty <= 0;
-        
         html += `
             <button class="item-btn ${stockColor} ${isOutOfStock ? 'out-of-stock' : ''}" 
                     onclick="${isOutOfStock ? '' : `addToCart(${item.id})`}"
@@ -705,7 +890,6 @@ function renderCategoryItems(category) {
             </button>
         `;
     });
-    
     document.getElementById('itemsGrid').innerHTML = html;
 }
 
@@ -726,13 +910,11 @@ document.getElementById('refreshItemsBtn').addEventListener('click', function() 
 function addToCart(itemId) {
     const item = items.find(i => i.id === itemId);
     if (!item) return;
-    
     const stockQty = getStockForItem(itemId);
     if (stockQty <= 0) {
         showToast(`❌ ${item.name} is out of stock!`);
         return;
     }
-    
     const existing = cart.find(c => c.id === item.id);
     if (existing) {
         if (existing.quantity >= stockQty) {
@@ -743,7 +925,6 @@ function addToCart(itemId) {
     } else {
         cart.push({ ...item, quantity: 1, discount: 0 });
     }
-    
     saveCart();
     updateBilling();
 }
@@ -782,15 +963,12 @@ function updateBilling() {
 function changeQty(id, delta) {
     const item = cart.find(c => c.id === id);
     if (!item) return;
-    
     const stockQty = getStockForItem(id);
     const newQty = item.quantity + delta;
-    
     if (delta > 0 && newQty > stockQty) {
         showToast(`❌ Not enough stock! Available: ${stockQty}`);
         return;
     }
-    
     item.quantity = newQty;
     if (item.quantity <= 0) {
         cart = cart.filter(c => c.id !== id);
@@ -834,7 +1012,6 @@ function calculateTotals() {
     document.getElementById('discountAmount').textContent = `-Rs. ${discount.toFixed(2)}`;
     document.getElementById('taxAmount').textContent = `Rs. ${taxAmount.toFixed(2)}`;
     document.getElementById('total').textContent = `Rs. ${total.toFixed(2)}`;
-    
     document.getElementById('payBtn').disabled = cart.length === 0;
 }
 
@@ -849,7 +1026,6 @@ document.getElementById('discountInput').addEventListener('input', function() {
 document.getElementById('clearCartBtn').addEventListener('click', function() {
     if (cart.length === 0) return;
     if (!confirm('Clear all items from cart?')) return;
-    
     cart.forEach(item => {
         const stockItem = stockData.find(s => s.id === item.id);
         if (stockItem) {
@@ -857,7 +1033,6 @@ document.getElementById('clearCartBtn').addEventListener('click', function() {
         }
     });
     saveStock();
-    
     cart = [];
     saveCart();
     updateBilling();
@@ -893,10 +1068,7 @@ document.getElementById('holdToTableBtn').addEventListener('click', function() {
         showToast('Invalid table number!');
         return;
     }
-    
     let stockError = false;
-    let stockUpdateMsg = '';
-    
     cart.forEach(item => {
         const stockItem = stockData.find(s => s.id === item.id);
         if (stockItem) {
@@ -907,13 +1079,10 @@ document.getElementById('holdToTableBtn').addEventListener('click', function() {
                 return;
             }
             stockItem.stock -= item.quantity;
-            stockUpdateMsg += `\n${item.name}: ${currentStock} → ${stockItem.stock}`;
         }
     });
-    
     if (stockError) return;
     saveStock();
-    
     cart.forEach(item => {
         const existing = tableOrders[num].find(c => c.id === item.id);
         if (existing) {
@@ -922,13 +1091,12 @@ document.getElementById('holdToTableBtn').addEventListener('click', function() {
             tableOrders[num].push({ ...item });
         }
     });
-    
     cart = [];
     saveCart();
     saveTables();
     updateBilling();
     renderItems();
-    showToast(`✅ Order held to Table ${num}! Stock updated:${stockUpdateMsg}`);
+    showToast(`✅ Order held to Table ${num}!`);
 });
 
 document.getElementById('holdToCustomerBtn').addEventListener('click', function() {
@@ -939,10 +1107,7 @@ document.getElementById('holdToCustomerBtn').addEventListener('click', function(
         return;
     }
     const name = customerName.trim();
-    
     let stockError = false;
-    let stockUpdateMsg = '';
-    
     cart.forEach(item => {
         const stockItem = stockData.find(s => s.id === item.id);
         if (stockItem) {
@@ -953,15 +1118,11 @@ document.getElementById('holdToCustomerBtn').addEventListener('click', function(
                 return;
             }
             stockItem.stock -= item.quantity;
-            stockUpdateMsg += `\n${item.name}: ${currentStock} → ${stockItem.stock}`;
         }
     });
-    
     if (stockError) return;
     saveStock();
-    
     if (!customerOrders[name]) customerOrders[name] = [];
-    
     cart.forEach(item => {
         const existing = customerOrders[name].find(c => c.id === item.id);
         if (existing) {
@@ -970,13 +1131,12 @@ document.getElementById('holdToCustomerBtn').addEventListener('click', function(
             customerOrders[name].push({ ...item });
         }
     });
-    
     cart = [];
     saveCart();
     saveCustomers();
     updateBilling();
     renderItems();
-    showToast(`✅ Order held to Customer "${name}"! Stock updated:${stockUpdateMsg}`);
+    showToast(`✅ Order held to Customer "${name}"!`);
 });
 
 // ============================================================
@@ -994,24 +1154,20 @@ document.getElementById('closeCustomerOrdersBtn').addEventListener('click', func
 function renderCustomerOrders(search = '') {
     const container = document.getElementById('customerOrdersList');
     let customers = Object.keys(customerOrders);
-    
     if (search) {
         customers = customers.filter(name => 
             name.toLowerCase().includes(search.toLowerCase())
         );
     }
-    
     if (customers.length === 0) {
         container.innerHTML = '<div class="empty-state">No customer orders found</div>';
         return;
     }
-    
     let html = '';
     customers.forEach(name => {
         const items = customerOrders[name] || [];
         const total = items.reduce((sum, i) => sum + i.price * i.quantity, 0);
         const count = items.reduce((sum, i) => sum + i.quantity, 0);
-        
         html += `
             <div class="customer-order-card" onclick="loadCustomerOrder('${name}')">
                 <div class="customer-info">
@@ -1023,7 +1179,6 @@ function renderCustomerOrders(search = '') {
             </div>
         `;
     });
-    
     container.innerHTML = html;
 }
 
@@ -1033,10 +1188,7 @@ function loadCustomerOrder(name) {
         showToast('No items found!');
         return;
     }
-    
     let stockError = false;
-    let stockUpdateMsg = '';
-    
     items.forEach(item => {
         const stockItem = stockData.find(s => s.id === item.id);
         if (stockItem) {
@@ -1047,13 +1199,10 @@ function loadCustomerOrder(name) {
                 return;
             }
             stockItem.stock -= item.quantity;
-            stockUpdateMsg += `\n${item.name}: ${currentStock} → ${stockItem.stock}`;
         }
     });
-    
     if (stockError) return;
     saveStock();
-    
     items.forEach(item => {
         const existing = cart.find(c => c.id === item.id);
         if (existing) {
@@ -1062,14 +1211,13 @@ function loadCustomerOrder(name) {
             cart.push({...item});
         }
     });
-    
     delete customerOrders[name];
     saveCustomers();
     saveCart();
     updateBilling();
     renderItems();
     document.getElementById('customerOrdersModal').classList.remove('open');
-    showToast(`✅ Order from "${name}" loaded! Stock updated:${stockUpdateMsg}`);
+    showToast(`✅ Order from "${name}" loaded!`);
 }
 
 // ============================================================
@@ -1080,7 +1228,6 @@ function selectPaymentMethod(method) {
     document.querySelectorAll('#paymentModal .payment-method-btn').forEach(btn => {
         btn.classList.toggle('active', btn.dataset.method === method);
     });
-    
     const refGroup = document.getElementById('paymentReferenceGroup');
     const refInput = document.getElementById('paymentReference');
     if (['card', 'mobile', 'bank'].includes(method)) {
@@ -1101,15 +1248,12 @@ function setupNumericKeypad(inputId, clearBtnId, keypadId) {
     const input = document.getElementById(inputId);
     const clearBtn = document.getElementById(clearBtnId);
     const keypad = document.getElementById(keypadId);
-    
     if (!input || !keypad) return;
-    
     keypad.querySelectorAll('.keypad-btn').forEach(btn => {
         btn.addEventListener('click', function(e) {
             e.preventDefault();
             e.stopPropagation();
             const value = this.dataset.value;
-            
             if (value === 'backspace') {
                 const currentValue = input.value;
                 input.value = currentValue.slice(0, -1);
@@ -1120,12 +1264,10 @@ function setupNumericKeypad(inputId, clearBtnId, keypadId) {
             } else {
                 input.value += value;
             }
-            
             const event = new Event('input', { bubbles: true });
             input.dispatchEvent(event);
         });
     });
-    
     if (clearBtn) {
         clearBtn.addEventListener('click', function() {
             input.value = '';
@@ -1133,7 +1275,6 @@ function setupNumericKeypad(inputId, clearBtnId, keypadId) {
             input.dispatchEvent(event);
         });
     }
-    
     input.addEventListener('focus', function(e) {
         this.blur();
         const firstBtn = keypad.querySelector('.keypad-btn');
@@ -1143,19 +1284,13 @@ function setupNumericKeypad(inputId, clearBtnId, keypadId) {
     });
 }
 
-// ============================================================
-//  COMPUTER NUMBER PAD SUPPORT
-// ============================================================
 function setupNumberPadSupport() {
     const input = document.getElementById('paymentAmount');
     if (!input) return;
-    
     document.addEventListener('keydown', function(e) {
         const modal = document.getElementById('paymentModal');
         if (!modal.classList.contains('open')) return;
-        
         const key = e.key;
-        
         if (key >= '0' && key <= '9') {
             e.preventDefault();
             input.value += key;
@@ -1163,7 +1298,6 @@ function setupNumberPadSupport() {
             input.dispatchEvent(event);
             return;
         }
-        
         if (key === '.') {
             e.preventDefault();
             if (!input.value.includes('.')) {
@@ -1173,7 +1307,6 @@ function setupNumberPadSupport() {
             }
             return;
         }
-        
         if (key === 'Backspace') {
             e.preventDefault();
             input.value = input.value.slice(0, -1);
@@ -1181,7 +1314,6 @@ function setupNumberPadSupport() {
             input.dispatchEvent(event);
             return;
         }
-        
         if (key === 'Enter') {
             e.preventDefault();
             if (!document.getElementById('confirmPaymentBtn').disabled) {
@@ -1189,7 +1321,6 @@ function setupNumberPadSupport() {
             }
             return;
         }
-        
         if (key === 'Escape') {
             e.preventDefault();
             document.getElementById('cancelPaymentBtn').click();
@@ -1205,10 +1336,8 @@ document.getElementById('paymentAmount').addEventListener('input', function() {
     const received = parseFloat(this.value) || 0;
     const total = currentBill ? currentBill.total : 0;
     const change = received - total;
-    
     const changeEl = document.getElementById('paymentChange');
     const changeSpan = document.getElementById('paymentChangeAmount');
-    
     if (received > 0 && received < total) {
         changeSpan.textContent = `-Rs. ${(total - received).toFixed(2)}`;
         changeSpan.style.color = '#ef4444';
@@ -1236,7 +1365,6 @@ document.getElementById('paymentAmount').addEventListener('input', function() {
 // ===== PAYMENT MODAL OPEN =====
 document.getElementById('payBtn').addEventListener('click', function() {
     if (cart.length === 0) return;
-    
     let stockError = false;
     cart.forEach(item => {
         const stockItem = stockData.find(s => s.id === item.id);
@@ -1250,7 +1378,6 @@ document.getElementById('payBtn').addEventListener('click', function() {
         }
     });
     if (stockError) return;
-    
     const subtotal = cart.reduce((sum, item) => sum + item.price * item.quantity, 0);
     const itemDiscounts = cart.reduce((sum, item) => {
         const total = item.price * item.quantity;
@@ -1260,7 +1387,6 @@ document.getElementById('payBtn').addEventListener('click', function() {
     const taxRate = getTaxRate();
     const taxAmount = ((subtotal - discount) * taxRate) / 100;
     const total = subtotal - discount + taxAmount;
-    
     currentBill = {
         items: cart.map(c => ({ 
             id: c.id,
@@ -1275,23 +1401,19 @@ document.getElementById('payBtn').addEventListener('click', function() {
         taxRate: taxRate,
         total: total
     };
-    
     selectedMethod = 'cash';
-    
     document.querySelectorAll('#paymentModal .payment-method-btn').forEach(btn => {
         btn.classList.toggle('active', btn.dataset.method === 'cash');
     });
     document.getElementById('paymentReferenceGroup').style.display = 'none';
     document.getElementById('paymentAmount').value = '';
     document.getElementById('paymentReference').value = '';
-    
     document.getElementById('paymentDetails').innerHTML = `
         <div class="pay-line"><span>Subtotal</span><span>Rs. ${currentBill.subtotal.toFixed(2)}</span></div>
         ${currentBill.discount > 0 ? `<div class="pay-line" style="color:#ef4444;"><span>Discount</span><span>-Rs. ${currentBill.discount.toFixed(2)}</span></div>` : ''}
         <div class="pay-line" style="color:#64748b;"><span>Tax (${taxRate}%)</span><span>Rs. ${currentBill.tax.toFixed(2)}</span></div>
         <div class="pay-line total"><span>TOTAL</span><span>Rs. ${currentBill.total.toFixed(2)}</span></div>
     `;
-    
     const changeEl = document.getElementById('paymentChange');
     const changeSpan = document.getElementById('paymentChangeAmount');
     changeSpan.textContent = 'Rs. 0.00';
@@ -1300,9 +1422,7 @@ document.getElementById('payBtn').addEventListener('click', function() {
     changeEl.style.background = '#f0fdf4';
     changeEl.querySelector('span:first-child').textContent = 'Change Due:';
     document.getElementById('confirmPaymentBtn').disabled = true;
-    
     document.getElementById('paymentModal').classList.add('open');
-    
     setTimeout(() => {
         const firstBtn = document.querySelector('#numericKeypad .keypad-btn');
         if (firstBtn) firstBtn.focus();
@@ -1312,16 +1432,13 @@ document.getElementById('payBtn').addEventListener('click', function() {
 // ===== CONFIRM PAYMENT =====
 document.getElementById('confirmPaymentBtn').addEventListener('click', function() {
     if (!currentBill) return;
-    
     const received = parseFloat(document.getElementById('paymentAmount').value) || 0;
     const billTotal = currentBill.total;
     const reference = document.getElementById('paymentReference').value.trim() || '-';
-    
     if (received < billTotal) {
         showToast(`❌ Insufficient amount!\nTotal: Rs. ${billTotal.toFixed(2)}\nReceived: Rs. ${received.toFixed(2)}\nRemaining: Rs. ${(billTotal - received).toFixed(2)}`);
         return;
     }
-    
     let stockError = false;
     currentBill.items.forEach(item => {
         const stockItem = stockData.find(s => s.id === item.id);
@@ -1336,25 +1453,9 @@ document.getElementById('confirmPaymentBtn').addEventListener('click', function(
     });
     if (stockError) return;
     saveStock();
-    
     const changeAmount = received - billTotal;
-    
-    const methodIcons = {
-        'cash': '💵',
-        'card': '💳',
-        'mobile': '📱',
-        'bank': '🏦',
-        'credit': '💰'
-    };
-    
-    const methodNames = {
-        'cash': 'Cash',
-        'card': 'Card',
-        'mobile': 'Mobile',
-        'bank': 'Bank',
-        'credit': 'Credit'
-    };
-    
+    const methodIcons = { 'cash': '💵', 'card': '💳', 'mobile': '📱', 'bank': '🏦', 'credit': '💰' };
+    const methodNames = { 'cash': 'Cash', 'card': 'Card', 'mobile': 'Mobile', 'bank': 'Bank', 'credit': 'Credit' };
     const bill = {
         id: Date.now(),
         date: new Date().toLocaleString('en-US', { month: '2-digit', day: '2-digit', year: 'numeric', hour: '2-digit', minute: '2-digit', second: '2-digit' }),
@@ -1376,20 +1477,18 @@ document.getElementById('confirmPaymentBtn').addEventListener('click', function(
     };
     history.push(bill);
     saveHistory();
-    
+    // Create backup after saving bill
+    createBackup();
+    // Generate daily report
+    generateAndSaveTodayReport();
     const shouldPrint = document.getElementById('printBillCheckbox') ? document.getElementById('printBillCheckbox').checked : true;
-    
     document.getElementById('paymentModal').classList.remove('open');
-    
     if (shouldPrint) {
         printBillWithTax(bill);
     }
-    
     const methodDisplay = `${methodIcons[selectedMethod]} ${methodNames[selectedMethod]}`;
     let refText = reference !== '-' ? ` (${reference})` : '';
-    
     showToast(`✅ Payment Successful!\n${methodDisplay}${refText}: Rs. ${bill.received.toFixed(2)}\nChange: Rs. ${bill.change.toFixed(2)}\nThank you! 🍽️`);
-    
     cart = [];
     saveCart();
     updateBilling();
@@ -1423,14 +1522,11 @@ function printBillWithTax(bill) {
         showToast('❌ Please allow popups for printing!');
         return;
     }
-    
     const taxRate = bill.taxRate || 0;
     const taxAmount = bill.tax || 0;
     const grandTotal = bill.total;
-    
     const isEdited = bill.edited || false;
     const editedText = isEdited ? ' (Edited)' : '';
-    
     const itemsHtml = bill.items.map(item => `
         <tr>
             <td>${item.name}</td>
@@ -1439,7 +1535,6 @@ function printBillWithTax(bill) {
             <td style="text-align:right;">Rs. ${(item.price * item.qty).toFixed(2)}</td>
         </tr>
     `).join('');
-    
     let paymentsHtml = '';
     if (bill.payments && bill.payments.length > 0) {
         paymentsHtml = bill.payments.map(p => `
@@ -1449,7 +1544,6 @@ function printBillWithTax(bill) {
             </div>
         `).join('');
     }
-    
     printWindow.document.write(`
         <!DOCTYPE html>
         <html>
@@ -1457,88 +1551,21 @@ function printBillWithTax(bill) {
             <title>Bill #${bill.id}${editedText}</title>
             <style>
                 * { margin: 0; padding: 0; box-sizing: border-box; }
-                body { 
-                    font-family: 'Courier New', monospace; 
-                    padding: 20px; 
-                    max-width: 350px; 
-                    margin: 0 auto; 
-                    background: white; 
-                }
-                .header { 
-                    text-align: center; 
-                    border-bottom: 2px dashed #333; 
-                    padding-bottom: 10px; 
-                    margin-bottom: 10px; 
-                }
+                body { font-family: 'Courier New', monospace; padding: 20px; max-width: 350px; margin: 0 auto; background: white; }
+                .header { text-align: center; border-bottom: 2px dashed #333; padding-bottom: 10px; margin-bottom: 10px; }
                 .header h1 { margin: 0; font-size: 1.4rem; }
                 .header p { margin: 4px 0; color: #666; font-size: 0.8rem; }
-                table { 
-                    width: 100%; 
-                    border-collapse: collapse; 
-                    font-size: 0.8rem; 
-                }
-                th { 
-                    text-align: left; 
-                    border-bottom: 1px solid #ddd; 
-                    padding: 4px 0; 
-                    font-size: 0.7rem; 
-                    color: #666; 
-                }
-                td { 
-                    padding: 4px 0; 
-                    border-bottom: 1px solid #eee; 
-                }
-                .totals { 
-                    margin-top: 10px; 
-                    border-top: 2px solid #333; 
-                    padding-top: 10px; 
-                }
-                .totals div { 
-                    display: flex; 
-                    justify-content: space-between; 
-                    font-size: 0.85rem; 
-                    padding: 2px 0; 
-                }
-                .totals .grand { 
-                    font-weight: 700; 
-                    font-size: 1.1rem; 
-                    border-top: 1px solid #ddd; 
-                    padding-top: 6px; 
-                    margin-top: 4px; 
-                }
-                .totals .tax { 
-                    color: #64748b; 
-                    font-size: 0.8rem; 
-                }
-                .payment-breakdown {
-                    margin: 6px 0;
-                    padding: 6px 0;
-                    border-top: 1px dashed #ddd;
-                    border-bottom: 1px dashed #ddd;
-                }
-                .payment-breakdown .title {
-                    font-weight: 600;
-                    font-size: 0.75rem;
-                    color: #666;
-                    margin-bottom: 2px;
-                }
-                .footer { 
-                    text-align: center; 
-                    margin-top: 20px; 
-                    font-size: 0.8rem; 
-                    color: #666; 
-                    border-top: 2px dashed #333; 
-                    padding-top: 10px; 
-                }
-                .edit-note {
-                    text-align: center;
-                    margin: 8px 0;
-                    padding: 8px;
-                    background: #fef3c7;
-                    border-radius: 4px;
-                    font-size: 0.7rem;
-                    color: #d97706;
-                }
+                table { width: 100%; border-collapse: collapse; font-size: 0.8rem; }
+                th { text-align: left; border-bottom: 1px solid #ddd; padding: 4px 0; font-size: 0.7rem; color: #666; }
+                td { padding: 4px 0; border-bottom: 1px solid #eee; }
+                .totals { margin-top: 10px; border-top: 2px solid #333; padding-top: 10px; }
+                .totals div { display: flex; justify-content: space-between; font-size: 0.85rem; padding: 2px 0; }
+                .totals .grand { font-weight: 700; font-size: 1.1rem; border-top: 1px solid #ddd; padding-top: 6px; margin-top: 4px; }
+                .totals .tax { color: #64748b; font-size: 0.8rem; }
+                .payment-breakdown { margin: 6px 0; padding: 6px 0; border-top: 1px dashed #ddd; border-bottom: 1px dashed #ddd; }
+                .payment-breakdown .title { font-weight: 600; font-size: 0.75rem; color: #666; margin-bottom: 2px; }
+                .footer { text-align: center; margin-top: 20px; font-size: 0.8rem; color: #666; border-top: 2px dashed #333; padding-top: 10px; }
+                .edit-note { text-align: center; margin: 8px 0; padding: 8px; background: #fef3c7; border-radius: 4px; font-size: 0.7rem; color: #d97706; }
             </style>
         </head>
         <body>
@@ -1549,14 +1576,7 @@ function printBillWithTax(bill) {
                 ${bill.table ? `<p>🪑 Table ${bill.table}</p>` : ''}
                 <p style="font-size:0.7rem;color:#999;">Thank you for your visit!</p>
             </div>
-            
-            ${isEdited ? `
-                <div class="edit-note">
-                    ✏️ This bill has been edited<br/>
-                    Edited on: ${bill.editedDate || ''}
-                </div>
-            ` : ''}
-            
+            ${isEdited ? `<div class="edit-note">✏️ This bill has been edited<br/>Edited on: ${bill.editedDate || ''}</div>` : ''}
             <table>
                 <thead>
                     <tr>
@@ -1570,7 +1590,6 @@ function printBillWithTax(bill) {
                     ${itemsHtml}
                 </tbody>
             </table>
-            
             <div class="totals">
                 <div><span>Subtotal</span><span>Rs. ${bill.subtotal.toFixed(2)}</span></div>
                 ${bill.discount > 0 ? `<div><span>Discount</span><span>-Rs. ${bill.discount.toFixed(2)}</span></div>` : ''}
@@ -1578,7 +1597,6 @@ function printBillWithTax(bill) {
                 <div class="grand"><span>TOTAL</span><span>Rs. ${grandTotal.toFixed(2)}</span></div>
                 ${isEdited ? `<div style="color:#d97706;text-decoration:line-through;"><span>Original Total</span><span>Rs. ${(bill.originalTotal || bill.total).toFixed(2)}</span></div>` : ''}
             </div>
-            
             ${bill.payments && bill.payments.length > 0 ? `
                 <div class="payment-breakdown">
                     <div class="title">💳 Payment Breakdown</div>
@@ -1602,12 +1620,10 @@ function printBillWithTax(bill) {
                     <span>Rs. ${bill.change.toFixed(2)}</span>
                 </div>
             `}
-            
             <div class="footer">
                 <p style="font-weight:600;">Thank you! Come again! 🍽️</p>
                 <p style="margin-top:4px;font-size:0.7rem;">Have a great day! 😊</p>
             </div>
-            
             <script>
                 window.onload = function() {
                     window.print();
@@ -1619,16 +1635,13 @@ function printBillWithTax(bill) {
         </body>
         </html>
     `);
-    
     printWindow.document.close();
 }
 
 // ============================================================
 //  PRINT FUNCTIONS
 // ============================================================
-function printBill(bill) {
-    printBillWithTax(bill);
-}
+function printBill(bill) { printBillWithTax(bill); }
 
 function printBillFromHistory(billId) {
     const bill = history.find(b => b.id === billId);
@@ -1644,25 +1657,20 @@ function printAllHistory() {
         showToast('❌ No bills to print!');
         return;
     }
-    
     const printWindow = window.open('', '_blank', 'width=500,height=800');
     if (!printWindow) {
         showToast('❌ Please allow popups for printing!');
         return;
     }
-    
     let allBillsHtml = '';
     let grandTotal = 0;
     let grandItems = 0;
-    
     const sortedHistory = [...history].sort((a, b) => a.id - b.id);
-    
     sortedHistory.forEach((bill, index) => {
         const isEdited = bill.edited || false;
         const editedText = isEdited ? ' (Edited)' : '';
         const taxRate = bill.taxRate || 0;
         const taxAmount = bill.tax || 0;
-        
         const itemsHtml = bill.items.map(item => `
             <tr>
                 <td>${item.name}</td>
@@ -1671,7 +1679,6 @@ function printAllHistory() {
                 <td style="text-align:right;">Rs. ${(item.price * item.qty).toFixed(2)}</td>
             </tr>
         `).join('');
-        
         allBillsHtml += `
             <div class="bill-print" style="${index > 0 ? 'page-break-before: always;' : ''}">
                 <div class="header">
@@ -1682,7 +1689,6 @@ function printAllHistory() {
                     ${isEdited ? `<p style="color:#d97706;">✏️ Edited on: ${bill.editedDate || ''}</p>` : ''}
                     ${isEdited ? `<p style="color:#d97706;text-decoration:line-through;">Original Total: Rs. ${(bill.originalTotal || bill.total).toFixed(2)}</p>` : ''}
                 </div>
-                
                 <table>
                     <thead>
                         <tr>
@@ -1696,7 +1702,6 @@ function printAllHistory() {
                         ${itemsHtml}
                     </tbody>
                 </table>
-                
                 <div class="totals">
                     <div><span>Subtotal</span><span>Rs. ${bill.subtotal.toFixed(2)}</span></div>
                     ${bill.discount > 0 ? `<div><span>Discount</span><span>-Rs. ${bill.discount.toFixed(2)}</span></div>` : ''}
@@ -1705,17 +1710,14 @@ function printAllHistory() {
                     ${bill.received ? `<div class="received"><span>Received</span><span>Rs. ${bill.received.toFixed(2)}</span></div>` : ''}
                     ${bill.change ? `<div class="change"><span>Change</span><span>Rs. ${bill.change.toFixed(2)}</span></div>` : ''}
                 </div>
-                
                 <div class="footer">
                     <p>Thank you! Come again! 🍽️</p>
                 </div>
             </div>
         `;
-        
         grandTotal += bill.total;
         grandItems += bill.items.reduce((sum, item) => sum + item.qty, 0);
     });
-    
     allBillsHtml += `
         <div class="grand-summary" style="page-break-before: always; text-align: center; padding-top: 50px;">
             <h2>📊 GRAND SUMMARY</h2>
@@ -1727,7 +1729,6 @@ function printAllHistory() {
             </div>
         </div>
     `;
-    
     printWindow.document.write(`
         <!DOCTYPE html>
         <html>
@@ -1735,86 +1736,24 @@ function printAllHistory() {
             <title>All Bills - Hotel POS</title>
             <style>
                 * { margin: 0; padding: 0; box-sizing: border-box; }
-                body { 
-                    font-family: 'Courier New', monospace; 
-                    padding: 20px; 
-                    max-width: 400px; 
-                    margin: 0 auto; 
-                    background: white; 
-                }
-                .header { 
-                    text-align: center; 
-                    border-bottom: 2px dashed #333; 
-                    padding-bottom: 10px; 
-                    margin-bottom: 10px; 
-                }
+                body { font-family: 'Courier New', monospace; padding: 20px; max-width: 400px; margin: 0 auto; background: white; }
+                .header { text-align: center; border-bottom: 2px dashed #333; padding-bottom: 10px; margin-bottom: 10px; }
                 .header h1 { margin: 0; font-size: 1.4rem; }
                 .header p { margin: 4px 0; color: #666; font-size: 0.8rem; }
-                table { 
-                    width: 100%; 
-                    border-collapse: collapse; 
-                    font-size: 0.8rem; 
-                }
-                th { 
-                    text-align: left; 
-                    border-bottom: 1px solid #ddd; 
-                    padding: 4px 0; 
-                    font-size: 0.7rem; 
-                    color: #666; 
-                }
-                td { 
-                    padding: 4px 0; 
-                    border-bottom: 1px solid #eee; 
-                }
-                .totals { 
-                    margin-top: 10px; 
-                    border-top: 2px solid #333; 
-                    padding-top: 10px; 
-                }
-                .totals div { 
-                    display: flex; 
-                    justify-content: space-between; 
-                    font-size: 0.85rem; 
-                    padding: 2px 0; 
-                }
-                .totals .grand { 
-                    font-weight: 700; 
-                    font-size: 1.1rem; 
-                    border-top: 1px solid #ddd; 
-                    padding-top: 6px; 
-                    margin-top: 4px; 
-                }
+                table { width: 100%; border-collapse: collapse; font-size: 0.8rem; }
+                th { text-align: left; border-bottom: 1px solid #ddd; padding: 4px 0; font-size: 0.7rem; color: #666; }
+                td { padding: 4px 0; border-bottom: 1px solid #eee; }
+                .totals { margin-top: 10px; border-top: 2px solid #333; padding-top: 10px; }
+                .totals div { display: flex; justify-content: space-between; font-size: 0.85rem; padding: 2px 0; }
+                .totals .grand { font-weight: 700; font-size: 1.1rem; border-top: 1px solid #ddd; padding-top: 6px; margin-top: 4px; }
                 .totals .received { color: #16a34a; }
                 .totals .change { color: #16a34a; }
                 .totals .tax { color: #64748b; font-size: 0.8rem; }
-                .footer { 
-                    text-align: center; 
-                    margin-top: 20px; 
-                    font-size: 0.8rem; 
-                    color: #666; 
-                    border-top: 2px dashed #333; 
-                    padding-top: 10px; 
-                }
-                .grand-summary {
-                    text-align: center;
-                    padding-top: 50px;
-                }
-                .grand-summary h2 {
-                    font-size: 1.8rem;
-                    margin-bottom: 20px;
-                }
-                .grand-summary p {
-                    font-size: 1.2rem;
-                    margin: 8px 0;
-                }
-                @media print {
-                    .bill-print {
-                        page-break-after: always;
-                    }
-                    .bill-print:last-child {
-                        page-break-after: avoid;
-                    }
-                }
+                .footer { text-align: center; margin-top: 20px; font-size: 0.8rem; color: #666; border-top: 2px dashed #333; padding-top: 10px; }
+                .grand-summary { text-align: center; padding-top: 50px; }
+                .grand-summary h2 { font-size: 1.8rem; margin-bottom: 20px; }
+                .grand-summary p { font-size: 1.2rem; margin: 8px 0; }
+                @media print { .bill-print { page-break-after: always; } .bill-print:last-child { page-break-after: avoid; } }
             </style>
         </head>
         <body>
@@ -1830,7 +1769,6 @@ function printAllHistory() {
         </body>
         </html>
     `);
-    
     printWindow.document.close();
 }
 
@@ -1843,25 +1781,20 @@ function openEditBill(billId) {
         showToast('❌ Bill not found!');
         return;
     }
-    
     editingBillId = billId;
     editedBillData = JSON.parse(JSON.stringify(bill));
-    
     document.getElementById('editBillId').textContent = billId;
     renderEditBillItems(editedBillData);
     updateEditTotals(editedBillData);
-    
     document.getElementById('editBillModal').classList.add('open');
 }
 
 function renderEditBillItems(bill) {
     const container = document.getElementById('editBillItems');
-    
     if (!bill || !bill.items || bill.items.length === 0) {
         container.innerHTML = '<div class="empty-state">No items</div>';
         return;
     }
-    
     let html = '';
     bill.items.forEach((item, index) => {
         html += `
@@ -1877,14 +1810,12 @@ function renderEditBillItems(bill) {
             </div>
         `;
     });
-    
     html += `
         <div class="edit-discount-row">
             <label>Discount %</label>
             <input type="number" id="editDiscountInput" value="${bill.discountPercent || 0}" min="0" max="100" step="1" onchange="updateEditDiscount(this.value)" />
         </div>
     `;
-    
     container.innerHTML = html;
 }
 
@@ -1912,12 +1843,10 @@ function updateEditTotals(bill) {
     const taxRate = bill.taxRate || getTaxRate();
     const tax = ((subtotal - discount) * taxRate) / 100;
     const total = subtotal - discount + tax;
-    
     document.getElementById('editSubtotal').textContent = `Rs. ${subtotal.toFixed(2)}`;
     document.getElementById('editDiscount').textContent = `-Rs. ${discount.toFixed(2)}`;
     document.getElementById('editTax').textContent = `Rs. ${tax.toFixed(2)}`;
     document.getElementById('editTotal').textContent = `Rs. ${total.toFixed(2)}`;
-    
     bill.subtotal = subtotal;
     bill.discount = discount;
     bill.tax = tax;
@@ -1933,27 +1862,24 @@ function updateEditDiscount(value) {
 
 function saveEditBill() {
     if (!editingBillId || !editedBillData) return;
-    
     const index = history.findIndex(b => b.id === editingBillId);
     if (index === -1) {
         showToast('❌ Bill not found!');
         return;
     }
-    
     editedBillData.edited = true;
     editedBillData.editedDate = new Date().toLocaleString('en-US', { 
         month: '2-digit', day: '2-digit', year: 'numeric', 
         hour: '2-digit', minute: '2-digit', second: '2-digit' 
     });
     editedBillData.originalTotal = history[index].total;
-    
     history[index] = editedBillData;
     saveHistory();
-    
+    // Create backup after editing bill
+    createBackup();
     document.getElementById('editBillModal').classList.remove('open');
     renderHistory();
     showToast('✅ Bill updated successfully!');
-    
     editingBillId = null;
     editedBillData = null;
 }
@@ -1971,14 +1897,9 @@ function autoClearOldBills() {
     const today = new Date();
     const todayStr = today.toDateString();
     const lastClearDate = localStorage.getItem('history_last_clear');
-    
-    if (lastClearDate === todayStr) {
-        return;
-    }
-    
+    if (lastClearDate === todayStr) return;
     const todayBills = [];
     const oldBills = [];
-    
     history.forEach(bill => {
         const billDate = new Date(bill.date);
         if (billDate.toDateString() === todayStr) {
@@ -1987,7 +1908,6 @@ function autoClearOldBills() {
             oldBills.push(bill);
         }
     });
-    
     if (oldBills.length > 0) {
         console.log(`🗑️ Auto-clearing ${oldBills.length} old bills from previous days`);
         history = todayBills;
@@ -2002,7 +1922,6 @@ function autoClearOldBills() {
 function renderHistory() {
     let filteredHistory = [];
     let filterLabel = '';
-    
     if (historyFilter === 'today') {
         const today = new Date().toDateString();
         filteredHistory = history.filter(bill => {
@@ -2022,23 +1941,19 @@ function renderHistory() {
         filteredHistory = history;
         filterLabel = '📋 All Bills';
     }
-    
     const filterInfo = document.getElementById('filterInfo');
     if (filterInfo) {
         filterInfo.textContent = `Showing: ${filterLabel} (${filteredHistory.length} bills)`;
     }
-    
     if (filteredHistory.length === 0) {
         document.getElementById('historyList').innerHTML = `<div class="empty-state">No bills found for this filter</div>`;
         return;
     }
-    
     document.getElementById('historyList').innerHTML = filteredHistory.slice().reverse().map(bill => {
         const isEdited = bill.edited || false;
         const editBadge = isEdited ? '<span class="edit-badge">✏️ Edited</span>' : '';
         const taxRate = bill.taxRate || 0;
         const taxText = bill.tax ? `Tax: Rs. ${bill.tax.toFixed(2)}` : '';
-        
         return `
             <div class="history-item ${isEdited ? 'edited' : ''}">
                 <div class="h-top">
@@ -2112,7 +2027,6 @@ function setupHistoryFilters() {
     const applyBtn = document.getElementById('applyDateFilterBtn');
     const clearBtn = document.getElementById('clearDateFilterBtn');
     const dateInput = document.getElementById('historyDateFilter');
-    
     if (todayBtn) {
         todayBtn.addEventListener('click', filterHistoryToday);
         todayBtn.classList.add('active');
@@ -2159,7 +2073,6 @@ document.getElementById('printHistoryBtn').addEventListener('click', function() 
 document.getElementById('saveEditBillBtn').addEventListener('click', saveEditBill);
 document.getElementById('cancelEditBillBtn').addEventListener('click', cancelEditBill);
 document.getElementById('closeEditBillModalBtn').addEventListener('click', cancelEditBill);
-
 document.getElementById('editBillModal').addEventListener('click', function(e) {
     if (e.target === this) cancelEditBill();
 });
@@ -2283,11 +2196,9 @@ if ('serviceWorker' in navigator) {
             .then(function(registration) {
                 console.log('✅ Service Worker registered successfully!');
                 console.log('Scope:', registration.scope);
-                
                 registration.addEventListener('updatefound', function() {
                     const newWorker = registration.installing;
                     console.log('🔄 Service Worker update found');
-                    
                     newWorker.addEventListener('statechange', function() {
                         if (newWorker.state === 'installed' && navigator.serviceWorker.controller) {
                             console.log('🔄 New version available!');
@@ -2302,9 +2213,6 @@ if ('serviceWorker' in navigator) {
     });
 }
 
-// ============================================================
-//  CHECK APP INSTALL STATUS
-// ============================================================
 function isAppInstalled() {
     if (window.matchMedia('(display-mode: standalone)').matches) {
         console.log('✅ App is installed and running in standalone mode');
@@ -2313,16 +2221,11 @@ function isAppInstalled() {
     return false;
 }
 
-// ============================================================
-//  INSTALL PROMPT HANDLER
-// ============================================================
 let deferredPrompt;
-
 window.addEventListener('beforeinstallprompt', function(e) {
     console.log('📲 App can be installed');
     e.preventDefault();
     deferredPrompt = e;
-    
     const banner = document.getElementById('installBanner');
     if (banner) {
         if (!isAppInstalled()) {
@@ -2353,9 +2256,6 @@ window.addEventListener('appinstalled', function(e) {
     showToast('✅ App installed successfully!');
 });
 
-// ============================================================
-//  CHECK ONLINE STATUS
-// ============================================================
 function checkOnlineStatus() {
     if (!navigator.onLine) {
         showToast('📡 You are offline. Some features may not work.');
@@ -2403,6 +2303,13 @@ window.filterHistoryToday = filterHistoryToday;
 window.filterHistoryAll = filterHistoryAll;
 window.filterHistoryByDate = filterHistoryByDate;
 window.clearDateFilter = clearDateFilter;
+window.createBackup = createBackup;
+window.getBackups = getBackups;
+window.restoreFromBackup = restoreFromBackup;
+window.generateDailyReport = generateDailyReport;
+window.saveDailyReport = saveDailyReport;
+window.getAllReports = getAllReports;
+window.generateAndSaveTodayReport = generateAndSaveTodayReport;
 
 // ============================================================
 //  INIT
@@ -2421,6 +2328,5 @@ document.addEventListener('DOMContentLoaded', function() {
     renderHistory();
 });
 </script>
-
 </body>
 </html>
