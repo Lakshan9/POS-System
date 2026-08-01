@@ -2106,6 +2106,53 @@ function toggleFullScreen() {
         if (document.exitFullscreen) document.exitFullscreen();
         else if (document.webkitExitFullscreen) document.webkitExitFullscreen();
     }
+    // ============================================================
+//  FULL SCREEN - FIXED for orientation
+// ============================================================
+function toggleFullScreen() {
+    if (!document.fullscreenElement && !document.webkitFullscreenElement) {
+        const el = document.documentElement;
+        if (el.requestFullscreen) {
+            el.requestFullscreen();
+        } else if (el.webkitRequestFullscreen) {
+            el.webkitRequestFullscreen();
+        }
+        // Screen orientation lock remove කරන්න
+        if (screen.orientation && screen.orientation.unlock) {
+            screen.orientation.unlock();
+        }
+    } else {
+        if (document.exitFullscreen) {
+            document.exitFullscreen();
+        } else if (document.webkitExitFullscreen) {
+            document.webkitExitFullscreen();
+        }
+    }
+}
+
+// ============================================================
+//  SCREEN ORIENTATION CHANGE EVENT
+// ============================================================
+function handleOrientationChange() {
+    console.log('🔄 Orientation changed:', screen.orientation.type);
+    // Grid adjustments automatically handled by CSS
+    // Refresh items grid if needed
+    if (typeof renderItems === 'function') {
+        // Small delay to let CSS catch up
+        setTimeout(renderItems, 100);
+    }
+}
+
+// Listen for orientation changes
+if (screen.orientation) {
+    screen.orientation.addEventListener('change', handleOrientationChange);
+} else {
+    // Fallback for older browsers
+    window.addEventListener('orientationchange', function() {
+        console.log('🔄 Orientation changed (legacy)');
+        setTimeout(handleOrientationChange, 300);
+    });
+}
 }
 
 // ============================================================

@@ -2785,3 +2785,356 @@ body.theme-dark .theme-toggle-btn {
 ::-webkit-scrollbar-thumb:hover {
     background: #94a3b8;
 }
+
+/* ============================================================
+   ORIENTATION RESPONSIVE STYLES
+   Auto-adjust for portrait and landscape mode
+   ============================================================ */
+
+/* Default: Landscape mode (බොහෝ POS systems සඳහා) */
+.pos-container.active {
+    display: grid;
+    grid-template-columns: 1fr 1.2fr;
+    gap: 10px;
+    height: calc(100vh - 56px);
+    padding: 6px 10px 10px 10px;
+}
+
+/* ===== Portrait mode (phone/tablet vertical) ===== */
+@media (orientation: portrait) {
+    .pos-container.active {
+        grid-template-columns: 1fr;
+        grid-template-rows: auto 1fr;
+        height: calc(100vh - 56px);
+        padding: 4px 8px 8px 8px;
+        gap: 8px;
+    }
+    
+    .left-billing {
+        min-height: 300px;
+        max-height: 50vh;
+    }
+    
+    .billing-table {
+        max-height: 200px;
+        min-height: 150px;
+    }
+    
+    .right-items {
+        min-height: 300px;
+        max-height: 50vh;
+    }
+    
+    .items-grid {
+        grid-template-columns: repeat(auto-fill, minmax(90px, 1fr));
+        gap: 6px;
+        padding: 6px;
+    }
+    
+    .main-grid {
+        grid-template-columns: 1fr;
+        height: auto;
+        min-height: auto;
+    }
+    
+    .categories-section {
+        max-height: 150px;
+        min-height: 100px;
+    }
+    
+    .items-section {
+        min-height: 300px;
+    }
+    
+    /* Summary cards in portrait */
+    .report-summary {
+        grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
+    }
+    
+    .report-grid {
+        grid-template-columns: 1fr;
+    }
+}
+
+/* ===== Landscape mode (default) ===== */
+@media (orientation: landscape) and (max-height: 500px) {
+    /* Small screens in landscape (phones) */
+    .pos-container.active {
+        grid-template-columns: 1fr 1.5fr;
+        gap: 6px;
+        height: calc(100vh - 56px);
+        padding: 3px 6px 6px 6px;
+    }
+    
+    .left-billing {
+        min-height: 200px;
+    }
+    
+    .billing-table {
+        max-height: 150px;
+        min-height: 100px;
+    }
+    
+    .items-grid {
+        grid-template-columns: repeat(auto-fill, minmax(70px, 1fr));
+        gap: 4px;
+        padding: 4px;
+    }
+    
+    .item-btn {
+        padding: 4px 3px;
+        font-size: 0.55rem;
+    }
+    
+    .item-price {
+        font-size: 0.6rem;
+    }
+    
+    .table-header, .billing-row {
+        font-size: 0.6rem;
+        padding: 3px 2px;
+    }
+}
+
+/* ===== Tablet portrait mode ===== */
+@media (orientation: portrait) and (min-width: 768px) {
+    .pos-container.active {
+        grid-template-columns: 1fr 1fr;
+        grid-template-rows: auto;
+        height: calc(100vh - 56px);
+        padding: 6px 10px 10px 10px;
+        gap: 10px;
+    }
+    
+    .left-billing {
+        max-height: 60vh;
+        min-height: 350px;
+    }
+    
+    .right-items {
+        max-height: 60vh;
+        min-height: 350px;
+    }
+    
+    .billing-table {
+        max-height: 300px;
+        min-height: 200px;
+    }
+    
+    .items-grid {
+        grid-template-columns: repeat(auto-fill, minmax(120px, 1fr));
+        gap: 8px;
+        padding: 8px;
+    }
+}
+
+/* ===== Tablet landscape mode ===== */
+@media (orientation: landscape) and (min-width: 1024px) {
+    .pos-container.active {
+        grid-template-columns: 1fr 1.2fr;
+        gap: 12px;
+        padding: 8px 14px 14px 14px;
+    }
+    
+    .left-billing {
+        min-height: 450px;
+    }
+    
+    .billing-table {
+        max-height: 400px;
+    }
+    
+    .items-grid {
+        grid-template-columns: repeat(auto-fill, minmax(130px, 1fr));
+        gap: 10px;
+        padding: 10px;
+    }
+}
+
+/* ===== Large screens (desktop) ===== */
+@media (min-width: 1400px) {
+    .pos-container.active {
+        max-width: 1400px;
+        margin: 0 auto;
+    }
+}
+
+/* ===== Fix for modal in portrait mode ===== */
+@media (orientation: portrait) {
+    .modal {
+        max-width: 95%;
+        max-height: 85vh;
+    }
+    
+    .modal-wide {
+        max-width: 95%;
+    }
+    
+    .modal-small {
+        max-width: 90%;
+    }
+    
+    .payment-methods-grid {
+        grid-template-columns: repeat(3, 1fr);
+    }
+    
+    .payment-actions {
+        grid-template-columns: 1fr 1fr;
+    }
+    
+    .edit-bill-item {
+        flex-wrap: wrap;
+        gap: 4px;
+    }
+}
+
+/* ===== Fix for table grid in portrait ===== */
+@media (orientation: portrait) {
+    .table-grid {
+        grid-template-columns: repeat(auto-fill, minmax(130px, 1fr));
+        gap: 10px;
+    }
+    
+    .table-btn {
+        padding: 14px;
+        min-height: 100px;
+    }
+    
+    .table-btn .num {
+        font-size: 1.2rem;
+    }
+}
+
+/* ===== Fix for stock page in portrait ===== */
+@media (orientation: portrait) {
+    .stock-summary {
+        grid-template-columns: repeat(2, 1fr);
+        gap: 8px;
+    }
+    
+    .stock-table th,
+    .stock-table td {
+        padding: 6px 8px;
+        font-size: 0.7rem;
+    }
+    
+    .actions-bar {
+        flex-wrap: wrap;
+    }
+    
+    .actions-bar button {
+        font-size: 0.7rem;
+        padding: 4px 10px;
+    }
+}
+
+/* ===== Fix for settings page in portrait ===== */
+@media (orientation: portrait) {
+    .setting-item {
+        flex-direction: column;
+        align-items: stretch;
+    }
+    
+    .setting-control {
+        flex-wrap: wrap;
+    }
+    
+    .password-row {
+        flex-direction: column;
+    }
+    
+    .password-toggle {
+        width: 100%;
+    }
+}
+
+/* ===== Fix for report page in portrait ===== */
+@media (orientation: portrait) {
+    .report-summary {
+        grid-template-columns: repeat(2, 1fr);
+        gap: 8px;
+        padding: 8px;
+    }
+    
+    .report-card {
+        padding: 12px;
+    }
+    
+    .report-card .num {
+        font-size: 1rem;
+    }
+    
+    .quick-filters {
+        flex-wrap: wrap;
+        gap: 4px;
+    }
+    
+    .filter-btn {
+        font-size: 0.65rem;
+        padding: 4px 10px;
+    }
+    
+    .payment-bar-row {
+        flex-wrap: wrap;
+    }
+    
+    .payment-bar-row .bar-track {
+        flex-basis: 100%;
+        order: 3;
+    }
+    
+    .saved-report-item {
+        flex-direction: column;
+        align-items: stretch;
+        gap: 6px;
+    }
+    
+    .saved-report-item .report-info {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 4px;
+    }
+    
+    .saved-report-item .view-btn {
+        width: 100%;
+        text-align: center;
+    }
+}
+
+/* ===== Smooth transition for orientation changes ===== */
+.pos-container,
+.left-billing,
+.right-items,
+.items-grid,
+.table-grid,
+.report-grid,
+.stock-summary,
+.main-grid {
+    transition: all 0.3s ease;
+}
+
+/* ===== Prevent zoom on orientation change ===== */
+@media (orientation: portrait) {
+    body {
+        font-size: 14px;
+    }
+}
+
+@media (orientation: landscape) {
+    body {
+        font-size: 15px;
+    }
+}
+
+@media (orientation: landscape) and (max-width: 768px) {
+    body {
+        font-size: 13px;
+    }
+}
+
+/* ===== Fix for keyboard showing on mobile ===== */
+@media (max-width: 768px) {
+    input, select, textarea {
+        font-size: 16px !important; /* Prevent iOS zoom */
+    }
+}
