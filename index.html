@@ -1457,24 +1457,25 @@ document.getElementById('confirmPaymentBtn').addEventListener('click', function(
     const changeAmount = received - billTotal;
     const methodIcons = { 'cash': '💵', 'card': '💳', 'mobile': '📱', 'bank': '🏦', 'credit': '💰' };
     const methodNames = { 'cash': 'Cash', 'card': 'Card', 'mobile': 'Mobile', 'bank': 'Bank', 'credit': 'Credit' };
-    const bill = {
-        id: Date.now(),
-        date: new Date().toLocaleString('en-US', { month: '2-digit', day: '2-digit', year: 'numeric', hour: '2-digit', minute: '2-digit', second: '2-digit' }),
-        items: currentBill.items,
-        subtotal: currentBill.subtotal,
-        discount: currentBill.discount,
-        tax: currentBill.tax,
-        taxRate: currentBill.taxRate,
-        total: currentBill.total,
-        payments: [{
-            method: selectedMethod,
-            methodLabel: `${methodIcons[selectedMethod]} ${methodNames[selectedMethod]}`,
-            amount: received,
-            reference: reference
-        }],
-        received: received,
-        change: changeAmount,
-        edited: false
+ const bill = {
+    id: Date.now(),
+    date: new Date().toLocaleString(),
+    items: currentBill.items,
+    subtotal: currentBill.subtotal,
+    discount: currentBill.discount,
+    tax: currentBill.tax,
+    taxRate: currentBill.taxRate,
+    total: currentBill.total,
+    paymentMethod: selectedMethod,  // ✅ මෙය add කරන්න
+    payments: [{
+        method: selectedMethod,
+        methodLabel: `${methodIcons[selectedMethod]} ${methodNames[selectedMethod]}`,
+        amount: received,
+        reference: reference
+    }],
+    received: received,
+    change: changeAmount,
+    edited: false
     };
     history.push(bill);
     saveHistory();

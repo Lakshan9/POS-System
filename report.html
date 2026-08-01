@@ -758,16 +758,20 @@ function getPaymentMethodTotals(bills) {
         'credit': { name: 'Credit', icon: '💰', total: 0, count: 0, color: '#dc2626' }
     };
     
-    // ✅ ONLY process the bills that were passed in (filtered bills)
     bills.forEach(bill => {
-        if (bill.payments && bill.payments.length > 0) {
-            bill.payments.forEach(payment => {
-                const method = payment.method || 'cash';
-                if (methods[method]) {
-                    methods[method].total += payment.amount || 0;
-                    methods[method].count += 1;
-                }
-            });
+        // ✅ Bill එකේ paymentMethod එක බලන්න
+        let method = bill.paymentMethod || 'cash';
+        
+        // ✅ payments array එකෙන් method එක හොයන්න (backup)
+        if (!method && bill.payments && bill.payments.length > 0) {
+            method = bill.payments[0].method || 'cash';
+        }
+        
+        // ✅ Bill total එක add කරන්න (received amount නෙවෙයි)
+        const billTotal = bill.total || 0;
+        if (methods[method]) {
+            methods[method].total += billTotal;
+            methods[method].count += 1;
         }
     });
     
