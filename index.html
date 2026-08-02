@@ -16,7 +16,7 @@
 <div id="installBanner" style="display:none;position:fixed;bottom:20px;left:50%;transform:translateX(-50%);z-index:9999;background:#1e293b;color:white;padding:12px 20px;border-radius:12px;box-shadow:0 4px 20px rgba(0,0,0,0.3);display:flex;align-items:center;gap:12px;flex-wrap:wrap;justify-content:center;max-width:90%;">
     <span style="font-size:1.1rem;">📲 Install Hotel POS App</span>
     <button id="installAppBtn" style="background:#8b5cf6;color:white;border:none;padding:8px 20px;border-radius:8px;cursor:pointer;font-weight:600;font-size:0.9rem;">Install</button>
-    <button onclick="document.getElementById('installBanner').style.display='none'" style="background:transparent;border:none;color:#94a3b8;cursor:pointer;font-size:1.2rem;padding:4px 8px;">✕</button>
+    <button onclick="dismissInstallBanner()" style="background:transparent;border:none;color:#94a3b8;cursor:pointer;font-size:1.2rem;padding:4px 8px;">✕</button>
 </div>
 
 <!-- ===== HEADER ===== -->
@@ -2310,12 +2310,28 @@ if ('serviceWorker' in navigator) {
     });
 }
 
+// ============================================================
+//  APP INSTALL DETECTION - FIXED
+// ============================================================
+
 function isAppInstalled() {
-    if (window.matchMedia('(display-mode: standalone)').matches) {
-        console.log('✅ App is installed and running in standalone mode');
+    // Check multiple ways to detect if app is installed
+    const isStandalone = window.matchMedia('(display-mode: standalone)').matches;
+    const isFullscreen = window.matchMedia('(display-mode: fullscreen)').matches;
+    const isMinimalUI = window.matchMedia('(display-mode: minimal-ui)').matches;
+    const isNativeApp = window.navigator.standalone === true;
+    const appInstalledFlag = localStorage.getItem('app_installed') === 'true';
+    
+    if (isStandalone || isFullscreen || isMinimalUI || isNativeApp || appInstalledFlag) {
+        console.log('✅ App is installed/standalone mode');
         return true;
     }
     return false;
+}
+
+function dismissInstallBanner() {
+    document.getElementById('installBanner').style.display = 'none';
+    localStorage.setItem('app_installed', 'true');
 }
 
 let deferredPrompt;
@@ -2327,6 +2343,8 @@ window.addEventListener('beforeinstallprompt', function(e) {
     if (banner) {
         if (!isAppInstalled()) {
             banner.style.display = 'flex';
+        } else {
+            banner.style.display = 'none';
         }
     }
 });
@@ -2337,37 +2355,43 @@ document.getElementById('installAppBtn')?.addEventListener('click', function() {
         deferredPrompt.userChoice.then(function(choiceResult) {
             if (choiceResult.outcome === 'accepted') {
                 console.log('✅ User accepted the install prompt');
+                localStorage.setItem('app_installed', 'true');
                 document.getElementById('installBanner').style.display = 'none';
                 showToast('✅ App installed successfully!');
             } else {
                 console.log('❌ User dismissed the install prompt');
+                // Don't show banner again for this session
+                document.getElementById('installBanner').style.display = 'none';
             }
             deferredPrompt = null;
         });
+    } else {
+        // If deferredPrompt is null, app might already be installed
+        localStorage.setItem('app_installed', 'true');
+        document.getElementById('installBanner').style.display = 'none';
+        showToast('✅ App already installed!');
     }
 });
 
 window.addEventListener('appinstalled', function(e) {
     console.log('✅ App was installed successfully!');
+    localStorage.setItem('app_installed', 'true');
     document.getElementById('installBanner').style.display = 'none';
     showToast('✅ App installed successfully!');
 });
 
-function checkOnlineStatus() {
-    if (!navigator.onLine) {
-        showToast('📡 You are offline. Some features may not work.');
+// On page load, check if app is installed
+document.addEventListener('DOMContentLoaded', function() {
+    // ... existing code ...
+    
+    // Hide install banner if app is installed or was dismissed
+    if (isAppInstalled()) {
+        const banner = document.getElementById('installBanner');
+        if (banner) {
+            banner.style.display = 'none';
+        }
     }
-}
-
-window.addEventListener('online', function() {
-    showToast('✅ Back online!');
 });
-
-window.addEventListener('offline', function() {
-    showToast('📡 You are offline. Some features may not work.');
-});
-
-checkOnlineStatus();
 
 // ============================================================
 //  EXPORT FUNCTIONS
