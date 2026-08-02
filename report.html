@@ -5,11 +5,6 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
     <title>Business Report - Hotel POS</title>
     <link rel="stylesheet" href="style-report.css" />
-
-    <!-- ===== FIREBASE SDK ===== -->
-    <script src="https://www.gstatic.com/firebasejs/10.12.4/firebase-app-compat.js"></script>
-    <script src="https://www.gstatic.com/firebasejs/10.12.4/firebase-firestore-compat.js"></script>
-    <script src="https://www.gstatic.com/firebasejs/10.12.4/firebase-auth-compat.js"></script>
 </head>
 <body>
 
@@ -92,22 +87,6 @@
     <button id="applyCustomFilter">🔍 Apply</button>
 </div>
 
-<!-- ===== CLOUD ACTIONS ===== -->
-<div class="cloud-actions" style="display:flex;gap:10px;padding:8px 20px;flex-wrap:wrap;align-items:center;background:#f8fafc;border-bottom:1px solid #e2e8f0;">
-    <button id="loadCloudReportsBtn" style="background:#8b5cf6;color:white;border:none;padding:8px 20px;border-radius:8px;cursor:pointer;font-weight:600;">
-        ☁️ Load Cloud Reports
-    </button>
-    <button id="saveCloudReportBtn" style="background:#22c55e;color:white;border:none;padding:8px 20px;border-radius:8px;cursor:pointer;font-weight:600;">
-        💾 Save Current to Cloud
-    </button>
-    <span id="cloudStatus" style="font-size:0.75rem;color:#94a3b8;display:flex;align-items:center;">
-        ⚡ Cloud ready
-    </span>
-    <span id="userEmail" style="font-size:0.7rem;color:#64748b;margin-left:auto;">
-        👤 Not logged in
-    </span>
-</div>
-
 <!-- ===== SUMMARY CARDS ===== -->
 <div class="report-summary" id="reportSummary">
     <div class="report-card revenue">
@@ -158,20 +137,6 @@
     </div>
     <div class="saved-reports-list" id="savedReportsList">
         <!-- Rendered by JS -->
-    </div>
-</div>
-
-<!-- ===== CLOUD REPORTS LIST ===== -->
-<div class="report-card-modern full-width">
-    <div class="card-title">
-        <span class="icon">☁️</span>
-        Cloud Reports (Firebase)
-        <span style="margin-left:auto;font-size:0.7rem;color:#94a3b8;" id="cloudReportCount">0 reports</span>
-    </div>
-    <div id="cloudReportsList">
-        <div style="text-align:center;padding:20px;color:#94a3b8;">
-            Click <strong>"Load Cloud Reports"</strong> to view reports from Firebase
-        </div>
     </div>
 </div>
 
@@ -306,33 +271,6 @@
 
 <script>
 // ============================================================
-//  FIREBASE CONFIG
-// ============================================================
-
-const firebaseConfig = {
-  apiKey: "AIzaSyBoc72fBPlF_pe_bHxy321oKeqt4U-wfis",
-  authDomain: "hotel-pos-system-113c7.firebaseapp.com",
-  databaseURL: "https://hotel-pos-system-113c7-default-rtdb.asia-southeast1.firebasedatabase.app",
-  projectId: "hotel-pos-system-113c7",
-  storageBucket: "hotel-pos-system-113c7.firebasestorage.app",
-  messagingSenderId: "1026466165620",
-  appId: "1:1026466165620:web:c7ae28b94d5fdc8778f221",
-  measurementId: "G-KP8GR66SC9"
-};
-
-// Initialize Firebase
-try {
-    firebase.initializeApp(firebaseConfig);
-    console.log('✅ Firebase initialized successfully!');
-    console.log('📁 Project:', firebaseConfig.projectId);
-} catch (error) {
-    console.error('❌ Firebase initialization error:', error);
-}
-
-const db = firebase.firestore();
-const auth = firebase.auth();
-
-// ============================================================
 //  DATA
 // ============================================================
 const HISTORY_KEY = 'hotel_history';
@@ -375,59 +313,69 @@ function getAllReports() {
 }
 
 function generateAndSaveTodayReport() {
-    try {
-        const today = new Date();
-        today.setHours(0, 0, 0, 0);
-        const todayStr = today.toDateString();
-        
-        const todayBills = history.filter(bill => {
-            const billDate = new Date(bill.date);
-            billDate.setHours(0, 0, 0, 0);
-            return billDate.toDateString() === todayStr;
-        });
-        
-        const totalRevenue = todayBills.reduce((sum, bill) => sum + (bill.total || 0), 0);
-        const totalOrders = todayBills.length;
-        const totalItems = todayBills.reduce((sum, bill) => {
-            return sum + bill.items.reduce((s, item) => s + (item.qty || item.quantity || 1), 0);
-        }, 0);
-        
-        const report = {
-            date: todayStr,
-            dateFormatted: today.toLocaleDateString('en-US', { 
-                weekday: 'long', 
-                year: 'numeric', 
-                month: 'long', 
-                day: 'numeric' 
-            }),
-            generatedAt: new Date().toLocaleString(),
-            summary: {
-                totalRevenue: totalRevenue,
-                totalOrders: totalOrders,
-                totalItems: totalItems,
-                totalDiscount: 0,
-                averageOrder: totalOrders > 0 ? totalRevenue / totalOrders : 0
-            },
-            topItems: [],
-            paymentMethods: {},
-            hourlySales: {},
-            bills: []
-        };
-        
-        let reports = getAllReports();
-        reports = reports.filter(r => r.date !== report.date);
-        reports.push(report);
-        reports.sort((a, b) => new Date(b.date) - new Date(a.date));
-        if (reports.length > 90) {
-            reports = reports.slice(0, 90);
+    if (typeof generateDailyReport === 'function' && typeof saveDailyReport === 'function') {
+        const report = generateDailyReport();
+        if (report) {
+            saveDailyReport(report);
+            showToast('✅ Today\'s report saved!');
+            renderSavedReports();
+            return report;
         }
-        localStorage.setItem(REPORTS_KEY, JSON.stringify(reports));
-        showToast('✅ Today\'s report saved!');
-        renderSavedReports();
-        return report;
-    } catch (error) {
-        console.error('Error saving report:', error);
-        showToast('❌ Failed to save report');
+    } else {
+        try {
+            const today = new Date();
+            today.setHours(0, 0, 0, 0);
+            const todayStr = today.toDateString();
+            
+            const todayBills = history.filter(bill => {
+                const billDate = new Date(bill.date);
+                billDate.setHours(0, 0, 0, 0);
+                return billDate.toDateString() === todayStr;
+            });
+            
+            const totalRevenue = todayBills.reduce((sum, bill) => sum + (bill.total || 0), 0);
+            const totalOrders = todayBills.length;
+            const totalItems = todayBills.reduce((sum, bill) => {
+                return sum + bill.items.reduce((s, item) => s + (item.qty || item.quantity || 1), 0);
+            }, 0);
+            
+            const report = {
+                date: todayStr,
+                dateFormatted: today.toLocaleDateString('en-US', { 
+                    weekday: 'long', 
+                    year: 'numeric', 
+                    month: 'long', 
+                    day: 'numeric' 
+                }),
+                generatedAt: new Date().toLocaleString(),
+                summary: {
+                    totalRevenue: totalRevenue,
+                    totalOrders: totalOrders,
+                    totalItems: totalItems,
+                    totalDiscount: 0,
+                    averageOrder: totalOrders > 0 ? totalRevenue / totalOrders : 0
+                },
+                topItems: [],
+                paymentMethods: {},
+                hourlySales: {},
+                bills: []
+            };
+            
+            let reports = getAllReports();
+            reports = reports.filter(r => r.date !== report.date);
+            reports.push(report);
+            reports.sort((a, b) => new Date(b.date) - new Date(a.date));
+            if (reports.length > 90) {
+                reports = reports.slice(0, 90);
+            }
+            localStorage.setItem(REPORTS_KEY, JSON.stringify(reports));
+            showToast('✅ Today\'s report saved!');
+            renderSavedReports();
+            return report;
+        } catch (error) {
+            console.error('Error saving report:', error);
+            showToast('❌ Failed to save report');
+        }
     }
 }
 
@@ -792,6 +740,7 @@ function renderTopSellingItems(bills, dateStr) {
 
 // ============================================================
 //  PAYMENT METHOD BREAKDOWN - FIXED
+//  Uses bill total, NOT received amount
 // ============================================================
 function getPaymentMethodTotals(bills) {
     const methods = {
@@ -1182,6 +1131,7 @@ function closeItemsSoldModal() {
 
 // ============================================================
 //  UPDATE REPORT
+//  All sections use the same filtered bills
 // ============================================================
 function updateReport(filter = 'today') {
     const range = getDateRange(filter);
@@ -1270,349 +1220,6 @@ fromDate.addEventListener('keydown', (e) => {
 toDate.addEventListener('keydown', (e) => {
     if (e.key === 'Enter') document.getElementById('applyCustomFilter').click();
 });
-
-// ============================================================
-//  CLOUD REPORTS FUNCTIONS
-// ============================================================
-
-// Get current report data
-function getCurrentReportData() {
-    const range = getDateRange(currentFilter);
-    if (!range) return null;
-    
-    const { start, end } = range;
-    const filteredBills = history.filter(bill => {
-        const billDate = new Date(bill.date);
-        return billDate >= start && billDate <= end;
-    });
-    
-    if (filteredBills.length === 0) {
-        showToast('📭 No data to save!');
-        return null;
-    }
-    
-    const orders = filteredBills.length;
-    const totalItems = filteredBills.reduce((sum, b) => sum + b.items.reduce((s, i) => s + (i.qty || i.quantity || 1), 0), 0);
-    const revenue = filteredBills.reduce((sum, b) => sum + (b.total || 0), 0);
-    const discount = filteredBills.reduce((sum, b) => sum + (b.discount || 0), 0);
-    const average = orders > 0 ? revenue / orders : 0;
-    
-    const topItems = getTopSellingItems(filteredBills, 5);
-    const paymentMethods = getPaymentMethodTotals(filteredBills);
-    const hourlySales = {};
-    filteredBills.forEach(bill => {
-        const hour = new Date(bill.date).getHours();
-        const hourKey = `${hour.toString().padStart(2, '0')}:00`;
-        if (!hourlySales[hourKey]) {
-            hourlySales[hourKey] = { orders: 0, revenue: 0 };
-        }
-        hourlySales[hourKey].orders += 1;
-        hourlySales[hourKey].revenue += bill.total || 0;
-    });
-    
-    const bills = filteredBills.map(bill => ({
-        id: bill.id,
-        time: bill.date,
-        total: bill.total,
-        items: bill.items.length
-    }));
-    
-    return {
-        date: start.toISOString().split('T')[0],
-        dateFormatted: start.toLocaleDateString('en-US', { 
-            weekday: 'long', 
-            year: 'numeric', 
-            month: 'long', 
-            day: 'numeric' 
-        }),
-        revenue: revenue,
-        orders: orders,
-        totalItems: totalItems,
-        discount: discount,
-        average: average,
-        topItems: topItems,
-        paymentMethods: paymentMethods,
-        hourlySales: hourlySales,
-        bills: bills,
-        summary: {
-            totalRevenue: revenue,
-            totalOrders: orders,
-            totalItems: totalItems,
-            totalDiscount: discount,
-            averageOrder: average
-        }
-    };
-}
-
-// Save Report to Cloud
-function saveReportToCloud(reportData) {
-    if (!auth.currentUser) {
-        showToast('❌ Please login first!');
-        return;
-    }
-    
-    const statusEl = document.getElementById('cloudStatus');
-    statusEl.textContent = '⏳ Saving...';
-    statusEl.style.color = '#f59e0b';
-    
-    db.collection('reports').add({
-        date: reportData.date,
-        dateFormatted: reportData.dateFormatted,
-        revenue: reportData.revenue,
-        orders: reportData.orders,
-        totalItems: reportData.totalItems,
-        discount: reportData.discount || 0,
-        average: reportData.average || 0,
-        topItems: reportData.topItems || [],
-        paymentMethods: reportData.paymentMethods || {},
-        hourlySales: reportData.hourlySales || {},
-        bills: reportData.bills || [],
-        summary: reportData.summary || {},
-        generatedBy: auth.currentUser.email,
-        timestamp: firebase.firestore.FieldValue.serverTimestamp()
-    })
-    .then((docRef) => {
-        showToast('✅ Report saved to cloud!');
-        statusEl.textContent = '✅ Saved!';
-        statusEl.style.color = '#22c55e';
-        loadCloudReports();
-    })
-    .catch((error) => {
-        showToast('❌ Failed to save: ' + error.message);
-        statusEl.textContent = '❌ Error';
-        statusEl.style.color = '#ef4444';
-    });
-}
-
-// Load Reports from Cloud
-function loadCloudReports() {
-    if (!auth.currentUser) {
-        showToast('❌ Please login first!');
-        return;
-    }
-    
-    const statusEl = document.getElementById('cloudStatus');
-    statusEl.textContent = '⏳ Loading...';
-    statusEl.style.color = '#f59e0b';
-    
-    db.collection('reports')
-        .orderBy('timestamp', 'desc')
-        .limit(100)
-        .get()
-        .then((querySnapshot) => {
-            const reports = [];
-            querySnapshot.forEach((doc) => {
-                reports.push({ 
-                    id: doc.id, 
-                    ...doc.data() 
-                });
-            });
-            
-            const countEl = document.getElementById('cloudReportCount');
-            if (countEl) {
-                countEl.textContent = `${reports.length} reports`;
-            }
-            
-            if (reports.length === 0) {
-                showToast('📭 No reports found in cloud!');
-                statusEl.textContent = '📭 No reports';
-                statusEl.style.color = '#94a3b8';
-                displayCloudReports([]);
-            } else {
-                displayCloudReports(reports);
-                showToast(`✅ ${reports.length} reports loaded from cloud!`);
-                statusEl.textContent = `✅ ${reports.length} reports`;
-                statusEl.style.color = '#22c55e';
-            }
-        })
-        .catch((error) => {
-            showToast('❌ Failed to load: ' + error.message);
-            statusEl.textContent = '❌ Error';
-            statusEl.style.color = '#ef4444';
-        });
-}
-
-// Display Cloud Reports
-function displayCloudReports(reports) {
-    const container = document.getElementById('cloudReportsList');
-    if (!container) return;
-    
-    if (reports.length === 0) {
-        container.innerHTML = `
-            <div style="text-align:center;padding:30px 20px;color:#94a3b8;">
-                <span style="font-size:3rem;display:block;margin-bottom:10px;">☁️</span>
-                No cloud reports found
-                <br/>
-                <span style="font-size:0.75rem;">Generate and save a report to the cloud</span>
-            </div>
-        `;
-        return;
-    }
-    
-    let html = `
-        <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:10px;flex-wrap:wrap;gap:6px;">
-            <span style="font-size:0.7rem;color:#94a3b8;">${reports.length} reports in cloud</span>
-            <button onclick="loadCloudReports()" style="background:#8b5cf6;color:white;border:none;padding:4px 12px;border-radius:4px;cursor:pointer;font-size:0.7rem;">⟳ Refresh</button>
-        </div>
-        <div style="max-height:400px;overflow-y:auto;">
-    `;
-    
-    reports.forEach((report, index) => {
-        const summary = report.summary || {};
-        const date = report.dateFormatted || report.date || 'Unknown';
-        const revenue = report.revenue || summary.totalRevenue || 0;
-        const orders = report.orders || summary.totalOrders || 0;
-        const items = report.totalItems || summary.totalItems || 0;
-        const generatedBy = report.generatedBy || 'Unknown';
-        const isEven = index % 2 === 0;
-        
-        html += `
-            <div class="cloud-report-item" onclick="viewCloudReport('${report.id}')" style="
-                background: ${isEven ? '#f8fafc' : '#f1f5f9'};
-                border-radius: 8px;
-                padding: 10px 14px;
-                margin-bottom: 4px;
-                cursor: pointer;
-                transition: all 0.2s;
-                border-left: 4px solid #8b5cf6;
-                display: flex;
-                justify-content: space-between;
-                align-items: center;
-                flex-wrap: wrap;
-                gap: 6px;
-            ">
-                <div style="display:flex;align-items:center;gap:8px;flex-wrap:wrap;">
-                    <span style="font-weight:600;font-size:0.85rem;">📅 ${date}</span>
-                    <span style="font-size:0.65rem;color:#94a3b8;">by ${generatedBy}</span>
-                </div>
-                <div style="display:flex;gap:10px;align-items:center;flex-wrap:wrap;">
-                    <span style="font-weight:600;color:#16a34a;font-size:0.85rem;">Rs. ${typeof revenue === 'number' ? revenue.toFixed(2) : '0.00'}</span>
-                    <span style="font-size:0.65rem;color:#64748b;">📋 ${orders || 0} orders</span>
-                    <span style="font-size:0.65rem;color:#64748b;">📦 ${items || 0} items</span>
-                    <span style="font-size:0.65rem;color:#8b5cf6;">👁️ View</span>
-                </div>
-            </div>
-        `;
-    });
-    
-    html += `</div>`;
-    container.innerHTML = html;
-}
-
-// View Single Cloud Report
-function viewCloudReport(reportId) {
-    const statusEl = document.getElementById('cloudStatus');
-    statusEl.textContent = '⏳ Loading...';
-    statusEl.style.color = '#f59e0b';
-    
-    db.collection('reports').doc(reportId).get()
-        .then((doc) => {
-            if (doc.exists) {
-                const report = { id: doc.id, ...doc.data() };
-                showCloudReportDetail(report);
-                statusEl.textContent = '✅ Viewed';
-                statusEl.style.color = '#22c55e';
-            } else {
-                showToast('❌ Report not found!');
-                statusEl.textContent = '❌ Not found';
-                statusEl.style.color = '#ef4444';
-            }
-        })
-        .catch((error) => {
-            showToast('❌ Error: ' + error.message);
-            statusEl.textContent = '❌ Error';
-            statusEl.style.color = '#ef4444';
-        });
-}
-
-// Show Cloud Report Detail
-function showCloudReportDetail(report) {
-    const summary = report.summary || {};
-    const topItems = report.topItems || [];
-    const paymentMethods = report.paymentMethods || {};
-    const hourlySales = report.hourlySales || {};
-    const bills = report.bills || [];
-    
-    let html = `
-        <div style="position:fixed;top:0;left:0;width:100%;height:100%;background:rgba(0,0,0,0.5);z-index:9999;display:flex;align-items:center;justify-content:center;padding:20px;">
-            <div style="background:white;border-radius:16px;max-width:700px;width:100%;max-height:90vh;overflow-y:auto;padding:24px;box-shadow:0 20px 60px rgba(0,0,0,0.3);">
-                <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:16px;">
-                    <h2 style="font-size:1.1rem;">📊 ${report.dateFormatted || report.date || 'Report'}</h2>
-                    <button onclick="this.closest('div[style*=\\'position:fixed\\']').remove()" style="background:transparent;border:none;font-size:1.2rem;cursor:pointer;padding:4px 8px;border-radius:4px;">✕</button>
-                </div>
-                
-                <div style="display:grid;grid-template-columns:repeat(4,1fr);gap:8px;margin-bottom:16px;">
-                    <div style="background:#f8fafc;padding:8px;border-radius:8px;text-align:center;">
-                        <div style="font-weight:700;color:#16a34a;font-size:0.95rem;">Rs. ${(report.revenue || summary.totalRevenue || 0).toFixed(2)}</div>
-                        <div style="font-size:0.6rem;color:#94a3b8;">Revenue</div>
-                    </div>
-                    <div style="background:#f8fafc;padding:8px;border-radius:8px;text-align:center;">
-                        <div style="font-weight:700;color:#3b82f6;font-size:0.95rem;">${report.orders || summary.totalOrders || 0}</div>
-                        <div style="font-size:0.6rem;color:#94a3b8;">Orders</div>
-                    </div>
-                    <div style="background:#f8fafc;padding:8px;border-radius:8px;text-align:center;">
-                        <div style="font-weight:700;color:#8b5cf6;font-size:0.95rem;">${report.totalItems || summary.totalItems || 0}</div>
-                        <div style="font-size:0.6rem;color:#94a3b8;">Items</div>
-                    </div>
-                    <div style="background:#f8fafc;padding:8px;border-radius:8px;text-align:center;">
-                        <div style="font-weight:700;color:#d97706;font-size:0.95rem;">${(report.orders || summary.totalOrders || 0) > 0 ? 'Rs. ' + ((report.revenue || summary.totalRevenue || 0) / (report.orders || summary.totalOrders || 1)).toFixed(2) : 'Rs. 0.00'}</div>
-                        <div style="font-size:0.6rem;color:#94a3b8;">Average</div>
-                    </div>
-                </div>
-                
-                ${topItems && topItems.length > 0 ? `
-                    <div style="margin-bottom:12px;">
-                        <h4 style="font-size:0.8rem;font-weight:600;margin-bottom:4px;">🏆 Top Items</h4>
-                        ${topItems.slice(0, 5).map((item, idx) => `
-                            <div style="display:flex;justify-content:space-between;padding:3px 8px;background:#f8fafc;border-radius:4px;margin-bottom:2px;font-size:0.8rem;">
-                                <span>${idx + 1}. ${item.name}</span>
-                                <span>${item.quantity} sold - Rs. ${(item.revenue || 0).toFixed(2)}</span>
-                            </div>
-                        `).join('')}
-                    </div>
-                ` : ''}
-                
-                ${paymentMethods && Object.keys(paymentMethods).length > 0 ? `
-                    <div style="margin-bottom:12px;">
-                        <h4 style="font-size:0.8rem;font-weight:600;margin-bottom:4px;">💳 Payments</h4>
-                        ${Object.entries(paymentMethods).map(([method, data]) => `
-                            <div style="display:flex;justify-content:space-between;padding:3px 8px;background:#f8fafc;border-radius:4px;margin-bottom:2px;font-size:0.8rem;">
-                                <span>${method}</span>
-                                <span>${data.count || 0} payments - Rs. ${(data.total || 0).toFixed(2)}</span>
-                            </div>
-                        `).join('')}
-                    </div>
-                ` : ''}
-                
-                ${bills && bills.length > 0 ? `
-                    <div style="margin-bottom:12px;">
-                        <h4 style="font-size:0.8rem;font-weight:600;margin-bottom:4px;">📋 Bills</h4>
-                        ${bills.slice(0, 10).map(bill => `
-                            <div style="display:flex;justify-content:space-between;padding:3px 8px;background:#f8fafc;border-radius:4px;margin-bottom:2px;font-size:0.75rem;">
-                                <span>#${bill.id}</span>
-                                <span>${bill.time || ''}</span>
-                                <span style="font-weight:600;color:#16a34a;">Rs. ${(bill.total || 0).toFixed(2)}</span>
-                            </div>
-                        `).join('')}
-                        ${bills.length > 10 ? `<div style="text-align:center;font-size:0.7rem;color:#94a3b8;padding:4px;">+ ${bills.length - 10} more bills</div>` : ''}
-                    </div>
-                ` : ''}
-                
-                <div style="font-size:0.65rem;color:#94a3b8;padding-top:8px;border-top:1px solid #e2e8f0;display:flex;justify-content:space-between;flex-wrap:wrap;gap:4px;">
-                    <span>👤 ${report.generatedBy || 'Unknown'}</span>
-                    <span>${report.timestamp ? '📅 ' + new Date(report.timestamp.seconds * 1000).toLocaleString() : ''}</span>
-                </div>
-                
-                <div style="margin-top:12px;display:flex;gap:8px;flex-wrap:wrap;">
-                    <button onclick="window.print()" style="background:#3b82f6;color:white;border:none;padding:6px 16px;border-radius:6px;cursor:pointer;font-size:0.8rem;">🖨️ Print</button>
-                    <button onclick="this.closest('div[style*=\\'position:fixed\\']').remove()" style="background:#e2e8f0;color:#475569;border:none;padding:6px 16px;border-radius:6px;cursor:pointer;font-size:0.8rem;">✕ Close</button>
-                </div>
-            </div>
-        </div>
-    `;
-    
-    document.body.insertAdjacentHTML('beforeend', html);
-}
 
 // ============================================================
 //  EXPORT CSV
@@ -1742,9 +1349,6 @@ document.addEventListener('keydown', function(e) {
         closeItemsSoldModal();
         closeReportDetail();
         closeDropdown();
-        // Close cloud report detail modal
-        const modal = document.querySelector('div[style*="position:fixed"]');
-        if (modal) modal.remove();
     }
 });
 
@@ -1803,6 +1407,22 @@ function checkLoginStatus() {
 }
 
 // ============================================================
+//  EXPORT FUNCTIONS
+// ============================================================
+window.toggleDropdown = toggleDropdown;
+window.closeDropdown = closeDropdown;
+window.toggleFullScreen = toggleFullScreen;
+window.logout = logout;
+window.showToast = showToast;
+window.openItemsSoldModal = openItemsSoldModal;
+window.closeItemsSoldModal = closeItemsSoldModal;
+window.toggleTheme = toggleTheme;
+window.renderSavedReports = renderSavedReports;
+window.generateAndSaveTodayReport = generateAndSaveTodayReport;
+window.showReportDetail = showReportDetail;
+window.closeReportDetail = closeReportDetail;
+
+// ============================================================
 //  THEME FUNCTIONS
 // ============================================================
 function toggleTheme() {
@@ -1834,57 +1454,6 @@ function loadSavedTheme() {
 }
 
 // ============================================================
-//  AUTH STATE LISTENER
-// ============================================================
-auth.onAuthStateChanged((user) => {
-    const userEmail = document.getElementById('userEmail');
-    if (user) {
-        userEmail.textContent = '👤 ' + user.email;
-        userEmail.style.color = '#16a34a';
-        console.log('✅ User logged in:', user.email);
-    } else {
-        userEmail.textContent = '👤 Not logged in';
-        userEmail.style.color = '#94a3b8';
-        console.log('❌ No user logged in');
-    }
-});
-
-// ============================================================
-//  EXPORT FUNCTIONS
-// ============================================================
-window.toggleDropdown = toggleDropdown;
-window.closeDropdown = closeDropdown;
-window.toggleFullScreen = toggleFullScreen;
-window.logout = logout;
-window.showToast = showToast;
-window.openItemsSoldModal = openItemsSoldModal;
-window.closeItemsSoldModal = closeItemsSoldModal;
-window.toggleTheme = toggleTheme;
-window.renderSavedReports = renderSavedReports;
-window.generateAndSaveTodayReport = generateAndSaveTodayReport;
-window.showReportDetail = showReportDetail;
-window.closeReportDetail = closeReportDetail;
-window.saveReportToCloud = saveReportToCloud;
-window.loadCloudReports = loadCloudReports;
-window.viewCloudReport = viewCloudReport;
-window.displayCloudReports = displayCloudReports;
-window.getCurrentReportData = getCurrentReportData;
-
-// ============================================================
-//  EVENT LISTENERS
-// ============================================================
-document.getElementById('loadCloudReportsBtn')?.addEventListener('click', loadCloudReports);
-
-document.getElementById('saveCloudReportBtn')?.addEventListener('click', function() {
-    const reportData = getCurrentReportData();
-    if (reportData) {
-        saveReportToCloud(reportData);
-    } else {
-        showToast('❌ No report data to save! Generate a report first.');
-    }
-});
-
-// ============================================================
 //  INIT
 // ============================================================
 document.addEventListener('DOMContentLoaded', function() {
@@ -1900,12 +1469,8 @@ document.addEventListener('DOMContentLoaded', function() {
     
     updateReport('today');
     renderSavedReports();
-    
-    // Auto load cloud reports if user is logged in
-    if (auth.currentUser) {
-        setTimeout(loadCloudReports, 1000);
-    }
 });
 </script>
+
 </body>
 </html>

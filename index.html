@@ -9,11 +9,6 @@
     <meta name="theme-color" content="#8b5cf6">
     <link rel="stylesheet" href="style.css" />
     <meta name="screen-orientation" content="any">
-
-    <!-- ===== FIREBASE SDK ===== -->
-    <script src="https://www.gstatic.com/firebasejs/10.12.4/firebase-app-compat.js"></script>
-    <script src="https://www.gstatic.com/firebasejs/10.12.4/firebase-firestore-compat.js"></script>
-    <script src="https://www.gstatic.com/firebasejs/10.12.4/firebase-auth-compat.js"></script>
 </head>
 <body>
 
@@ -316,54 +311,27 @@
 
 <script>
 // ============================================================
-//  FIREBASE CONFIG
-// ============================================================
-
-const firebaseConfig = {
-  apiKey: "AIzaSyBoc72fBPlF_pe_bHxy321oKeqt4U-wfis",
-  authDomain: "hotel-pos-system-113c7.firebaseapp.com",
-  databaseURL: "https://hotel-pos-system-113c7-default-rtdb.asia-southeast1.firebasedatabase.app",
-  projectId: "hotel-pos-system-113c7",
-  storageBucket: "hotel-pos-system-113c7.firebasestorage.app",
-  messagingSenderId: "1026466165620",
-  appId: "1:1026466165620:web:c7ae28b94d5fdc8778f221",
-  measurementId: "G-KP8GR66SC9"
-};
-
-// Initialize Firebase
-try {
-    firebase.initializeApp(firebaseConfig);
-    console.log('✅ Firebase initialized successfully!');
-    console.log('📁 Project:', firebaseConfig.projectId);
-} catch (error) {
-    console.error('❌ Firebase initialization error:', error);
-}
-
-const db = firebase.firestore();
-const auth = firebase.auth();
-
-// ============================================================
 //  ORIENTATION CONTROL - AUTO + MANUAL
 // ============================================================
 
-let currentOrientation = 'auto';
+let currentOrientation = 'auto'; // 'auto', 'landscape', 'portrait', 'portrait-tablet'
 
 function toggleManualOrientation() {
     const body = document.body;
     const btn = document.getElementById('orientationToggleBtn');
     
     const modes = ['auto', 'landscape', 'portrait', 'portrait-tablet'];
-    const shortLabels = {
-        'auto': '🔄',
-        'landscape': '🌅',
-        'portrait': '📱',
-        'portrait-tablet': '📱2'
-    };
     const labels = {
         'auto': '🔄 Auto',
         'landscape': '🌅 Landscape',
         'portrait': '📱 Portrait',
         'portrait-tablet': '📱 2 Col'
+    };
+    const shortLabels = {
+        'auto': '🔄',
+        'landscape': '🌅',
+        'portrait': '📱',
+        'portrait-tablet': '📱2'
     };
     const colors = {
         'auto': '#8b5cf6',
@@ -2327,10 +2295,27 @@ document.addEventListener('keydown', function(e) {
 });
 
 // ============================================================
-//  APP INSTALL DETECTION
+//  PWA - REGISTER SERVICE WORKER
+// ============================================================
+if ('serviceWorker' in navigator) {
+    window.addEventListener('load', function() {
+        navigator.serviceWorker.register('sw.js')
+            .then(function(registration) {
+                console.log('✅ Service Worker registered successfully!');
+                console.log('Scope:', registration.scope);
+            })
+            .catch(function(error) {
+                console.log('❌ Service Worker registration failed:', error);
+            });
+    });
+}
+
+// ============================================================
+//  APP INSTALL DETECTION - FIXED
 // ============================================================
 
 function isAppInstalled() {
+    // Check multiple ways to detect if app is installed
     const isStandalone = window.matchMedia('(display-mode: standalone)').matches;
     const isFullscreen = window.matchMedia('(display-mode: fullscreen)').matches;
     const isMinimalUI = window.matchMedia('(display-mode: minimal-ui)').matches;
@@ -2375,11 +2360,13 @@ document.getElementById('installAppBtn')?.addEventListener('click', function() {
                 showToast('✅ App installed successfully!');
             } else {
                 console.log('❌ User dismissed the install prompt');
+                // Don't show banner again for this session
                 document.getElementById('installBanner').style.display = 'none';
             }
             deferredPrompt = null;
         });
     } else {
+        // If deferredPrompt is null, app might already be installed
         localStorage.setItem('app_installed', 'true');
         document.getElementById('installBanner').style.display = 'none';
         showToast('✅ App already installed!');
@@ -2393,21 +2380,18 @@ window.addEventListener('appinstalled', function(e) {
     showToast('✅ App installed successfully!');
 });
 
-function checkOnlineStatus() {
-    if (!navigator.onLine) {
-        showToast('📡 You are offline. Some features may not work.');
+// On page load, check if app is installed
+document.addEventListener('DOMContentLoaded', function() {
+    // ... existing code ...
+    
+    // Hide install banner if app is installed or was dismissed
+    if (isAppInstalled()) {
+        const banner = document.getElementById('installBanner');
+        if (banner) {
+            banner.style.display = 'none';
+        }
     }
-}
-
-window.addEventListener('online', function() {
-    showToast('✅ Back online!');
 });
-
-window.addEventListener('offline', function() {
-    showToast('📡 You are offline. Some features may not work.');
-});
-
-checkOnlineStatus();
 
 // ============================================================
 //  EXPORT FUNCTIONS
@@ -2450,8 +2434,6 @@ window.generateAndSaveTodayReport = generateAndSaveTodayReport;
 window.toggleManualOrientation = toggleManualOrientation;
 window.loadOrientationPreference = loadOrientationPreference;
 window.handleOrientationChange = handleOrientationChange;
-window.isAppInstalled = isAppInstalled;
-window.dismissInstallBanner = dismissInstallBanner;
 
 // ============================================================
 //  INIT
@@ -2469,15 +2451,11 @@ document.addEventListener('DOMContentLoaded', function() {
     autoClearOldBills();
     renderHistory();
     
+    // Load orientation preference
     loadOrientationPreference();
-    setTimeout(handleOrientationChange, 500);
     
-    if (isAppInstalled()) {
-        const banner = document.getElementById('installBanner');
-        if (banner) {
-            banner.style.display = 'none';
-        }
-    }
+    // Handle orientation change on load
+    setTimeout(handleOrientationChange, 500);
 });
 </script>
 </body>
