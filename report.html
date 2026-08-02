@@ -322,7 +322,6 @@ function generateAndSaveTodayReport() {
             return report;
         }
     } else {
-        // Fallback: Generate report from history
         try {
             const today = new Date();
             today.setHours(0, 0, 0, 0);
@@ -453,7 +452,6 @@ function showReportDetail(dateStr) {
         </div>
     `;
     
-    // Top Items
     if (topItems && topItems.length > 0) {
         html += `
             <div style="margin-bottom:12px;">
@@ -468,7 +466,6 @@ function showReportDetail(dateStr) {
         `;
     }
     
-    // Payment Methods
     if (paymentMethods && Object.keys(paymentMethods).length > 0) {
         html += `
             <div style="margin-bottom:12px;">
@@ -483,7 +480,6 @@ function showReportDetail(dateStr) {
         `;
     }
     
-    // Hourly Sales
     if (hourlySales && Object.keys(hourlySales).length > 0) {
         html += `
             <div style="margin-bottom:12px;">
@@ -530,9 +526,7 @@ function applySavedTheme() {
         if (settings.fontSize) {
             document.body.classList.add(`font-${settings.fontSize}`);
         }
-    } catch (e) {
-        // No settings found
-    }
+    } catch (e) {}
 }
 
 // ============================================================
@@ -604,7 +598,6 @@ function getDateRange(filter) {
     
     switch(filter) {
         case 'today':
-            // Already set to today
             break;
         case 'yesterday':
             start.setDate(today.getDate() - 1);
@@ -759,13 +752,11 @@ function getPaymentMethodTotals(bills) {
     };
     
     bills.forEach(bill => {
-        // Use bill.paymentMethod or get from payments array
         let method = bill.paymentMethod || 'cash';
         if (!method && bill.payments && bill.payments.length > 0) {
             method = bill.payments[0].method || 'cash';
         }
         
-        // ✅ Use bill.total, NOT received amount
         const billTotal = bill.total || 0;
         if (methods[method]) {
             methods[method].total += billTotal;
@@ -777,7 +768,6 @@ function getPaymentMethodTotals(bills) {
 }
 
 function renderPaymentBreakdown(bills) {
-    // ✅ Get payment method totals from the filtered bills
     const methods = getPaymentMethodTotals(bills);
     const totalAmount = Object.values(methods).reduce((sum, m) => sum + m.total, 0);
     
@@ -1140,7 +1130,7 @@ function closeItemsSoldModal() {
 }
 
 // ============================================================
-//  UPDATE REPORT - FIXED
+//  UPDATE REPORT
 //  All sections use the same filtered bills
 // ============================================================
 function updateReport(filter = 'today') {
@@ -1152,17 +1142,13 @@ function updateReport(filter = 'today') {
     
     const { start, end } = range;
     
-    // ✅ Get filtered bills for the selected date range
     const filteredBills = history.filter(bill => {
         const billDate = new Date(bill.date);
         return billDate >= start && billDate <= end;
     });
     
-    // Log for debugging
     console.log(`📊 Filter: ${filter}, Bills: ${filteredBills.length}`);
-    console.log('📊 Filtered Bills:', filteredBills);
     
-    // Update Summary Cards
     const orders = filteredBills.length;
     const totalItems = filteredBills.reduce((sum, b) => sum + b.items.reduce((s, i) => s + (i.qty || i.quantity || 1), 0), 0);
     const revenue = filteredBills.reduce((sum, b) => sum + (b.total || 0), 0);
@@ -1175,12 +1161,10 @@ function updateReport(filter = 'today') {
     animateCurrency(reportDiscount, discount);
     animateCurrency(reportAverage, average);
     
-    // Date string for display
     const dateStr = start.toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' });
     
-    // ✅ Render all sections using the SAME filtered bills
     renderTopSellingItems(filteredBills, dateStr);
-    renderPaymentBreakdown(filteredBills);  // ✅ Now uses filtered bills
+    renderPaymentBreakdown(filteredBills);
     renderStockMovement(filteredBills);
     renderPeakHours(filteredBills);
     renderBillList(filteredBills, start, end);
@@ -1262,7 +1246,6 @@ document.getElementById('exportReportBtn').addEventListener('click', function() 
     csv += `Date Range: ${start.toLocaleDateString()} - ${end.toLocaleDateString()}\n`;
     csv += `Generated: ${new Date().toLocaleString()}\n\n`;
     
-    // Summary
     const orders = filteredBills.length;
     const totalItems = filteredBills.reduce((sum, b) => sum + b.items.reduce((s, i) => s + (i.qty || i.quantity || 1), 0), 0);
     const revenue = filteredBills.reduce((sum, b) => sum + (b.total || 0), 0);
@@ -1276,7 +1259,6 @@ document.getElementById('exportReportBtn').addEventListener('click', function() 
     csv += `Total Discount,Rs. ${discount.toFixed(2)}\n`;
     csv += `Average Order,Rs. ${average.toFixed(2)}\n\n`;
     
-    // Top Selling Items
     const topItems = getTopSellingItems(filteredBills, 5);
     csv += '===== TOP SELLING ITEMS =====\n';
     csv += 'Rank,Item Name,Quantity Sold,Revenue\n';
@@ -1285,7 +1267,6 @@ document.getElementById('exportReportBtn').addEventListener('click', function() 
     });
     csv += '\n';
     
-    // Payment Methods
     const methods = getPaymentMethodTotals(filteredBills);
     csv += '===== PAYMENT METHODS =====\n';
     csv += 'Method,Count,Total Amount\n';
@@ -1298,14 +1279,12 @@ document.getElementById('exportReportBtn').addEventListener('click', function() 
     });
     csv += '\n';
     
-    // Stock Movement
     const movement = getStockMovement(filteredBills);
     csv += '===== STOCK MOVEMENT =====\n';
     csv += `Total Added,${movement.totalAdded}\n`;
     csv += `Total Sold,${movement.totalSold}\n`;
     csv += `Remaining Stock,${movement.totalRemaining}\n\n`;
     
-    // Removed Stock
     let allRemoved = [];
     let currentDate = new Date(start);
     while (currentDate <= end) {
@@ -1322,7 +1301,6 @@ document.getElementById('exportReportBtn').addEventListener('click', function() 
         csv += '\n';
     }
     
-    // Bill Details
     csv += '===== BILL DETAILS =====\n';
     csv += 'Bill ID,Date,Table,Items,Total,Discount,Received,Change,Payments\n';
     filteredBills.forEach(bill => {

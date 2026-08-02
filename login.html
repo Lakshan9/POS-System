@@ -5,16 +5,8 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
     <title>Login - Hotel POS</title>
     <link rel="stylesheet" href="style-login.css" />
-
-    <!-- ===== PWA META TAGS ===== -->
-<link rel="manifest" href="manifest.json" />
-<link rel="apple-touch-icon" href="icons/icon-192.png" />
-<link rel="icon" href="icons/icon-192.png" />
-<meta name="theme-color" content="#8b5cf6" />
-<meta name="apple-mobile-web-app-capable" content="yes" />
-<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
-<meta name="apple-mobile-web-app-title" content="Hotel POS" />
-
+    <link rel="manifest" href="manifest.json" />
+    <meta name="theme-color" content="#8b5cf6" />
 </head>
 <body>
 
@@ -61,17 +53,11 @@
 </div>
 
 <script>
-// ============================================================
-//  LOGIN FUNCTIONS
-// ============================================================
-
-// Get stored password (default: admin123)
 function getStoredPassword() {
     const stored = localStorage.getItem('hotel_password');
     return stored || 'admin123';
 }
 
-// Handle Login
 function handleLogin() {
     const username = document.getElementById('username').value.trim();
     const password = document.getElementById('password').value;
@@ -79,7 +65,6 @@ function handleLogin() {
     
     const storedPassword = getStoredPassword();
     
-    // Clear previous error
     errorEl.style.display = 'none';
     errorEl.textContent = '';
     
@@ -96,11 +81,9 @@ function handleLogin() {
     }
     
     if (password === storedPassword) {
-        // Success - set login session
         localStorage.setItem('hotel_logged_in', 'true');
         localStorage.setItem('hotel_username', username);
         
-        // Add loading animation to button
         const btn = document.querySelector('.login-btn');
         btn.innerHTML = '<span>⏳</span> Logging in...';
         btn.disabled = true;
@@ -113,7 +96,6 @@ function handleLogin() {
         document.getElementById('password').value = '';
         document.getElementById('password').focus();
         
-        // Shake animation
         const box = document.querySelector('.login-box');
         box.style.animation = 'shake 0.5s ease';
         setTimeout(() => {
@@ -122,14 +104,12 @@ function handleLogin() {
     }
 }
 
-// Show error message
 function showError(message) {
     const errorEl = document.getElementById('loginError');
     errorEl.textContent = message;
     errorEl.style.display = 'block';
 }
 
-// Toggle password visibility
 function togglePassword() {
     const passwordInput = document.getElementById('password');
     const btn = document.querySelector('.toggle-password');
@@ -144,7 +124,6 @@ function togglePassword() {
     }
 }
 
-// Enter key support
 document.getElementById('password').addEventListener('keydown', function(e) {
     if (e.key === 'Enter') {
         e.preventDefault();
@@ -159,26 +138,21 @@ document.getElementById('username').addEventListener('keydown', function(e) {
     }
 });
 
-// Auto-focus on username if not logged in
 document.addEventListener('DOMContentLoaded', function() {
-    // Check if already logged in
     if (localStorage.getItem('hotel_logged_in') === 'true') {
         window.location.href = 'index.html';
     }
     
-    // Focus username field
     setTimeout(() => {
         document.getElementById('username').focus();
     }, 100);
 });
 
-// Prevent form submission
 document.querySelector('.login-form').addEventListener('submit', function(e) {
     e.preventDefault();
     handleLogin();
 });
 
-// Add shake animation dynamically
 const style = document.createElement('style');
 style.textContent = `
     @keyframes shake {

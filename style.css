@@ -1,6 +1,3 @@
-/* ============================================================
-   RESET & BASE
-   ============================================================ */
 * {
     margin: 0;
     padding: 0;
@@ -16,9 +13,6 @@ body {
     transition: background 0.3s, color 0.3s;
 }
 
-/* ============================================================
-   THEMES
-   ============================================================ */
 body.theme-dark {
     background: #0f172a;
     color: #f1f5f9;
@@ -377,7 +371,6 @@ body.theme-dark .edit-bill-summary .line.tax {
     color: #94a3b8;
 }
 
-/* Dark Theme - Payment Actions */
 body.theme-dark .payment-actions .confirm-btn {
     background: #16a34a;
 }
@@ -394,7 +387,6 @@ body.theme-dark .payment-actions .cancel-btn:hover {
     background: #b91c1c;
 }
 
-/* Dark Theme - Numeric Keypad */
 body.theme-dark .payment-amount-section label {
     color: #94a3b8;
 }
@@ -442,7 +434,6 @@ body.theme-dark .clear-amount-btn:hover {
     background: #b91c1c;
 }
 
-/* Dark Theme - History Filter */
 body.theme-dark .history-filter-bar {
     background: #0f172a;
     border-color: #334155;
@@ -468,9 +459,6 @@ body.theme-dark .history-actions #filterAllBtn.active {
     box-shadow: 0 0 0 2px #c4b5fd;
 }
 
-/* ============================================================
-   FONT SIZES
-   ============================================================ */
 body.font-small {
     font-size: 14px;
 }
@@ -487,9 +475,6 @@ body.font-xlarge {
     font-size: 20px;
 }
 
-/* ============================================================
-   HEADER
-   ============================================================ */
 .main-header {
     background: linear-gradient(135deg, #1e293b, #0f172a);
     color: white;
@@ -561,9 +546,6 @@ body.font-xlarge {
     background: #ef4444;
 }
 
-/* ============================================================
-   THEME TOGGLE BUTTON
-   ============================================================ */
 .theme-toggle-btn {
     background: rgba(255,255,255,0.15);
     border: none;
@@ -587,9 +569,6 @@ body.theme-dark .theme-toggle-btn {
     background: rgba(255,255,255,0.1);
 }
 
-/* ============================================================
-   HAMBURGER BUTTON
-   ============================================================ */
 .hamburger-btn {
     display: flex;
     flex-direction: column;
@@ -633,9 +612,6 @@ body.theme-dark .theme-toggle-btn {
     transform: translateY(-6.5px) rotate(-45deg);
 }
 
-/* ============================================================
-   DROPDOWN MENU
-   ============================================================ */
 .dropdown-overlay {
     display: none;
     position: fixed;
@@ -712,9 +688,6 @@ body.theme-dark .theme-toggle-btn {
     margin: 6px 16px;
 }
 
-/* ============================================================
-   POS CONTAINER
-   ============================================================ */
 .pos-container {
     display: none;
     height: calc(100vh - 56px);
@@ -729,9 +702,6 @@ body.theme-dark .theme-toggle-btn {
     gap: 10px;
 }
 
-/* ============================================================
-   LEFT BILLING - වැඩි කරන ලදි
-   ============================================================ */
 .left-billing {
     background: white;
     border-radius: 14px;
@@ -810,9 +780,6 @@ body.theme-dark .theme-toggle-btn {
     background: #dc2626;
 }
 
-/* ============================================================
-   BILLING SEARCH
-   ============================================================ */
 .billing-search {
     display: flex;
     align-items: center;
@@ -844,9 +811,6 @@ body.theme-dark .theme-toggle-btn {
     white-space: nowrap;
 }
 
-/* ============================================================
-   BILLING TABLE - ප්‍රධාන වෙනස මෙයයි
-   ============================================================ */
 .billing-table {
     flex: 1;
     overflow-y: auto;
@@ -963,9 +927,6 @@ body.theme-dark .theme-toggle-btn {
     font-size: 0.9rem;
 }
 
-/* ============================================================
-   BILLING SUMMARY
-   ============================================================ */
 .billing-summary {
     padding: 6px 12px;
     background: #f8fafc;
@@ -1048,9 +1009,6 @@ body.theme-dark .theme-toggle-btn {
     transform: none;
 }
 
-/* ============================================================
-   QUICK ADD SECTION
-   ============================================================ */
 .quick-add-section {
     background: white;
     border-radius: 10px;
@@ -1129,9 +1087,6 @@ body.theme-dark .theme-toggle-btn {
     margin-left: 3px;
 }
 
-/* ============================================================
-   RIGHT ITEMS
-   ============================================================ */
 .right-items {
     background: white;
     border-radius: 14px;
@@ -1196,9 +1151,6 @@ body.theme-dark .theme-toggle-btn {
     align-content: start;
 }
 
-/* ============================================================
-   CATEGORY GRID ITEMS
-   ============================================================ */
 .category-grid-item {
     background: #f8fafc;
     border: 2px solid #e2e8f0;
@@ -1239,9 +1191,6 @@ body.theme-dark .theme-toggle-btn {
     border-bottom: 2px solid #e2e8f0;
 }
 
-/* ============================================================
-   ITEM BUTTONS
-   ============================================================ */
 .item-btn {
     background: #f8fafc;
     border: 2px solid #e2e8f0;
@@ -1295,9 +1244,6 @@ body.theme-dark .theme-toggle-btn {
     margin-top: 2px;
 }
 
-/* ============================================================
-   STOCK COLORS
-   ============================================================ */
 .stock-success {
     border-color: #86efac !important;
     background: #f0fdf4 !important;
@@ -1325,9 +1271,6 @@ body.theme-dark .theme-toggle-btn {
     color: #16a34a;
 }
 
-/* ============================================================
-   VIEW CONTAINER (History)
-   ============================================================ */
 .view-container {
     display: none;
     padding: 16px;
@@ -1370,9 +1313,6 @@ body.theme-dark .theme-toggle-btn {
     transform: scale(1.02);
 }
 
-/* ============================================================
-   HISTORY FILTER BAR
-   ============================================================ */
 .history-filter-bar {
     display: flex;
     gap: 8px;
@@ -1429,9 +1369,6 @@ body.theme-dark .theme-toggle-btn {
     box-shadow: 0 0 0 2px #c4b5fd;
 }
 
-/* ============================================================
-   HISTORY LIST
-   ============================================================ */
 .history-list {
     display: flex;
     flex-direction: column;
@@ -1543,9 +1480,6 @@ body.theme-dark .theme-toggle-btn {
     font-size: 0.85rem;
 }
 
-/* ============================================================
-   MODALS
-   ============================================================ */
 .modal-overlay {
     display: none;
     position: fixed;
@@ -1626,9 +1560,6 @@ body.theme-dark .theme-toggle-btn {
     padding: 20px;
 }
 
-/* ============================================================
-   HOLD OPTIONS
-   ============================================================ */
 .hold-options {
     display: grid;
     grid-template-columns: 1fr 1fr;
@@ -1658,9 +1589,6 @@ body.theme-dark .theme-toggle-btn {
     transform: translateY(-2px);
 }
 
-/* ============================================================
-   PAYMENT MODAL
-   ============================================================ */
 .payment-body {
     padding: 16px 20px;
 }
@@ -1689,7 +1617,6 @@ body.theme-dark .theme-toggle-btn {
     margin-top: 3px;
 }
 
-/* Payment Method Buttons */
 #paymentModal .payment-methods-simple {
     margin: 8px 0;
 }
@@ -1733,7 +1660,6 @@ body.theme-dark .theme-toggle-btn {
     color: #8b5cf6;
 }
 
-/* Reference Input */
 #paymentModal .payment-input-group {
     margin: 6px 0;
 }
@@ -1761,9 +1687,6 @@ body.theme-dark .theme-toggle-btn {
     border-color: #8b5cf6;
 }
 
-/* ============================================================
-   NUMERIC KEYPAD
-   ============================================================ */
 .payment-amount-section {
     margin: 8px 0;
 }
@@ -1878,9 +1801,6 @@ body.theme-dark .theme-toggle-btn {
     font-size: 1rem;
 }
 
-/* ============================================================
-   PAYMENT CHANGE
-   ============================================================ */
 .payment-change {
     background: #f0fdf4;
     border: 2px solid #86efac;
@@ -1908,9 +1828,6 @@ body.theme-dark .theme-toggle-btn {
     color: #dc2626;
 }
 
-/* ============================================================
-   PRINT OPTION
-   ============================================================ */
 .print-option {
     margin: 8px 0;
     display: flex;
@@ -1933,9 +1850,6 @@ body.theme-dark .theme-toggle-btn {
     accent-color: #8b5cf6;
 }
 
-/* ============================================================
-   PAYMENT ACTIONS
-   ============================================================ */
 .payment-actions {
     display: grid;
     grid-template-columns: 1fr 1fr;
@@ -1983,9 +1897,6 @@ body.theme-dark .theme-toggle-btn {
     transform: scale(1.02);
 }
 
-/* ============================================================
-   EDIT BILL MODAL
-   ============================================================ */
 .edit-bill-items {
     max-height: 250px;
     overflow-y: auto;
@@ -2152,9 +2063,6 @@ body.theme-dark .theme-toggle-btn {
     text-align: center;
 }
 
-/* ============================================================
-   CUSTOMER ORDERS MODAL
-   ============================================================ */
 .customer-search {
     margin-bottom: 12px;
 }
@@ -2228,9 +2136,6 @@ body.theme-dark .theme-toggle-btn {
     background: #7c3aed;
 }
 
-/* ============================================================
-   TOAST
-   ============================================================ */
 #toast {
     position: fixed;
     bottom: 24px;
@@ -2256,9 +2161,6 @@ body.theme-dark .theme-toggle-btn {
     transform: translateX(-50%) translateY(0);
 }
 
-/* ============================================================
-   RESPONSIVE
-   ============================================================ */
 @media (max-width: 1024px) {
     .pos-container.active {
         grid-template-columns: 1fr 1fr;
@@ -2764,9 +2666,6 @@ body.theme-dark .theme-toggle-btn {
     }
 }
 
-/* ============================================================
-   SCROLLBAR
-   ============================================================ */
 ::-webkit-scrollbar {
     width: 5px;
     height: 5px;
@@ -2786,21 +2685,6 @@ body.theme-dark .theme-toggle-btn {
     background: #94a3b8;
 }
 
-/* ============================================================
-   ORIENTATION RESPONSIVE STYLES
-   Auto-adjust for portrait and landscape mode
-   ============================================================ */
-
-/* Default: Landscape mode (බොහෝ POS systems සඳහා) */
-.pos-container.active {
-    display: grid;
-    grid-template-columns: 1fr 1.2fr;
-    gap: 10px;
-    height: calc(100vh - 56px);
-    padding: 6px 10px 10px 10px;
-}
-
-/* ===== Portrait mode (phone/tablet vertical) ===== */
 @media (orientation: portrait) {
     .pos-container.active {
         grid-template-columns: 1fr;
@@ -2831,22 +2715,6 @@ body.theme-dark .theme-toggle-btn {
         padding: 6px;
     }
     
-    .main-grid {
-        grid-template-columns: 1fr;
-        height: auto;
-        min-height: auto;
-    }
-    
-    .categories-section {
-        max-height: 150px;
-        min-height: 100px;
-    }
-    
-    .items-section {
-        min-height: 300px;
-    }
-    
-    /* Summary cards in portrait */
     .report-summary {
         grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
     }
@@ -2856,9 +2724,7 @@ body.theme-dark .theme-toggle-btn {
     }
 }
 
-/* ===== Landscape mode (default) ===== */
 @media (orientation: landscape) and (max-height: 500px) {
-    /* Small screens in landscape (phones) */
     .pos-container.active {
         grid-template-columns: 1fr 1.5fr;
         gap: 6px;
@@ -2896,7 +2762,6 @@ body.theme-dark .theme-toggle-btn {
     }
 }
 
-/* ===== Tablet portrait mode ===== */
 @media (orientation: portrait) and (min-width: 768px) {
     .pos-container.active {
         grid-template-columns: 1fr 1fr;
@@ -2928,7 +2793,6 @@ body.theme-dark .theme-toggle-btn {
     }
 }
 
-/* ===== Tablet landscape mode ===== */
 @media (orientation: landscape) and (min-width: 1024px) {
     .pos-container.active {
         grid-template-columns: 1fr 1.2fr;
@@ -2951,7 +2815,6 @@ body.theme-dark .theme-toggle-btn {
     }
 }
 
-/* ===== Large screens (desktop) ===== */
 @media (min-width: 1400px) {
     .pos-container.active {
         max-width: 1400px;
@@ -2959,7 +2822,6 @@ body.theme-dark .theme-toggle-btn {
     }
 }
 
-/* ===== Fix for modal in portrait mode ===== */
 @media (orientation: portrait) {
     .modal {
         max-width: 95%;
@@ -2988,7 +2850,6 @@ body.theme-dark .theme-toggle-btn {
     }
 }
 
-/* ===== Fix for table grid in portrait ===== */
 @media (orientation: portrait) {
     .table-grid {
         grid-template-columns: repeat(auto-fill, minmax(130px, 1fr));
@@ -3005,7 +2866,6 @@ body.theme-dark .theme-toggle-btn {
     }
 }
 
-/* ===== Fix for stock page in portrait ===== */
 @media (orientation: portrait) {
     .stock-summary {
         grid-template-columns: repeat(2, 1fr);
@@ -3028,7 +2888,6 @@ body.theme-dark .theme-toggle-btn {
     }
 }
 
-/* ===== Fix for settings page in portrait ===== */
 @media (orientation: portrait) {
     .setting-item {
         flex-direction: column;
@@ -3048,7 +2907,6 @@ body.theme-dark .theme-toggle-btn {
     }
 }
 
-/* ===== Fix for report page in portrait ===== */
 @media (orientation: portrait) {
     .report-summary {
         grid-template-columns: repeat(2, 1fr);
@@ -3101,7 +2959,6 @@ body.theme-dark .theme-toggle-btn {
     }
 }
 
-/* ===== Smooth transition for orientation changes ===== */
 .pos-container,
 .left-billing,
 .right-items,
@@ -3113,7 +2970,6 @@ body.theme-dark .theme-toggle-btn {
     transition: all 0.3s ease;
 }
 
-/* ===== Prevent zoom on orientation change ===== */
 @media (orientation: portrait) {
     body {
         font-size: 14px;
@@ -3132,82 +2988,12 @@ body.theme-dark .theme-toggle-btn {
     }
 }
 
-/* ===== Fix for keyboard showing on mobile ===== */
 @media (max-width: 768px) {
     input, select, textarea {
-        font-size: 16px !important; /* Prevent iOS zoom */
+        font-size: 16px !important;
     }
 }
 
-/* ============================================================
-   FIX: POS GRID - FORCE 2 COLUMNS ON TABLET/DESKTOP
-   ============================================================ */
-
-/* Tablet and larger screens */
-@media (min-width: 769px) {
-    .pos-container.active {
-        display: grid !important;
-        grid-template-columns: 1fr 1.2fr !important;
-        gap: 12px !important;
-        height: calc(100vh - 56px) !important;
-        padding: 8px 14px 14px 14px !important;
-    }
-    
-    .pos-container.active .left-billing {
-        min-height: 450px !important;
-        height: 100% !important;
-    }
-    
-    .pos-container.active .right-items {
-        min-height: 450px !important;
-        height: 100% !important;
-    }
-}
-
-/* Mobile: Keep 1 column */
-@media (max-width: 768px) {
-    .pos-container.active {
-        display: grid !important;
-        grid-template-columns: 1fr !important;
-        grid-template-rows: auto 1fr !important;
-        gap: 8px !important;
-        height: calc(100vh - 56px) !important;
-        padding: 4px 8px 8px 8px !important;
-    }
-    
-    .pos-container.active .left-billing {
-        min-height: 300px !important;
-        max-height: 45vh !important;
-    }
-    
-    .pos-container.active .right-items {
-        min-height: 300px !important;
-        max-height: 55vh !important;
-    }
-}
-
-/* Portrait mode fix */
-@media (orientation: portrait) and (min-width: 769px) {
-    .pos-container.active {
-        grid-template-columns: 1fr 1.2fr !important;
-        grid-template-rows: auto !important;
-    }
-}
-
-/* Landscape mode on small screens */
-@media (orientation: landscape) and (max-height: 500px) {
-    .pos-container.active {
-        grid-template-columns: 1fr 1.5fr !important;
-        gap: 6px !important;
-        padding: 3px 6px 6px 6px !important;
-    }
-}
-
-/* ============================================================
-   MANUAL ORIENTATION CLASSES - ADD THIS AT THE END
-   ============================================================ */
-
-/* Default: Landscape */
 body.orientation-landscape .pos-container.active {
     display: grid !important;
     grid-template-columns: 1fr 1.2fr !important;
@@ -3236,7 +3022,6 @@ body.orientation-landscape .items-grid {
     gap: 8px !important;
 }
 
-/* Manual: Portrait */
 body.orientation-portrait .pos-container.active {
     display: grid !important;
     grid-template-columns: 1fr !important;
@@ -3279,7 +3064,6 @@ body.orientation-portrait .billing-row {
     min-height: 28px !important;
 }
 
-/* Portrait Tablet - 2 columns */
 body.orientation-portrait-tablet .pos-container.active {
     display: grid !important;
     grid-template-columns: 1fr 1.2fr !important;
@@ -3307,7 +3091,6 @@ body.orientation-portrait-tablet .items-grid {
     grid-template-columns: repeat(auto-fill, minmax(100px, 1fr)) !important;
 }
 
-/* Auto mode - follows device orientation */
 body.orientation-auto .pos-container.active {
     display: grid !important;
     grid-template-columns: 1fr 1.2fr !important;
@@ -3356,7 +3139,6 @@ body.orientation-auto .right-items {
     }
 }
 
-/* Small screens */
 @media (max-width: 480px) {
     body.orientation-landscape .items-grid {
         grid-template-columns: repeat(auto-fill, minmax(70px, 1fr)) !important;
@@ -3374,7 +3156,6 @@ body.orientation-auto .right-items {
     }
 }
 
-/* Orientation Toggle Button Styles */
 #orientationToggleBtn {
     background: #8b5cf6 !important;
     color: white !important;
@@ -3404,7 +3185,6 @@ body.theme-dark #orientationToggleBtn:hover {
     background: #6d28d9 !important;
 }
 
-/* Smooth transitions */
 .pos-container,
 .left-billing,
 .right-items,

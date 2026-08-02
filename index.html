@@ -4,7 +4,7 @@
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
     <title>Hotel POS System</title>
-    <base href="/POS-System/">
+    <base href="./">
     <link rel="manifest" href="manifest.json">
     <meta name="theme-color" content="#8b5cf6">
     <link rel="stylesheet" href="style.css" />
@@ -12,14 +12,12 @@
 </head>
 <body>
 
-<!-- ===== INSTALL APP BANNER ===== -->
 <div id="installBanner" style="display:none;position:fixed;bottom:20px;left:50%;transform:translateX(-50%);z-index:9999;background:#1e293b;color:white;padding:12px 20px;border-radius:12px;box-shadow:0 4px 20px rgba(0,0,0,0.3);display:flex;align-items:center;gap:12px;flex-wrap:wrap;justify-content:center;max-width:90%;">
     <span style="font-size:1.1rem;">📲 Install Hotel POS App</span>
     <button id="installAppBtn" style="background:#8b5cf6;color:white;border:none;padding:8px 20px;border-radius:8px;cursor:pointer;font-weight:600;font-size:0.9rem;">Install</button>
     <button onclick="document.getElementById('installBanner').style.display='none'" style="background:transparent;border:none;color:#94a3b8;cursor:pointer;font-size:1.2rem;padding:4px 8px;">✕</button>
 </div>
 
-<!-- ===== HEADER ===== -->
 <div class="main-header">
     <div class="header-left">
         <button class="hamburger-btn" id="hamburgerBtn">
@@ -32,16 +30,13 @@
         <button id="darkModeToggle" class="theme-toggle-btn" onclick="toggleTheme()">🌙</button>
     </div>
     <div class="header-right">
-        <button class="tab-btn" id="orientationToggleBtn" onclick="toggleManualOrientation()" style="background:#8b5cf6;color:#fff;font-size:0.7rem;min-width:45px;">
-            🔄
-        </button>
-        <button class="tab-btn fullscreen-btn" onclick="toggleFullScreen()" id="fullscreenBtn">⛶ Full</button>
+        <button class="tab-btn" id="orientationToggleBtn" onclick="toggleManualOrientation()" style="background:#8b5cf6;color:#fff;font-size:0.7rem;min-width:45px;">🔄</button>
         <button class="tab-btn" onclick="window.location.href='settings.html'" style="background:#8b5cf6;color:#fff;">⚙️</button>
+        <button class="tab-btn fullscreen-btn" onclick="toggleFullScreen()" id="fullscreenBtn">⛶ Full</button>
         <button class="tab-btn" onclick="logout()" style="background:#ef4444;color:#fff;">🚪 Logout</button>
     </div>
 </div>
 
-<!-- ===== DROPDOWN MENU ===== -->
 <div class="dropdown-menu" id="dropdownMenu">
     <div class="dropdown-content">
         <a href="#" class="dropdown-item" onclick="switchTab('pos');closeDropdown();">
@@ -80,13 +75,10 @@
     </div>
 </div>
 
-<!-- ===== DROPDOWN OVERLAY ===== -->
 <div class="dropdown-overlay" id="dropdownOverlay"></div>
 
-<!-- ===== POS VIEW ===== -->
 <div id="view-pos" class="pos-container active">
 
-    <!-- ===== LEFT: CART / BILLING ===== -->
     <div class="left-billing">
         <div class="billing-header">
             <span>🧾 Current Order</span>
@@ -127,7 +119,6 @@
         </div>
     </div>
 
-    <!-- ===== RIGHT: CATEGORIES & ITEMS ===== -->
     <div class="right-items">
         <div class="items-header">
             <span>📂 Categories</span>
@@ -142,18 +133,13 @@
                 <span>⚡ Quick Add</span>
                 <button id="toggleQuickAddBtn" class="toggle-quick-add">▶</button>
             </div>
-            <div class="quick-add-items" id="quickAddItems">
-                <!-- Rendered by JS -->
-            </div>
+            <div class="quick-add-items" id="quickAddItems"></div>
         </div>
 
-        <div class="items-grid" id="itemsGrid">
-            <!-- Rendered by JS -->
-        </div>
+        <div class="items-grid" id="itemsGrid"></div>
     </div>
 </div>
 
-<!-- ===== HISTORY VIEW ===== -->
 <div id="view-history" class="view-container">
     <h2>
         📜 Bill History
@@ -177,7 +163,6 @@
     </div>
 </div>
 
-<!-- ===== MODALS ===== -->
 <div class="modal-overlay" id="holdModal">
     <div class="modal modal-small">
         <div class="modal-header">
@@ -310,71 +295,53 @@
     </div>
 </div>
 
-<!-- ===== TOAST ===== -->
 <div id="toast"></div>
 
 <script>
-// ============================================================
-//  MANUAL ORIENTATION TOGGLE - Added
-// ============================================================
-
-let currentOrientation = 'auto'; // 'auto', 'landscape', 'portrait', 'portrait-tablet'
+let currentOrientation = 'auto';
 
 function toggleManualOrientation() {
     const body = document.body;
     const btn = document.getElementById('orientationToggleBtn');
     
-    // Cycle through modes
     const modes = ['auto', 'landscape', 'portrait', 'portrait-tablet'];
-    const labels = {
-        'auto': '🔄 Auto',
-        'landscape': '🌅 Landscape',
-        'portrait': '📱 Portrait',
-        'portrait-tablet': '📱 2 Col'
-    };
     const shortLabels = {
         'auto': '🔄',
         'landscape': '🌅',
         'portrait': '📱',
         'portrait-tablet': '📱2'
     };
+    const labels = {
+        'auto': '🔄 Auto',
+        'landscape': '🌅 Landscape',
+        'portrait': '📱 Portrait',
+        'portrait-tablet': '📱 2 Col'
+    };
     
-    // Remove all orientation classes
     body.classList.remove('orientation-auto', 'orientation-landscape', 'orientation-portrait', 'orientation-portrait-tablet');
     
-    // Find next mode
     const currentIndex = modes.indexOf(currentOrientation);
     const nextIndex = (currentIndex + 1) % modes.length;
     currentOrientation = modes[nextIndex];
     
-    // Apply new class
     body.classList.add(`orientation-${currentOrientation}`);
-    
-    // Update button
     btn.textContent = shortLabels[currentOrientation];
     btn.title = labels[currentOrientation];
     btn.style.background = currentOrientation === 'auto' ? '#8b5cf6' : '#f59e0b';
     
-    // Save preference
     localStorage.setItem('manual_orientation', currentOrientation);
-    
-    // Show toast
     showToast(`📱 ${labels[currentOrientation]}`);
     
-    // Refresh items grid
     if (typeof renderItems === 'function') {
         setTimeout(renderItems, 300);
     }
 }
 
-// Load saved orientation preference
 function loadOrientationPreference() {
     const saved = localStorage.getItem('manual_orientation');
     if (saved && ['auto', 'landscape', 'portrait', 'portrait-tablet'].includes(saved)) {
         currentOrientation = saved;
-        const body = document.body;
-        body.classList.add(`orientation-${saved}`);
-        
+        document.body.classList.add(`orientation-${saved}`);
         const btn = document.getElementById('orientationToggleBtn');
         const shortLabels = {
             'auto': '🔄',
@@ -389,9 +356,6 @@ function loadOrientationPreference() {
     }
 }
 
-// ============================================================
-//  DATA STORAGE KEYS
-// ============================================================
 const STORAGE_KEY = 'hotel_items';
 const CART_KEY = 'hotel_cart';
 const HISTORY_KEY = 'hotel_history';
@@ -403,9 +367,6 @@ const BACKUP_KEY = 'hotel_backups';
 const REPORTS_KEY = 'hotel_daily_reports';
 const MAX_BACKUPS = 10;
 
-// ============================================================
-//  GLOBAL VARIABLES
-// ============================================================
 let items = [];
 let cart = [];
 let history = [];
@@ -422,9 +383,6 @@ let historyFilter = 'today';
 let historyFilterDate = null;
 let selectedMethod = 'cash';
 
-// ============================================================
-//  LOAD / SAVE FUNCTIONS
-// ============================================================
 function loadData() {
     try {
         const storedItems = localStorage.getItem(STORAGE_KEY);
@@ -502,10 +460,6 @@ function saveStock() { localStorage.setItem(STOCK_KEY, JSON.stringify(stockData)
 function getTaxRate() {
     return parseFloat(localStorage.getItem(TAX_KEY)) || 0;
 }
-
-// ============================================================
-//  AUTO-BACKUP SYSTEM
-// ============================================================
 
 function createBackup() {
     try {
@@ -591,10 +545,6 @@ function stopAutoBackup() {
 }
 
 startAutoBackup();
-
-// ============================================================
-//  DAILY REPORT SYSTEM
-// ============================================================
 
 function generateDailyReport(date = new Date()) {
     try {
@@ -737,9 +687,6 @@ function checkAndGenerateEndOfDay() {
 
 setInterval(checkAndGenerateEndOfDay, 60000);
 
-// ============================================================
-//  THEME FUNCTIONS
-// ============================================================
 function toggleTheme() {
     const body = document.body;
     const btn = document.getElementById('darkModeToggle');
@@ -767,9 +714,6 @@ function loadSavedTheme() {
     }
 }
 
-// ============================================================
-//  QUICK ADD FUNCTIONS
-// ============================================================
 function loadQuickAddItems() {
     const popularItems = items.slice(0, 10);
     const container = document.getElementById('quickAddItems');
@@ -803,9 +747,6 @@ function toggleQuickAdd() {
     }
 }
 
-// ============================================================
-//  STOCK HELPER FUNCTIONS
-// ============================================================
 function getStockForItem(itemId) {
     const stockItem = stockData.find(s => s.id === itemId);
     return stockItem ? stockItem.stock : 0;
@@ -823,9 +764,6 @@ function getStockStatus(stock) {
     else return '🟢 In Stock';
 }
 
-// ============================================================
-//  CLOCK
-// ============================================================
 function updateClock() {
     const now = new Date();
     const d = now.toLocaleDateString('en-US', { month: '2-digit', day: '2-digit', year: 'numeric' });
@@ -835,9 +773,6 @@ function updateClock() {
 updateClock();
 setInterval(updateClock, 1000);
 
-// ============================================================
-//  DROPDOWN MENU
-// ============================================================
 const hamburgerBtn = document.getElementById('hamburgerBtn');
 const dropdownMenu = document.getElementById('dropdownMenu');
 const dropdownOverlay = document.getElementById('dropdownOverlay');
@@ -866,13 +801,9 @@ document.addEventListener('keydown', function(e) {
         document.getElementById('paymentModal').classList.remove('open');
         document.getElementById('holdModal').classList.remove('open');
         document.getElementById('customerOrdersModal').classList.remove('open');
-        document.getElementById('reportDetailModal')?.classList.remove('open');
     }
 });
 
-// ============================================================
-//  RENDER CATEGORIES & ITEMS
-// ============================================================
 function renderItems() {
     const categories = getCategories();
     if (!selectedCategory) {
@@ -979,9 +910,6 @@ document.getElementById('refreshItemsBtn').addEventListener('click', function() 
     showToast('🔄 Items refreshed!');
 });
 
-// ============================================================
-//  ADD TO CART
-// ============================================================
 function addToCart(itemId) {
     const item = items.find(i => i.id === itemId);
     if (!item) return;
@@ -1069,9 +997,6 @@ function updateDiscount(id, value) {
     updateBilling();
 }
 
-// ============================================================
-//  CALCULATE TOTALS
-// ============================================================
 function calculateTotals() {
     const subtotal = cart.reduce((sum, item) => sum + item.price * item.quantity, 0);
     const itemDiscounts = cart.reduce((sum, item) => {
@@ -1115,9 +1040,6 @@ document.getElementById('clearCartBtn').addEventListener('click', function() {
     showToast('🔄 Cart cleared! Stock restored.');
 });
 
-// ============================================================
-//  HOLD FUNCTIONS
-// ============================================================
 document.getElementById('holdBtn').addEventListener('click', function() {
     if (cart.length === 0) {
         showToast('Cart is empty!');
@@ -1214,9 +1136,6 @@ document.getElementById('holdToCustomerBtn').addEventListener('click', function(
     showToast(`✅ Order held to Customer "${name}"!`);
 });
 
-// ============================================================
-//  CUSTOMER ORDERS
-// ============================================================
 function openCustomerOrders() {
     renderCustomerOrders();
     document.getElementById('customerOrdersModal').classList.add('open');
@@ -1295,9 +1214,6 @@ function loadCustomerOrder(name) {
     showToast(`✅ Order from "${name}" loaded!`);
 }
 
-// ============================================================
-//  SELECT PAYMENT METHOD
-// ============================================================
 function selectPaymentMethod(method) {
     selectedMethod = method;
     document.querySelectorAll('#paymentModal .payment-method-btn').forEach(btn => {
@@ -1316,9 +1232,6 @@ function selectPaymentMethod(method) {
     }
 }
 
-// ============================================================
-//  NUMERIC KEYPAD FUNCTIONS
-// ============================================================
 function setupNumericKeypad(inputId, clearBtnId, keypadId) {
     const input = document.getElementById(inputId);
     const clearBtn = document.getElementById(clearBtnId);
@@ -1404,9 +1317,6 @@ function setupNumberPadSupport() {
     });
 }
 
-// ============================================================
-//  CALCULATE CHANGE (POS)
-// ============================================================
 document.getElementById('paymentAmount').addEventListener('input', function() {
     const received = parseFloat(this.value) || 0;
     const total = currentBill ? currentBill.total : 0;
@@ -1437,7 +1347,6 @@ document.getElementById('paymentAmount').addEventListener('input', function() {
     }
 });
 
-// ===== PAYMENT MODAL OPEN =====
 document.getElementById('payBtn').addEventListener('click', function() {
     if (cart.length === 0) return;
     let stockError = false;
@@ -1504,7 +1413,6 @@ document.getElementById('payBtn').addEventListener('click', function() {
     }, 200);
 });
 
-// ===== CONFIRM PAYMENT =====
 document.getElementById('confirmPaymentBtn').addEventListener('click', function() {
     if (!currentBill) return;
     const received = parseFloat(document.getElementById('paymentAmount').value) || 0;
@@ -1587,9 +1495,6 @@ document.getElementById('paymentModal').addEventListener('click', function(e) {
     }
 });
 
-// ============================================================
-//  PRINT WITH TAX
-// ============================================================
 function printBillWithTax(bill) {
     const printWindow = window.open('', '_blank', 'width=400,height=600');
     if (!printWindow) {
@@ -1712,9 +1617,6 @@ function printBillWithTax(bill) {
     printWindow.document.close();
 }
 
-// ============================================================
-//  PRINT FUNCTIONS
-// ============================================================
 function printBill(bill) { printBillWithTax(bill); }
 
 function printBillFromHistory(billId) {
@@ -1846,9 +1748,6 @@ function printAllHistory() {
     printWindow.document.close();
 }
 
-// ============================================================
-//  EDIT BILL FUNCTIONS
-// ============================================================
 function openEditBill(billId) {
     const bill = history.find(b => b.id === billId);
     if (!bill) {
@@ -1963,9 +1862,6 @@ function cancelEditBill() {
     editedBillData = null;
 }
 
-// ============================================================
-//  HISTORY FUNCTIONS
-// ============================================================
 function autoClearOldBills() {
     const today = new Date();
     const todayStr = today.toDateString();
@@ -2140,9 +2036,6 @@ document.getElementById('printHistoryBtn').addEventListener('click', function() 
     printAllHistory();
 });
 
-// ============================================================
-//  EDIT MODAL EVENT LISTENERS
-// ============================================================
 document.getElementById('saveEditBillBtn').addEventListener('click', saveEditBill);
 document.getElementById('cancelEditBillBtn').addEventListener('click', cancelEditBill);
 document.getElementById('closeEditBillModalBtn').addEventListener('click', cancelEditBill);
@@ -2150,9 +2043,6 @@ document.getElementById('editBillModal').addEventListener('click', function(e) {
     if (e.target === this) cancelEditBill();
 });
 
-// ============================================================
-//  TABS
-// ============================================================
 function switchTab(tab) {
     document.querySelectorAll('.pos-container, .view-container').forEach(el => el.classList.remove('active'));
     if (tab === 'pos') {
@@ -2167,9 +2057,6 @@ function switchTab(tab) {
     closeDropdown();
 }
 
-// ============================================================
-//  FULL SCREEN
-// ============================================================
 function toggleFullScreen() {
     if (!document.fullscreenElement && !document.webkitFullscreenElement) {
         const el = document.documentElement;
@@ -2184,9 +2071,6 @@ function toggleFullScreen() {
     }
 }
 
-// ============================================================
-//  LOGOUT
-// ============================================================
 function logout() {
     if (confirm('Are you sure you want to logout?')) {
         localStorage.removeItem('hotel_logged_in');
@@ -2195,9 +2079,6 @@ function logout() {
     }
 }
 
-// ============================================================
-//  CHECK LOGIN STATUS
-// ============================================================
 function checkLoginStatus() {
     const isLoggedIn = localStorage.getItem('hotel_logged_in');
     if (isLoggedIn !== 'true') {
@@ -2205,9 +2086,6 @@ function checkLoginStatus() {
     }
 }
 
-// ============================================================
-//  TOAST NOTIFICATION
-// ============================================================
 function showToast(message) {
     let toast = document.getElementById('toast');
     if (!toast) {
@@ -2232,9 +2110,6 @@ function showToast(message) {
     }, 3000);
 }
 
-// ============================================================
-//  KEYBOARD SHORTCUTS
-// ============================================================
 document.addEventListener('keydown', function(e) {
     if ((e.ctrlKey || e.metaKey) && e.key === 'q') {
         e.preventDefault();
@@ -2263,25 +2138,12 @@ document.addEventListener('keydown', function(e) {
     }
 });
 
-// ============================================================
-//  PWA - REGISTER SERVICE WORKER
-// ============================================================
 if ('serviceWorker' in navigator) {
     window.addEventListener('load', function() {
         navigator.serviceWorker.register('sw.js')
             .then(function(registration) {
                 console.log('✅ Service Worker registered successfully!');
                 console.log('Scope:', registration.scope);
-                registration.addEventListener('updatefound', function() {
-                    const newWorker = registration.installing;
-                    console.log('🔄 Service Worker update found');
-                    newWorker.addEventListener('statechange', function() {
-                        if (newWorker.state === 'installed' && navigator.serviceWorker.controller) {
-                            console.log('🔄 New version available!');
-                            showToast('🔄 New version available! Refresh to update.');
-                        }
-                    });
-                });
             })
             .catch(function(error) {
                 console.log('❌ Service Worker registration failed:', error);
@@ -2348,9 +2210,6 @@ window.addEventListener('offline', function() {
 
 checkOnlineStatus();
 
-// ============================================================
-//  EXPORT FUNCTIONS
-// ============================================================
 window.addToCart = addToCart;
 window.changeQty = changeQty;
 window.removeFromCart = removeFromCart;
@@ -2389,9 +2248,6 @@ window.generateAndSaveTodayReport = generateAndSaveTodayReport;
 window.toggleManualOrientation = toggleManualOrientation;
 window.loadOrientationPreference = loadOrientationPreference;
 
-// ============================================================
-//  INIT
-// ============================================================
 document.addEventListener('DOMContentLoaded', function() {
     checkLoginStatus();
     loadSavedTheme();
@@ -2404,8 +2260,6 @@ document.addEventListener('DOMContentLoaded', function() {
     setupNumberPadSupport();
     autoClearOldBills();
     renderHistory();
-    
-    // Load orientation preference
     loadOrientationPreference();
 });
 </script>

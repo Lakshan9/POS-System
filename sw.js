@@ -1,34 +1,24 @@
-// ============================================================
-//  SERVICE WORKER - GitHub Pages
-//  URL: https://lakshan9.github.io/POS-System/
-// ============================================================
-
-const REPO_NAME = 'POS-System';
 const CACHE_NAME = 'hotel-pos-v2';
 const OFFLINE_URL = 'offline.html';
 
-// Assets to cache - GitHub Pages path එකට අනුව
 const ASSETS = [
-  '/POS-System/',
-  '/POS-System/index.html',
-  '/POS-System/login.html',
-  '/POS-System/items-stock.html',
-  '/POS-System/report.html',
-  '/POS-System/settings.html',
-  '/POS-System/tables.html',
-  '/POS-System/offline.html',
-  '/POS-System/style.css',
-  '/POS-System/style-items-stock.css',
-  '/POS-System/style-login.css',
-  '/POS-System/style-report.css',
-  '/POS-System/style-settings.css',
-  '/POS-System/style-tables.css',
-  '/POS-System/manifest.json'
+  '/',
+  'index.html',
+  'login.html',
+  'items-stock.html',
+  'report.html',
+  'settings.html',
+  'tables.html',
+  'offline.html',
+  'style.css',
+  'style-items-stock.css',
+  'style-login.css',
+  'style-report.css',
+  'style-settings.css',
+  'style-tables.css',
+  'manifest.json'
 ];
 
-// ============================================================
-//  INSTALL EVENT
-// ============================================================
 self.addEventListener('install', event => {
   console.log('Service Worker: Installing...');
   
@@ -48,9 +38,6 @@ self.addEventListener('install', event => {
   );
 });
 
-// ============================================================
-//  ACTIVATE EVENT
-// ============================================================
 self.addEventListener('activate', event => {
   console.log('Service Worker: Activating...');
   
@@ -72,18 +59,13 @@ self.addEventListener('activate', event => {
   );
 });
 
-// ============================================================
-//  FETCH EVENT
-// ============================================================
 self.addEventListener('fetch', event => {
   const requestUrl = new URL(event.request.url);
   
-  // Skip cross-origin requests
   if (requestUrl.origin !== self.location.origin) {
     return;
   }
   
-  // Skip non-GET requests
   if (event.request.method !== 'GET') {
     return;
   }
@@ -138,9 +120,6 @@ self.addEventListener('fetch', event => {
   );
 });
 
-// ============================================================
-//  PUSH NOTIFICATIONS
-// ============================================================
 self.addEventListener('push', event => {
   console.log('Service Worker: Push notification received');
   
@@ -150,8 +129,7 @@ self.addEventListener('push', event => {
   } catch (e) {
     data = {
       title: 'Hotel POS',
-      message: 'You have a new notification',
-      url: '/POS-System/'
+      message: 'You have a new notification'
     };
   }
   
@@ -159,10 +137,7 @@ self.addEventListener('push', event => {
     body: data.message || 'New notification',
     icon: 'data:image/svg+xml,%3Csvg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 192 192"%3E%3Crect width="192" height="192" rx="40" fill="%238b5cf6"/%3E%3Ctext x="96" y="120" text-anchor="middle" font-size="100" fill="white"%3E%F0%9F%8D%BD%3C/text%3E%3Ctext x="96" y="165" text-anchor="middle" font-size="30" fill="white" font-weight="bold"%3EPOS%3C/text%3E%3C/svg%3E',
     badge: 'data:image/svg+xml,%3Csvg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 72 72"%3E%3Crect width="72" height="72" rx="20" fill="%238b5cf6"/%3E%3Ctext x="36" y="50" text-anchor="middle" font-size="40" fill="white"%3E%F0%9F%8D%BD%3C/text%3E%3C/svg%3E',
-    vibrate: [200, 100, 200],
-    data: {
-      url: data.url || '/POS-System/'
-    }
+    vibrate: [200, 100, 200]
   };
   
   event.waitUntil(
@@ -173,18 +148,9 @@ self.addEventListener('push', event => {
   );
 });
 
-// ============================================================
-//  NOTIFICATION CLICK
-// ============================================================
 self.addEventListener('notificationclick', event => {
   console.log('Service Worker: Notification clicked');
   event.notification.close();
-  
-  const url = event.notification.data?.url || '/POS-System/';
-  
-  if (event.action === 'close') {
-    return;
-  }
   
   event.waitUntil(
     clients.matchAll({
@@ -193,20 +159,17 @@ self.addEventListener('notificationclick', event => {
     })
     .then(windowClients => {
       for (let client of windowClients) {
-        if (client.url === url && 'focus' in client) {
+        if (client.url === '/' && 'focus' in client) {
           return client.focus();
         }
       }
       if (clients.openWindow) {
-        return clients.openWindow(url);
+        return clients.openWindow('/');
       }
     })
   );
 });
 
-// ============================================================
-//  MESSAGE HANDLER
-// ============================================================
 self.addEventListener('message', event => {
   console.log('Service Worker: Message received:', event.data);
   

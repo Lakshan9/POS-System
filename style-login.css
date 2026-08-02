@@ -1,6 +1,3 @@
-/* ============================================================
-   RESET & BASE
-   ============================================================ */
 * {
     margin: 0;
     padding: 0;
@@ -19,7 +16,6 @@ body {
     overflow: hidden;
 }
 
-/* Animated background particles */
 body::before {
     content: '';
     position: absolute;
@@ -40,7 +36,6 @@ body::before {
     100% { transform: rotate(360deg); }
 }
 
-/* Floating dots animation */
 body::after {
     content: '';
     position: absolute;
@@ -66,9 +61,6 @@ body::after {
     100% { transform: translate(-100px, -100px); }
 }
 
-/* ============================================================
-   LOGIN CONTAINER
-   ============================================================ */
 .login-container {
     position: relative;
     z-index: 1;
@@ -80,9 +72,6 @@ body::after {
     gap: 20px;
 }
 
-/* ============================================================
-   LOGIN BOX
-   ============================================================ */
 .login-box {
     background: rgba(255, 255, 255, 0.95);
     backdrop-filter: blur(20px);
@@ -113,9 +102,6 @@ body::after {
         0 0 0 1px rgba(139, 92, 246, 0.1);
 }
 
-/* ============================================================
-   LOGIN HEADER
-   ============================================================ */
 .login-header {
     text-align: center;
     margin-bottom: 32px;
@@ -151,18 +137,12 @@ body::after {
     font-weight: 500;
 }
 
-/* ============================================================
-   LOGIN FORM
-   ============================================================ */
 .login-form {
     display: flex;
     flex-direction: column;
     gap: 20px;
 }
 
-/* ============================================================
-   INPUT GROUP
-   ============================================================ */
 .input-group {
     display: flex;
     flex-direction: column;
@@ -201,9 +181,6 @@ body::after {
     color: #94a3b8;
 }
 
-/* ============================================================
-   PASSWORD WRAPPER
-   ============================================================ */
 .password-wrapper {
     position: relative;
     width: 100%;
@@ -238,9 +215,6 @@ body::after {
     outline: none;
 }
 
-/* ============================================================
-   LOGIN BUTTON
-   ============================================================ */
 .login-btn {
     padding: 14px 20px;
     background: linear-gradient(135deg, #8b5cf6, #7c3aed);
@@ -294,9 +268,6 @@ body::after {
     font-size: 1.1rem;
 }
 
-/* ============================================================
-   ERROR MESSAGE
-   ============================================================ */
 .login-error {
     display: none;
     padding: 12px 16px;
@@ -321,9 +292,6 @@ body::after {
     }
 }
 
-/* ============================================================
-   LOGIN FOOTER
-   ============================================================ */
 .login-footer {
     display: flex;
     flex-direction: column;
@@ -354,9 +322,6 @@ body::after {
     letter-spacing: 0.5px;
 }
 
-/* ============================================================
-   RESPONSIVE DESIGN
-   ============================================================ */
 @media (max-width: 480px) {
     .login-box {
         padding: 30px 24px;
@@ -400,18 +365,12 @@ body::after {
     }
 }
 
-/* ============================================================
-   HIGHER RESOLUTION SCREENS
-   ============================================================ */
 @media (min-width: 1024px) {
     .login-box {
         padding: 48px 44px;
     }
 }
 
-/* ============================================================
-   DARK MODE SUPPORT
-   ============================================================ */
 @media (prefers-color-scheme: dark) {
     body {
         background: linear-gradient(135deg, #0a0a0a 0%, #1a1a2e 50%, #0a0a0a 100%);
@@ -477,9 +436,6 @@ body::after {
     }
 }
 
-/* ============================================================
-   ACCESSIBILITY
-   ============================================================ */
 @media (prefers-reduced-motion: reduce) {
     * {
         animation-duration: 0.01ms !important;
@@ -488,7 +444,6 @@ body::after {
     }
 }
 
-/* Focus visible for keyboard navigation */
 .login-btn:focus-visible,
 .input-group input:focus-visible,
 .toggle-password:focus-visible {
@@ -496,7 +451,6 @@ body::after {
     outline-offset: 2px;
 }
 
-/* High contrast mode */
 @media (forced-colors: active) {
     .login-box {
         border: 2px solid CanvasText;
