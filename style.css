@@ -698,7 +698,6 @@ body.theme-dark .theme-toggle-btn {
 
 .pos-container.active {
     display: grid;
-    grid-template-columns: 1fr 1.2fr;
     gap: 10px;
 }
 
@@ -778,37 +777,6 @@ body.theme-dark .theme-toggle-btn {
 
 .clear-btn:hover {
     background: #dc2626;
-}
-
-.billing-search {
-    display: flex;
-    align-items: center;
-    gap: 8px;
-    padding: 4px 10px;
-    background: #f8fafc;
-    border-bottom: 1px solid #e2e8f0;
-}
-
-.billing-search input {
-    flex: 1;
-    padding: 4px 10px;
-    border: 2px solid #e2e8f0;
-    border-radius: 6px;
-    font-size: 0.75rem;
-    background: white;
-    transition: border-color 0.3s;
-}
-
-.billing-search input:focus {
-    outline: none;
-    border-color: #8b5cf6;
-}
-
-.billing-search .cart-total-items {
-    font-size: 0.7rem;
-    font-weight: 600;
-    color: #64748b;
-    white-space: nowrap;
 }
 
 .billing-table {
@@ -2161,511 +2129,6 @@ body.theme-dark .theme-toggle-btn {
     transform: translateX(-50%) translateY(0);
 }
 
-@media (max-width: 1024px) {
-    .pos-container.active {
-        grid-template-columns: 1fr 1fr;
-    }
-}
-
-@media (max-width: 768px) {
-    .pos-container.active {
-        grid-template-columns: 1fr;
-        grid-template-rows: 1fr 1fr;
-        height: calc(100vh - 56px);
-        padding: 4px 8px 8px 8px;
-        gap: 8px;
-    }
-    
-    .left-billing {
-        min-height: 350px;
-    }
-    
-    .billing-table {
-        min-height: 200px;
-        max-height: none;
-    }
-    
-    .header-left h1 {
-        font-size: 0.8rem;
-    }
-    
-    .datetime {
-        font-size: 0.55rem;
-        padding: 2px 6px;
-    }
-    
-    .tab-btn {
-        font-size: 0.6rem;
-        padding: 3px 8px;
-    }
-    
-    .billing-header {
-        padding: 4px 10px;
-        flex-direction: row;
-        flex-wrap: wrap;
-    }
-    
-    .billing-header > span {
-        font-size: 0.75rem;
-    }
-    
-    .billing-actions {
-        gap: 3px;
-    }
-    
-    .billing-actions button {
-        font-size: 0.55rem;
-        padding: 2px 8px;
-    }
-    
-    .table-header, .billing-row {
-        font-size: 0.6rem;
-        grid-template-columns: 1.5fr 0.7fr 0.8fr 0.8fr 0.8fr 0.5fr;
-        padding: 4px 2px;
-        gap: 3px;
-    }
-    
-    .item-qty button {
-        width: 18px;
-        height: 18px;
-        font-size: 0.6rem;
-    }
-    
-    .item-qty span {
-        min-width: 16px;
-        font-size: 0.6rem;
-    }
-    
-    .item-discount input {
-        width: 38px;
-        font-size: 0.55rem;
-        padding: 1px 2px;
-    }
-    
-    .remove-btn {
-        font-size: 0.7rem;
-    }
-    
-    .billing-summary {
-        padding: 4px 10px;
-    }
-    
-    .line {
-        font-size: 0.65rem;
-        padding: 1px 0;
-    }
-    
-    .line.total {
-        font-size: 0.8rem;
-        padding-top: 3px;
-        margin-top: 1px;
-    }
-    
-    .discount-row {
-        margin: 3px 0;
-        gap: 6px;
-    }
-    
-    .discount-row label {
-        font-size: 0.6rem;
-    }
-    
-    .discount-row input {
-        width: 50px;
-        padding: 1px 4px;
-        font-size: 0.65rem;
-    }
-    
-    .pay-btn {
-        padding: 6px;
-        font-size: 0.75rem;
-        margin-top: 2px;
-        border-radius: 6px;
-    }
-    
-    .items-grid {
-        grid-template-columns: repeat(auto-fill, minmax(90px, 1fr));
-        padding: 6px;
-        gap: 6px;
-    }
-    
-    .item-btn {
-        padding: 6px 4px;
-        font-size: 0.6rem;
-    }
-    
-    .item-price {
-        font-size: 0.65rem;
-    }
-    
-    .dropdown-menu {
-        width: 260px;
-    }
-    
-    .modal {
-        width: 95%;
-        border-radius: 14px;
-    }
-    
-    #paymentModal .payment-methods-grid {
-        grid-template-columns: repeat(3, 1fr);
-    }
-    
-    #paymentModal .payment-actions {
-        grid-template-columns: 1fr;
-    }
-    
-    .quick-add-items {
-        max-height: 36px;
-        gap: 3px;
-        padding: 4px 8px;
-    }
-    
-    .quick-add-item {
-        font-size: 0.55rem;
-        padding: 2px 8px;
-    }
-    
-    .quick-add-section {
-        margin: 4px 8px;
-    }
-    
-    .quick-add-header {
-        font-size: 0.65rem;
-        padding: 3px 10px;
-    }
-    
-    .history-filter-bar {
-        padding: 6px 10px;
-        gap: 6px;
-    }
-    
-    .history-filter-bar input[type="date"] {
-        font-size: 0.7rem;
-        padding: 3px 8px;
-    }
-    
-    .history-filter-bar button {
-        font-size: 0.65rem;
-        padding: 3px 10px;
-    }
-    
-    .history-actions button {
-        font-size: 0.65rem;
-        padding: 3px 10px;
-    }
-    
-    .view-container h2 {
-        font-size: 0.95rem;
-    }
-}
-
-@media (max-width: 480px) {
-    .main-header {
-        padding: 6px 10px;
-        flex-wrap: wrap;
-    }
-    
-    .header-left {
-        gap: 6px;
-    }
-    
-    .header-left h1 {
-        font-size: 0.7rem;
-    }
-    
-    .header-right {
-        gap: 3px;
-    }
-    
-    .tab-btn {
-        font-size: 0.5rem;
-        padding: 2px 6px;
-    }
-    
-    .pos-container.active {
-        height: calc(100vh - 50px);
-        padding: 3px 6px 6px 6px;
-        gap: 6px;
-    }
-    
-    .left-billing {
-        min-height: 300px;
-        border-radius: 10px;
-    }
-    
-    .billing-table {
-        min-height: 150px;
-        max-height: none;
-        padding: 0 6px;
-    }
-    
-    .billing-header {
-        padding: 3px 8px;
-    }
-    
-    .billing-header > span {
-        font-size: 0.65rem;
-    }
-    
-    .billing-actions button {
-        font-size: 0.45rem;
-        padding: 1px 5px;
-        border-radius: 4px;
-    }
-    
-    .table-header, .billing-row {
-        font-size: 0.55rem;
-        grid-template-columns: 1.2fr 0.6fr 0.7fr 0.7fr 0.7fr 0.4fr;
-        gap: 2px;
-        padding: 3px 2px;
-    }
-    
-    .billing-row {
-        min-height: 28px;
-        padding: 4px 2px;
-    }
-    
-    .item-qty button {
-        width: 16px;
-        height: 16px;
-        font-size: 0.5rem;
-        border-radius: 3px;
-    }
-    
-    .item-qty span {
-        min-width: 14px;
-        font-size: 0.55rem;
-    }
-    
-    .item-discount input {
-        width: 32px;
-        font-size: 0.5rem;
-        padding: 0 1px;
-        border-radius: 3px;
-    }
-    
-    .remove-btn {
-        font-size: 0.6rem;
-    }
-    
-    .billing-summary {
-        padding: 3px 8px;
-    }
-    
-    .line {
-        font-size: 0.55rem;
-        padding: 1px 0;
-    }
-    
-    .line.total {
-        font-size: 0.7rem;
-        padding-top: 2px;
-        margin-top: 1px;
-    }
-    
-    .discount-row {
-        margin: 2px 0;
-        gap: 4px;
-    }
-    
-    .discount-row label {
-        font-size: 0.55rem;
-    }
-    
-    .discount-row input {
-        width: 40px;
-        padding: 1px 3px;
-        font-size: 0.55rem;
-        border-radius: 4px;
-    }
-    
-    .pay-btn {
-        padding: 4px;
-        font-size: 0.65rem;
-        margin-top: 2px;
-        border-radius: 4px;
-    }
-    
-    .items-grid {
-        grid-template-columns: repeat(auto-fill, minmax(70px, 1fr));
-        gap: 4px;
-        padding: 4px;
-    }
-    
-    .item-btn {
-        padding: 4px 3px;
-        font-size: 0.5rem;
-        border-radius: 6px;
-    }
-    
-    .item-price {
-        font-size: 0.55rem;
-    }
-    
-    .item-stock {
-        font-size: 0.45rem;
-        padding: 0 4px;
-    }
-    
-    .category-grid-item {
-        padding: 10px 6px;
-        border-radius: 8px;
-    }
-    
-    .cat-icon {
-        font-size: 1.4rem;
-    }
-    
-    .modal {
-        width: 98%;
-        border-radius: 12px;
-    }
-    
-    .modal-small {
-        max-width: 98%;
-    }
-    
-    .modal-wide {
-        max-width: 98%;
-    }
-    
-    #paymentModal .payment-methods-grid {
-        grid-template-columns: repeat(2, 1fr);
-    }
-    
-    .payment-actions {
-        grid-template-columns: 1fr 1fr;
-        gap: 6px;
-    }
-    
-    .payment-actions .confirm-btn,
-    .payment-actions .cancel-btn {
-        padding: 8px 10px;
-        font-size: 0.75rem;
-        border-radius: 6px;
-    }
-    
-    .hold-options {
-        grid-template-columns: 1fr;
-    }
-    
-    .edit-bill-item {
-        flex-wrap: wrap;
-        gap: 4px;
-    }
-    
-    .edit-bill-item .item-name {
-        flex-basis: 100%;
-        font-size: 0.75rem;
-    }
-    
-    .edit-actions {
-        flex-direction: column;
-    }
-    
-    .edit-discount-row {
-        flex-wrap: wrap;
-    }
-    
-    .h-top {
-        flex-direction: column;
-        align-items: flex-start;
-        gap: 3px;
-    }
-    
-    .history-actions {
-        flex-direction: column;
-        width: 100%;
-    }
-    
-    .history-actions button {
-        width: 100%;
-    }
-    
-    .history-filter-bar {
-        flex-direction: column;
-        align-items: stretch;
-    }
-    
-    .history-filter-bar .filter-info {
-        margin-left: 0;
-        text-align: center;
-    }
-    
-    .history-filter-bar input[type="date"] {
-        width: 100%;
-    }
-    
-    .history-filter-bar button {
-        width: 100%;
-    }
-    
-    .quick-add-items {
-        max-height: 32px;
-        gap: 2px;
-        padding: 3px 6px;
-    }
-    
-    .quick-add-item {
-        font-size: 0.5rem;
-        padding: 1px 6px;
-        border-radius: 12px;
-    }
-    
-    .quick-add-section {
-        margin: 3px 6px;
-        border-radius: 6px;
-    }
-    
-    .quick-add-header {
-        font-size: 0.6rem;
-        padding: 2px 8px;
-    }
-    
-    .keypad-btn {
-        padding: 8px 4px;
-        font-size: 0.85rem;
-        min-height: 36px;
-        border-radius: 6px;
-    }
-    
-    .numeric-keypad {
-        padding: 4px;
-        gap: 3px;
-    }
-    
-    .keypad-row {
-        gap: 3px;
-    }
-    
-    .amount-display-row input {
-        font-size: 0.85rem;
-        padding: 6px 10px;
-        min-height: 34px;
-    }
-    
-    .clear-amount-btn {
-        width: 32px;
-        height: 32px;
-        min-width: 32px;
-        font-size: 0.75rem;
-    }
-    
-    .payment-change {
-        padding: 6px 10px;
-    }
-    
-    .payment-change span:last-child {
-        font-size: 0.85rem;
-    }
-    
-    .empty-cart {
-        padding: 25px 0;
-        font-size: 0.75rem;
-    }
-}
-
 ::-webkit-scrollbar {
     width: 5px;
     height: 5px;
@@ -2685,315 +2148,87 @@ body.theme-dark .theme-toggle-btn {
     background: #94a3b8;
 }
 
-@media (orientation: portrait) {
-    .pos-container.active {
-        grid-template-columns: 1fr;
-        grid-template-rows: auto 1fr;
-        height: calc(100vh - 56px);
-        padding: 4px 8px 8px 8px;
-        gap: 8px;
-    }
-    
-    .left-billing {
-        min-height: 300px;
-        max-height: 50vh;
-    }
-    
-    .billing-table {
-        max-height: 200px;
-        min-height: 150px;
-    }
-    
-    .right-items {
-        min-height: 300px;
-        max-height: 50vh;
-    }
-    
-    .items-grid {
-        grid-template-columns: repeat(auto-fill, minmax(90px, 1fr));
-        gap: 6px;
-        padding: 6px;
-    }
-    
-    .report-summary {
-        grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
-    }
-    
-    .report-grid {
-        grid-template-columns: 1fr;
-    }
-}
+/* ============================================================
+   ORIENTATION CLASSES - AUTO + MANUAL
+   ============================================================ */
 
-@media (orientation: landscape) and (max-height: 500px) {
-    .pos-container.active {
-        grid-template-columns: 1fr 1.5fr;
-        gap: 6px;
-        height: calc(100vh - 56px);
-        padding: 3px 6px 6px 6px;
-    }
-    
-    .left-billing {
-        min-height: 200px;
-    }
-    
-    .billing-table {
-        max-height: 150px;
-        min-height: 100px;
-    }
-    
-    .items-grid {
-        grid-template-columns: repeat(auto-fill, minmax(70px, 1fr));
-        gap: 4px;
-        padding: 4px;
-    }
-    
-    .item-btn {
-        padding: 4px 3px;
-        font-size: 0.55rem;
-    }
-    
-    .item-price {
-        font-size: 0.6rem;
-    }
-    
-    .table-header, .billing-row {
-        font-size: 0.6rem;
-        padding: 3px 2px;
-    }
-}
-
-@media (orientation: portrait) and (min-width: 768px) {
-    .pos-container.active {
-        grid-template-columns: 1fr 1fr;
-        grid-template-rows: auto;
-        height: calc(100vh - 56px);
-        padding: 6px 10px 10px 10px;
-        gap: 10px;
-    }
-    
-    .left-billing {
-        max-height: 60vh;
-        min-height: 350px;
-    }
-    
-    .right-items {
-        max-height: 60vh;
-        min-height: 350px;
-    }
-    
-    .billing-table {
-        max-height: 300px;
-        min-height: 200px;
-    }
-    
-    .items-grid {
-        grid-template-columns: repeat(auto-fill, minmax(120px, 1fr));
-        gap: 8px;
-        padding: 8px;
-    }
-}
-
-@media (orientation: landscape) and (min-width: 1024px) {
-    .pos-container.active {
-        grid-template-columns: 1fr 1.2fr;
-        gap: 12px;
-        padding: 8px 14px 14px 14px;
-    }
-    
-    .left-billing {
-        min-height: 450px;
-    }
-    
-    .billing-table {
-        max-height: 400px;
-    }
-    
-    .items-grid {
-        grid-template-columns: repeat(auto-fill, minmax(130px, 1fr));
-        gap: 10px;
-        padding: 10px;
-    }
-}
-
-@media (min-width: 1400px) {
-    .pos-container.active {
-        max-width: 1400px;
-        margin: 0 auto;
-    }
-}
-
-@media (orientation: portrait) {
-    .modal {
-        max-width: 95%;
-        max-height: 85vh;
-    }
-    
-    .modal-wide {
-        max-width: 95%;
-    }
-    
-    .modal-small {
-        max-width: 90%;
-    }
-    
-    .payment-methods-grid {
-        grid-template-columns: repeat(3, 1fr);
-    }
-    
-    .payment-actions {
-        grid-template-columns: 1fr 1fr;
-    }
-    
-    .edit-bill-item {
-        flex-wrap: wrap;
-        gap: 4px;
-    }
-}
-
-@media (orientation: portrait) {
-    .table-grid {
-        grid-template-columns: repeat(auto-fill, minmax(130px, 1fr));
-        gap: 10px;
-    }
-    
-    .table-btn {
-        padding: 14px;
-        min-height: 100px;
-    }
-    
-    .table-btn .num {
-        font-size: 1.2rem;
-    }
-}
-
-@media (orientation: portrait) {
-    .stock-summary {
-        grid-template-columns: repeat(2, 1fr);
-        gap: 8px;
-    }
-    
-    .stock-table th,
-    .stock-table td {
-        padding: 6px 8px;
-        font-size: 0.7rem;
-    }
-    
-    .actions-bar {
-        flex-wrap: wrap;
-    }
-    
-    .actions-bar button {
-        font-size: 0.7rem;
-        padding: 4px 10px;
-    }
-}
-
-@media (orientation: portrait) {
-    .setting-item {
-        flex-direction: column;
-        align-items: stretch;
-    }
-    
-    .setting-control {
-        flex-wrap: wrap;
-    }
-    
-    .password-row {
-        flex-direction: column;
-    }
-    
-    .password-toggle {
-        width: 100%;
-    }
-}
-
-@media (orientation: portrait) {
-    .report-summary {
-        grid-template-columns: repeat(2, 1fr);
-        gap: 8px;
-        padding: 8px;
-    }
-    
-    .report-card {
-        padding: 12px;
-    }
-    
-    .report-card .num {
-        font-size: 1rem;
-    }
-    
-    .quick-filters {
-        flex-wrap: wrap;
-        gap: 4px;
-    }
-    
-    .filter-btn {
-        font-size: 0.65rem;
-        padding: 4px 10px;
-    }
-    
-    .payment-bar-row {
-        flex-wrap: wrap;
-    }
-    
-    .payment-bar-row .bar-track {
-        flex-basis: 100%;
-        order: 3;
-    }
-    
-    .saved-report-item {
-        flex-direction: column;
-        align-items: stretch;
-        gap: 6px;
-    }
-    
-    .saved-report-item .report-info {
-        flex-direction: column;
-        align-items: flex-start;
-        gap: 4px;
-    }
-    
-    .saved-report-item .view-btn {
-        width: 100%;
-        text-align: center;
-    }
-}
-
-.pos-container,
-.left-billing,
-.right-items,
-.items-grid,
-.table-grid,
-.report-grid,
-.stock-summary,
-.main-grid {
-    transition: all 0.3s ease;
-}
-
-@media (orientation: portrait) {
-    body {
-        font-size: 14px;
-    }
+/* ----- AUTO MODE (Follows device orientation) ----- */
+body.orientation-auto .pos-container.active {
+    display: grid !important;
+    gap: 10px !important;
+    height: calc(100vh - 56px) !important;
+    padding: 6px 10px 10px 10px !important;
 }
 
 @media (orientation: landscape) {
-    body {
-        font-size: 15px;
+    body.orientation-auto .pos-container.active {
+        grid-template-columns: 1fr 1.2fr !important;
+    }
+    
+    body.orientation-auto .left-billing {
+        min-height: 400px !important;
+        max-height: none !important;
+    }
+    
+    body.orientation-auto .right-items {
+        min-height: 400px !important;
+        max-height: none !important;
+    }
+    
+    body.orientation-auto .billing-table {
+        max-height: 350px !important;
+        min-height: 200px !important;
+    }
+    
+    body.orientation-auto .items-grid {
+        grid-template-columns: repeat(auto-fill, minmax(120px, 1fr)) !important;
+        gap: 8px !important;
     }
 }
 
-@media (orientation: landscape) and (max-width: 768px) {
-    body {
-        font-size: 13px;
+@media (orientation: portrait) {
+    body.orientation-auto .pos-container.active {
+        grid-template-columns: 1fr !important;
+        grid-template-rows: auto 1fr !important;
+        gap: 8px !important;
+        padding: 4px 8px 8px 8px !important;
+    }
+    
+    body.orientation-auto .left-billing {
+        min-height: 250px !important;
+        max-height: 45vh !important;
+    }
+    
+    body.orientation-auto .right-items {
+        min-height: 250px !important;
+        max-height: 55vh !important;
+    }
+    
+    body.orientation-auto .billing-table {
+        max-height: 200px !important;
+        min-height: 150px !important;
+    }
+    
+    body.orientation-auto .items-grid {
+        grid-template-columns: repeat(auto-fill, minmax(80px, 1fr)) !important;
+        gap: 5px !important;
+        padding: 5px !important;
+    }
+    
+    body.orientation-auto .item-btn {
+        padding: 6px 4px !important;
+        font-size: 0.6rem !important;
+    }
+    
+    body.orientation-auto .billing-row {
+        font-size: 0.6rem !important;
+        grid-template-columns: 1.2fr 0.6fr 0.7fr 0.7fr 0.7fr 0.4fr !important;
+        padding: 4px 2px !important;
+        min-height: 28px !important;
     }
 }
 
-@media (max-width: 768px) {
-    input, select, textarea {
-        font-size: 16px !important;
-    }
-}
-
+/* ----- MANUAL: LANDSCAPE (Force 2 columns) ----- */
 body.orientation-landscape .pos-container.active {
     display: grid !important;
     grid-template-columns: 1fr 1.2fr !important;
@@ -3022,6 +2257,7 @@ body.orientation-landscape .items-grid {
     gap: 8px !important;
 }
 
+/* ----- MANUAL: PORTRAIT (1 column) ----- */
 body.orientation-portrait .pos-container.active {
     display: grid !important;
     grid-template-columns: 1fr !important;
@@ -3064,6 +2300,7 @@ body.orientation-portrait .billing-row {
     min-height: 28px !important;
 }
 
+/* ----- MANUAL: PORTRAIT 2 COL (Tablet portrait with 2 columns) ----- */
 body.orientation-portrait-tablet .pos-container.active {
     display: grid !important;
     grid-template-columns: 1fr 1.2fr !important;
@@ -3091,71 +2328,7 @@ body.orientation-portrait-tablet .items-grid {
     grid-template-columns: repeat(auto-fill, minmax(100px, 1fr)) !important;
 }
 
-body.orientation-auto .pos-container.active {
-    display: grid !important;
-    grid-template-columns: 1fr 1.2fr !important;
-    gap: 10px !important;
-    height: calc(100vh - 56px) !important;
-    padding: 6px 10px 10px 10px !important;
-}
-
-body.orientation-auto .left-billing {
-    min-height: 400px !important;
-    max-height: none !important;
-}
-
-body.orientation-auto .right-items {
-    min-height: 400px !important;
-    max-height: none !important;
-}
-
-@media (orientation: portrait) {
-    body.orientation-auto .pos-container.active {
-        grid-template-columns: 1fr !important;
-        grid-template-rows: auto 1fr !important;
-        gap: 8px !important;
-        padding: 4px 8px 8px 8px !important;
-    }
-    
-    body.orientation-auto .left-billing {
-        min-height: 250px !important;
-        max-height: 45vh !important;
-    }
-    
-    body.orientation-auto .right-items {
-        min-height: 250px !important;
-        max-height: 55vh !important;
-    }
-    
-    body.orientation-auto .billing-table {
-        max-height: 200px !important;
-        min-height: 150px !important;
-    }
-    
-    body.orientation-auto .items-grid {
-        grid-template-columns: repeat(auto-fill, minmax(80px, 1fr)) !important;
-        gap: 5px !important;
-        padding: 5px !important;
-    }
-}
-
-@media (max-width: 480px) {
-    body.orientation-landscape .items-grid {
-        grid-template-columns: repeat(auto-fill, minmax(70px, 1fr)) !important;
-    }
-    
-    body.orientation-portrait .items-grid {
-        grid-template-columns: repeat(auto-fill, minmax(65px, 1fr)) !important;
-    }
-    
-    body.orientation-portrait .billing-row {
-        font-size: 0.5rem !important;
-        grid-template-columns: 1fr 0.5fr 0.6fr 0.6fr 0.6fr 0.3fr !important;
-        padding: 3px 2px !important;
-        min-height: 24px !important;
-    }
-}
-
+/* ----- ORIENTATION TOGGLE BUTTON ----- */
 #orientationToggleBtn {
     background: #8b5cf6 !important;
     color: white !important;
@@ -3185,10 +2358,69 @@ body.theme-dark #orientationToggleBtn:hover {
     background: #6d28d9 !important;
 }
 
+/* ----- SMOOTH TRANSITIONS ----- */
 .pos-container,
 .left-billing,
 .right-items,
 .items-grid,
 .billing-table {
     transition: all 0.4s ease !important;
+}
+
+/* ----- SMALL SCREEN FIXES ----- */
+@media (max-width: 480px) {
+    body.orientation-landscape .items-grid {
+        grid-template-columns: repeat(auto-fill, minmax(70px, 1fr)) !important;
+    }
+    
+    body.orientation-portrait .items-grid {
+        grid-template-columns: repeat(auto-fill, minmax(65px, 1fr)) !important;
+    }
+    
+    body.orientation-portrait .billing-row {
+        font-size: 0.5rem !important;
+        grid-template-columns: 1fr 0.5fr 0.6fr 0.6fr 0.6fr 0.3fr !important;
+        padding: 3px 2px !important;
+        min-height: 24px !important;
+    }
+}
+
+/* Small landscape phones */
+@media (orientation: landscape) and (max-height: 500px) {
+    body.orientation-auto .pos-container.active,
+    body.orientation-landscape .pos-container.active {
+        grid-template-columns: 1fr 1.5fr !important;
+        gap: 6px !important;
+        height: calc(100vh - 50px) !important;
+        padding: 3px 6px 6px 6px !important;
+    }
+    
+    body.orientation-auto .left-billing,
+    body.orientation-landscape .left-billing {
+        min-height: 180px !important;
+    }
+    
+    body.orientation-auto .right-items,
+    body.orientation-landscape .right-items {
+        min-height: 180px !important;
+    }
+    
+    body.orientation-auto .billing-table,
+    body.orientation-landscape .billing-table {
+        max-height: 100px !important;
+        min-height: 60px !important;
+    }
+    
+    body.orientation-auto .items-grid,
+    body.orientation-landscape .items-grid {
+        grid-template-columns: repeat(auto-fill, minmax(60px, 1fr)) !important;
+        gap: 3px !important;
+        padding: 3px !important;
+    }
+    
+    body.orientation-auto .item-btn,
+    body.orientation-landscape .item-btn {
+        padding: 3px 2px !important;
+        font-size: 0.5rem !important;
+    }
 }
