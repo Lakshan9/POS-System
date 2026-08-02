@@ -747,7 +747,7 @@ function renderTopSellingItems(bills, dateStr) {
 
 // ============================================================
 //  PAYMENT METHOD BREAKDOWN - FIXED
-//  Uses the bills passed to it (filtered bills)
+//  Uses bill total, NOT received amount
 // ============================================================
 function getPaymentMethodTotals(bills) {
     const methods = {
@@ -759,15 +759,13 @@ function getPaymentMethodTotals(bills) {
     };
     
     bills.forEach(bill => {
-        // ✅ Bill එකේ paymentMethod එක බලන්න
+        // Use bill.paymentMethod or get from payments array
         let method = bill.paymentMethod || 'cash';
-        
-        // ✅ payments array එකෙන් method එක හොයන්න (backup)
         if (!method && bill.payments && bill.payments.length > 0) {
             method = bill.payments[0].method || 'cash';
         }
         
-        // ✅ Bill total එක add කරන්න (received amount නෙවෙයි)
+        // ✅ Use bill.total, NOT received amount
         const billTotal = bill.total || 0;
         if (methods[method]) {
             methods[method].total += billTotal;

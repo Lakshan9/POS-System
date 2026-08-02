@@ -32,6 +32,9 @@
         <button id="darkModeToggle" class="theme-toggle-btn" onclick="toggleTheme()">🌙</button>
     </div>
     <div class="header-right">
+        <button class="tab-btn" id="orientationToggleBtn" onclick="toggleManualOrientation()" style="background:#8b5cf6;color:#fff;font-size:0.7rem;min-width:45px;">
+            🔄
+        </button>
         <button class="tab-btn fullscreen-btn" onclick="toggleFullScreen()" id="fullscreenBtn">⛶ Full</button>
         <button class="tab-btn" onclick="window.location.href='settings.html'" style="background:#8b5cf6;color:#fff;">⚙️</button>
         <button class="tab-btn" onclick="logout()" style="background:#ef4444;color:#fff;">🚪 Logout</button>
@@ -312,6 +315,81 @@
 
 <script>
 // ============================================================
+//  MANUAL ORIENTATION TOGGLE - Added
+// ============================================================
+
+let currentOrientation = 'auto'; // 'auto', 'landscape', 'portrait', 'portrait-tablet'
+
+function toggleManualOrientation() {
+    const body = document.body;
+    const btn = document.getElementById('orientationToggleBtn');
+    
+    // Cycle through modes
+    const modes = ['auto', 'landscape', 'portrait', 'portrait-tablet'];
+    const labels = {
+        'auto': '🔄 Auto',
+        'landscape': '🌅 Landscape',
+        'portrait': '📱 Portrait',
+        'portrait-tablet': '📱 2 Col'
+    };
+    const shortLabels = {
+        'auto': '🔄',
+        'landscape': '🌅',
+        'portrait': '📱',
+        'portrait-tablet': '📱2'
+    };
+    
+    // Remove all orientation classes
+    body.classList.remove('orientation-auto', 'orientation-landscape', 'orientation-portrait', 'orientation-portrait-tablet');
+    
+    // Find next mode
+    const currentIndex = modes.indexOf(currentOrientation);
+    const nextIndex = (currentIndex + 1) % modes.length;
+    currentOrientation = modes[nextIndex];
+    
+    // Apply new class
+    body.classList.add(`orientation-${currentOrientation}`);
+    
+    // Update button
+    btn.textContent = shortLabels[currentOrientation];
+    btn.title = labels[currentOrientation];
+    btn.style.background = currentOrientation === 'auto' ? '#8b5cf6' : '#f59e0b';
+    
+    // Save preference
+    localStorage.setItem('manual_orientation', currentOrientation);
+    
+    // Show toast
+    showToast(`📱 ${labels[currentOrientation]}`);
+    
+    // Refresh items grid
+    if (typeof renderItems === 'function') {
+        setTimeout(renderItems, 300);
+    }
+}
+
+// Load saved orientation preference
+function loadOrientationPreference() {
+    const saved = localStorage.getItem('manual_orientation');
+    if (saved && ['auto', 'landscape', 'portrait', 'portrait-tablet'].includes(saved)) {
+        currentOrientation = saved;
+        const body = document.body;
+        body.classList.add(`orientation-${saved}`);
+        
+        const btn = document.getElementById('orientationToggleBtn');
+        const shortLabels = {
+            'auto': '🔄',
+            'landscape': '🌅',
+            'portrait': '📱',
+            'portrait-tablet': '📱2'
+        };
+        if (btn) {
+            btn.textContent = shortLabels[saved] || '🔄';
+            btn.style.background = saved === 'auto' ? '#8b5cf6' : '#f59e0b';
+        }
+    }
+}
+
+// ============================================================
 //  DATA STORAGE KEYS
 // ============================================================
 const STORAGE_KEY = 'hotel_items';
@@ -557,16 +635,12 @@ function generateDailyReport(date = new Date()) {
         
         const paymentMethods = {};
         todayBills.forEach(bill => {
-            if (bill.payments && bill.payments.length > 0) {
-                bill.payments.forEach(payment => {
-                    const method = payment.method || 'cash';
-                    if (!paymentMethods[method]) {
-                        paymentMethods[method] = { count: 0, total: 0 };
-                    }
-                    paymentMethods[method].count += 1;
-                    paymentMethods[method].total += payment.amount || 0;
-                });
+            const method = bill.paymentMethod || 'cash';
+            if (!paymentMethods[method]) {
+                paymentMethods[method] = { count: 0, total: 0 };
             }
+            paymentMethods[method].count += 1;
+            paymentMethods[method].total += bill.total || 0;
         });
         
         const hourlySales = {};
@@ -1457,31 +1531,29 @@ document.getElementById('confirmPaymentBtn').addEventListener('click', function(
     const changeAmount = received - billTotal;
     const methodIcons = { 'cash': '💵', 'card': '💳', 'mobile': '📱', 'bank': '🏦', 'credit': '💰' };
     const methodNames = { 'cash': 'Cash', 'card': 'Card', 'mobile': 'Mobile', 'bank': 'Bank', 'credit': 'Credit' };
- const bill = {
-    id: Date.now(),
-    date: new Date().toLocaleString(),
-    items: currentBill.items,
-    subtotal: currentBill.subtotal,
-    discount: currentBill.discount,
-    tax: currentBill.tax,
-    taxRate: currentBill.taxRate,
-    total: currentBill.total,
-    paymentMethod: selectedMethod,  // ✅ මෙය add කරන්න
-    payments: [{
-        method: selectedMethod,
-        methodLabel: `${methodIcons[selectedMethod]} ${methodNames[selectedMethod]}`,
-        amount: received,
-        reference: reference
-    }],
-    received: received,
-    change: changeAmount,
-    edited: false
+    const bill = {
+        id: Date.now(),
+        date: new Date().toLocaleString('en-US', { month: '2-digit', day: '2-digit', year: 'numeric', hour: '2-digit', minute: '2-digit', second: '2-digit' }),
+        items: currentBill.items,
+        subtotal: currentBill.subtotal,
+        discount: currentBill.discount,
+        tax: currentBill.tax,
+        taxRate: currentBill.taxRate,
+        total: currentBill.total,
+        paymentMethod: selectedMethod,
+        payments: [{
+            method: selectedMethod,
+            methodLabel: `${methodIcons[selectedMethod]} ${methodNames[selectedMethod]}`,
+            amount: received,
+            reference: reference
+        }],
+        received: received,
+        change: changeAmount,
+        edited: false
     };
     history.push(bill);
     saveHistory();
-    // Create backup after saving bill
     createBackup();
-    // Generate daily report
     generateAndSaveTodayReport();
     const shouldPrint = document.getElementById('printBillCheckbox') ? document.getElementById('printBillCheckbox').checked : true;
     document.getElementById('paymentModal').classList.remove('open');
@@ -1877,7 +1949,6 @@ function saveEditBill() {
     editedBillData.originalTotal = history[index].total;
     history[index] = editedBillData;
     saveHistory();
-    // Create backup after editing bill
     createBackup();
     document.getElementById('editBillModal').classList.remove('open');
     renderHistory();
@@ -2104,57 +2175,13 @@ function toggleFullScreen() {
         const el = document.documentElement;
         if (el.requestFullscreen) el.requestFullscreen();
         else if (el.webkitRequestFullscreen) el.webkitRequestFullscreen();
-    } else {
-        if (document.exitFullscreen) document.exitFullscreen();
-        else if (document.webkitExitFullscreen) document.webkitExitFullscreen();
-    }
-    // ============================================================
-//  FULL SCREEN - FIXED for orientation
-// ============================================================
-function toggleFullScreen() {
-    if (!document.fullscreenElement && !document.webkitFullscreenElement) {
-        const el = document.documentElement;
-        if (el.requestFullscreen) {
-            el.requestFullscreen();
-        } else if (el.webkitRequestFullscreen) {
-            el.webkitRequestFullscreen();
-        }
-        // Screen orientation lock remove කරන්න
         if (screen.orientation && screen.orientation.unlock) {
             screen.orientation.unlock();
         }
     } else {
-        if (document.exitFullscreen) {
-            document.exitFullscreen();
-        } else if (document.webkitExitFullscreen) {
-            document.webkitExitFullscreen();
-        }
+        if (document.exitFullscreen) document.exitFullscreen();
+        else if (document.webkitExitFullscreen) document.webkitExitFullscreen();
     }
-}
-
-// ============================================================
-//  SCREEN ORIENTATION CHANGE EVENT
-// ============================================================
-function handleOrientationChange() {
-    console.log('🔄 Orientation changed:', screen.orientation.type);
-    // Grid adjustments automatically handled by CSS
-    // Refresh items grid if needed
-    if (typeof renderItems === 'function') {
-        // Small delay to let CSS catch up
-        setTimeout(renderItems, 100);
-    }
-}
-
-// Listen for orientation changes
-if (screen.orientation) {
-    screen.orientation.addEventListener('change', handleOrientationChange);
-} else {
-    // Fallback for older browsers
-    window.addEventListener('orientationchange', function() {
-        console.log('🔄 Orientation changed (legacy)');
-        setTimeout(handleOrientationChange, 300);
-    });
-}
 }
 
 // ============================================================
@@ -2359,6 +2386,8 @@ window.generateDailyReport = generateDailyReport;
 window.saveDailyReport = saveDailyReport;
 window.getAllReports = getAllReports;
 window.generateAndSaveTodayReport = generateAndSaveTodayReport;
+window.toggleManualOrientation = toggleManualOrientation;
+window.loadOrientationPreference = loadOrientationPreference;
 
 // ============================================================
 //  INIT
@@ -2375,6 +2404,9 @@ document.addEventListener('DOMContentLoaded', function() {
     setupNumberPadSupport();
     autoClearOldBills();
     renderHistory();
+    
+    // Load orientation preference
+    loadOrientationPreference();
 });
 </script>
 </body>

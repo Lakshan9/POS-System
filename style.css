@@ -3138,3 +3138,277 @@ body.theme-dark .theme-toggle-btn {
         font-size: 16px !important; /* Prevent iOS zoom */
     }
 }
+
+/* ============================================================
+   FIX: POS GRID - FORCE 2 COLUMNS ON TABLET/DESKTOP
+   ============================================================ */
+
+/* Tablet and larger screens */
+@media (min-width: 769px) {
+    .pos-container.active {
+        display: grid !important;
+        grid-template-columns: 1fr 1.2fr !important;
+        gap: 12px !important;
+        height: calc(100vh - 56px) !important;
+        padding: 8px 14px 14px 14px !important;
+    }
+    
+    .pos-container.active .left-billing {
+        min-height: 450px !important;
+        height: 100% !important;
+    }
+    
+    .pos-container.active .right-items {
+        min-height: 450px !important;
+        height: 100% !important;
+    }
+}
+
+/* Mobile: Keep 1 column */
+@media (max-width: 768px) {
+    .pos-container.active {
+        display: grid !important;
+        grid-template-columns: 1fr !important;
+        grid-template-rows: auto 1fr !important;
+        gap: 8px !important;
+        height: calc(100vh - 56px) !important;
+        padding: 4px 8px 8px 8px !important;
+    }
+    
+    .pos-container.active .left-billing {
+        min-height: 300px !important;
+        max-height: 45vh !important;
+    }
+    
+    .pos-container.active .right-items {
+        min-height: 300px !important;
+        max-height: 55vh !important;
+    }
+}
+
+/* Portrait mode fix */
+@media (orientation: portrait) and (min-width: 769px) {
+    .pos-container.active {
+        grid-template-columns: 1fr 1.2fr !important;
+        grid-template-rows: auto !important;
+    }
+}
+
+/* Landscape mode on small screens */
+@media (orientation: landscape) and (max-height: 500px) {
+    .pos-container.active {
+        grid-template-columns: 1fr 1.5fr !important;
+        gap: 6px !important;
+        padding: 3px 6px 6px 6px !important;
+    }
+}
+
+/* ============================================================
+   MANUAL ORIENTATION CLASSES - ADD THIS AT THE END
+   ============================================================ */
+
+/* Default: Landscape */
+body.orientation-landscape .pos-container.active {
+    display: grid !important;
+    grid-template-columns: 1fr 1.2fr !important;
+    gap: 10px !important;
+    height: calc(100vh - 56px) !important;
+    padding: 6px 10px 10px 10px !important;
+}
+
+body.orientation-landscape .left-billing {
+    min-height: 400px !important;
+    max-height: none !important;
+}
+
+body.orientation-landscape .right-items {
+    min-height: 400px !important;
+    max-height: none !important;
+}
+
+body.orientation-landscape .billing-table {
+    max-height: 350px !important;
+    min-height: 200px !important;
+}
+
+body.orientation-landscape .items-grid {
+    grid-template-columns: repeat(auto-fill, minmax(120px, 1fr)) !important;
+    gap: 8px !important;
+}
+
+/* Manual: Portrait */
+body.orientation-portrait .pos-container.active {
+    display: grid !important;
+    grid-template-columns: 1fr !important;
+    grid-template-rows: auto 1fr !important;
+    gap: 8px !important;
+    height: calc(100vh - 56px) !important;
+    padding: 4px 8px 8px 8px !important;
+}
+
+body.orientation-portrait .left-billing {
+    min-height: 250px !important;
+    max-height: 45vh !important;
+}
+
+body.orientation-portrait .right-items {
+    min-height: 250px !important;
+    max-height: 55vh !important;
+}
+
+body.orientation-portrait .billing-table {
+    max-height: 200px !important;
+    min-height: 150px !important;
+}
+
+body.orientation-portrait .items-grid {
+    grid-template-columns: repeat(auto-fill, minmax(80px, 1fr)) !important;
+    gap: 5px !important;
+    padding: 5px !important;
+}
+
+body.orientation-portrait .item-btn {
+    padding: 6px 4px !important;
+    font-size: 0.6rem !important;
+}
+
+body.orientation-portrait .billing-row {
+    font-size: 0.6rem !important;
+    grid-template-columns: 1.2fr 0.6fr 0.7fr 0.7fr 0.7fr 0.4fr !important;
+    padding: 4px 2px !important;
+    min-height: 28px !important;
+}
+
+/* Portrait Tablet - 2 columns */
+body.orientation-portrait-tablet .pos-container.active {
+    display: grid !important;
+    grid-template-columns: 1fr 1.2fr !important;
+    gap: 10px !important;
+    height: calc(100vh - 56px) !important;
+    padding: 6px 10px 10px 10px !important;
+}
+
+body.orientation-portrait-tablet .left-billing {
+    min-height: 400px !important;
+    max-height: none !important;
+}
+
+body.orientation-portrait-tablet .right-items {
+    min-height: 400px !important;
+    max-height: none !important;
+}
+
+body.orientation-portrait-tablet .billing-table {
+    max-height: 300px !important;
+    min-height: 200px !important;
+}
+
+body.orientation-portrait-tablet .items-grid {
+    grid-template-columns: repeat(auto-fill, minmax(100px, 1fr)) !important;
+}
+
+/* Auto mode - follows device orientation */
+body.orientation-auto .pos-container.active {
+    display: grid !important;
+    grid-template-columns: 1fr 1.2fr !important;
+    gap: 10px !important;
+    height: calc(100vh - 56px) !important;
+    padding: 6px 10px 10px 10px !important;
+}
+
+body.orientation-auto .left-billing {
+    min-height: 400px !important;
+    max-height: none !important;
+}
+
+body.orientation-auto .right-items {
+    min-height: 400px !important;
+    max-height: none !important;
+}
+
+@media (orientation: portrait) {
+    body.orientation-auto .pos-container.active {
+        grid-template-columns: 1fr !important;
+        grid-template-rows: auto 1fr !important;
+        gap: 8px !important;
+        padding: 4px 8px 8px 8px !important;
+    }
+    
+    body.orientation-auto .left-billing {
+        min-height: 250px !important;
+        max-height: 45vh !important;
+    }
+    
+    body.orientation-auto .right-items {
+        min-height: 250px !important;
+        max-height: 55vh !important;
+    }
+    
+    body.orientation-auto .billing-table {
+        max-height: 200px !important;
+        min-height: 150px !important;
+    }
+    
+    body.orientation-auto .items-grid {
+        grid-template-columns: repeat(auto-fill, minmax(80px, 1fr)) !important;
+        gap: 5px !important;
+        padding: 5px !important;
+    }
+}
+
+/* Small screens */
+@media (max-width: 480px) {
+    body.orientation-landscape .items-grid {
+        grid-template-columns: repeat(auto-fill, minmax(70px, 1fr)) !important;
+    }
+    
+    body.orientation-portrait .items-grid {
+        grid-template-columns: repeat(auto-fill, minmax(65px, 1fr)) !important;
+    }
+    
+    body.orientation-portrait .billing-row {
+        font-size: 0.5rem !important;
+        grid-template-columns: 1fr 0.5fr 0.6fr 0.6fr 0.6fr 0.3fr !important;
+        padding: 3px 2px !important;
+        min-height: 24px !important;
+    }
+}
+
+/* Orientation Toggle Button Styles */
+#orientationToggleBtn {
+    background: #8b5cf6 !important;
+    color: white !important;
+    border: none !important;
+    padding: 5px 12px !important;
+    border-radius: 8px !important;
+    cursor: pointer !important;
+    font-size: 0.75rem !important;
+    font-weight: 600 !important;
+    transition: all 0.3s ease !important;
+    min-width: 45px !important;
+}
+
+#orientationToggleBtn:hover {
+    transform: scale(1.05) !important;
+}
+
+#orientationToggleBtn:active {
+    transform: scale(0.95) !important;
+}
+
+body.theme-dark #orientationToggleBtn {
+    background: #7c3aed !important;
+}
+
+body.theme-dark #orientationToggleBtn:hover {
+    background: #6d28d9 !important;
+}
+
+/* Smooth transitions */
+.pos-container,
+.left-billing,
+.right-items,
+.items-grid,
+.billing-table {
+    transition: all 0.4s ease !important;
+}
